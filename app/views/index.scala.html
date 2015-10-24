@@ -12,7 +12,7 @@
         <tr valign="top">
             <td>
             @tags.map{t =>
-                <h4><a href="@routes.Application.tag(t.id)">@t.name</a></h4>
+                <h4><a href="@routes.TagsController.tag(t.id)">@t.name</a></h4>
             }
             </td>
             <td>

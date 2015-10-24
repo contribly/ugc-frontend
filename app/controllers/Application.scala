@@ -8,9 +8,7 @@ import services.ugc.UGCService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object Application extends Controller {
-
-  val pageSize: Int = 20
+object Application extends Controller with PageSize {
 
   val ugcService = UGCService
 
@@ -41,18 +39,6 @@ object Application extends Controller {
   def report(id: String) = Action.async {
     val eventualReport = ugcService.report(id)
     eventualReport.map(r => Ok(views.html.report(r)))
-  }
-
-  def tag(id: String) = Action.async {
-    val eventualTag = ugcService.tag(id)
-    val eventualReports = ugcService.reports(pageSize, 1, Some(id))
-
-    for {
-      tag <- eventualTag
-      reports <- eventualReports
-    } yield {
-      Ok(views.html.tag(tag, reports.results))
-    }
   }
 
 }

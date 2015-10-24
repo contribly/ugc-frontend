@@ -11,7 +11,7 @@
     }
     <p>
         @r.tags.map{t =>
-        <a href="@routes.Application.tag(t.id)">@t.name</a>
+        <a href="@routes.TagsController.tag(t.id)">@t.name</a>
         }
     </p>
 }

@@ -1,0 +1,16 @@
+@import model.Tag
+@(tags: Seq[Tag])
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+</head>
+<body>
+
+    <hr/>
+    @tags.map{t =>
+        <h4><a href="@routes.TagsController.tag(t.id)">@t.name</a></h4>
+    }
+    <hr/>
+
+</body>
+</html>
