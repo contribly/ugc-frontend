@@ -1,4 +1,8 @@
 GET        /                        controllers.Application.index
+
+GET        /login                   controllers.LoginController.login
+GET        /logout                   controllers.LoginController.logout
+
 GET        /noticeboards/:id        controllers.Application.noticeboard(id: String)
 GET        /reports/:id             controllers.Application.report(id: String)
 GET        /tags                    controllers.TagsController.tags
