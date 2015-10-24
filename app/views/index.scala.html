@@ -1,11 +1,14 @@
-@import model.Tag
 @import model.Report
-@(tags: Seq[Tag], reports: Seq[Report])
+@import model.Tag
+@import model.User
+@(tags: Seq[Tag], reports: Seq[Report], owner: User)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
 </head>
 <body>
+
+    <h3>@owner.displayName</h3>
 
     <hr/>
     <table border="1">

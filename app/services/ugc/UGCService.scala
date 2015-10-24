@@ -57,6 +57,16 @@ trait UGCService {
     }
   }
 
+  def owner(): Future[User] = {
+    val u = apiUrl + "/users/" + "wellynews"
+    Logger.info("Fetching from url: " + u)
+    WS.url(u).get.map {
+      response => {
+        Json.parse(response.body).as[User]
+      }
+    }
+  }
+
   def tag(id: String): Future[Tag] = {
     val u = apiUrl + "/tags/" + id
     Logger.info("Fetching from url: " + u)

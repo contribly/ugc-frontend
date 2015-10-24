@@ -13,14 +13,17 @@ object Application extends Controller with PageSize {
   val ugcService = UGCService
 
   def index = Action.async {
-    val eventualTags: Future[Seq[Tag]] = ugcService.tags()
+    val eventualTags = ugcService.tags()
     val eventualReports = ugcService.reports(pageSize, 1, None)
+    val eventualOwner = ugcService.owner
 
     for {
       tags <- eventualTags
       reports <- eventualReports
+      owner <- eventualOwner
+
     } yield {
-      Ok(views.html.index(tags, reports.results))
+      Ok(views.html.index(tags, reports.results, owner))
     }
   }
 
