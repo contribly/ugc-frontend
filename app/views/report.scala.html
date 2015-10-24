@@ -1,0 +1,21 @@
+@import model.Report
+@(r: Report)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@r.headline</title>
+</head>
+<body>
+<hr/>
+    <h4>@r.headline</h4>
+
+    @r.created<br/>
+    @r.image.map{i =>
+        <p>@i</p>
+    }
+    @r.body.map{b =>
+        <p>@b</p>
+    }
+<hr/>
+</body>
+</html>

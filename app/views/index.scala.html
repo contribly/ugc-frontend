@@ -1,0 +1,27 @@
+@import model.Tag
+@import model.Report
+@(tags: Seq[Tag], reports: Seq[Report])
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+</head>
+<body>
+
+    <hr/>
+    <table border="1">
+        <tr valign="top">
+            <td>
+            @tags.map{t =>
+                <h4><a href="@routes.Application.tag(t.id)">@t.name</a></h4>
+            }
+            </td>
+            <td>
+              @includes.reports(reports)
+            </td>
+        </tr>
+    </table>
+    </p>
+    <hr/>
+
+</body>
+</html>

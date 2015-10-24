@@ -1,0 +1,19 @@
+@import model.Report
+@import model.Tag
+@(tag: Tag, reports: Seq[Report])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@tag.name</title>
+</head>
+<body>
+
+<hr/>
+
+    <h4>@tag.name</h4>
+
+    @includes.reports(reports)
+
+<hr/>
+</body>
+</html>

@@ -1,0 +1,22 @@
+@import model.Report
+@import model.Noticeboard
+@(noticeboard: Noticeboard, reports: Seq[Report])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@noticeboard.name</title>
+</head>
+<body>
+
+<hr/>
+
+
+    <h4>@noticeboard.name</h4>
+    <p>@Html(noticeboard.description.fold("")(d => d))</p>
+    <hr/>
+
+    @includes.reports(reports)
+
+<hr/>
+</body>
+</html>

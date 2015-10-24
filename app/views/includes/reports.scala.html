@@ -1,0 +1,17 @@
+@import model.Report
+@(reports: Seq[Report])
+@reports.map{r =>
+    <a href="@routes.Application.report(r.id)"><h5>@r.headline</h5></a>
+    @r.created<br/>
+    @r.image.map{i =>
+        <p>@i</p>
+    }
+    @r.body.map{b =>
+        <p>@b</p>
+    }
+    <p>
+        @r.tags.map{t =>
+        <a href="@routes.Application.tag(t.id)">@t.name</a>
+        }
+    </p>
+}
