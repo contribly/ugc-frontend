@@ -1,18 +1,21 @@
 
 package controllers
 
-import model.Tag
+import play.api.Logger
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 object Application extends Controller with PageSize {
 
   val ugcService = UGCService
 
-  def index = Action.async {
+  def index = Action.async {request =>
+
+    val signedIn: Option[String] = request.session.get("signedin")
+    Logger.info("Signed in: " + signedIn)
+
     val eventualTags = ugcService.tags()
     val eventualReports = ugcService.reports(pageSize, 1, None)
     val eventualOwner = ugcService.owner
@@ -23,7 +26,7 @@ object Application extends Controller with PageSize {
       owner <- eventualOwner
 
     } yield {
-      Ok(views.html.index(tags, reports.results, owner))
+      Ok(views.html.index(tags, reports.results, owner, signedIn))
     }
   }
 

@@ -1,7 +1,7 @@
 @import model.Report
 @import model.Tag
 @import model.User
-@(tags: Seq[Tag], reports: Seq[Report], owner: User)
+@(tags: Seq[Tag], reports: Seq[Report], owner: User, signedIn: Option[String])
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -9,6 +9,7 @@
 <body>
 
     <h3>@owner.displayName</h3>
+    <p>Singed in as: @signedIn</p>
 
     <hr/>
     <table border="1">
