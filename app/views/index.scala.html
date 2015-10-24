@@ -8,13 +8,8 @@
 </head>
 <body>
 
-    <h3>@owner.displayName</h3>
+    @includes.header(owner, signedIn)
 
-    @signedIn.fold{<a href="@routes.LoginController.login">Sign in</a>
-    }{s => Signed in as @s
-        <a href="@routes.LoginController.logout">Sign out</a>
-    }
-    
     <hr/>
     <table border="1">
         <tr valign="top">
