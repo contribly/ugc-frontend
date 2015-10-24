@@ -1,0 +1,10 @@
+@import model.User
+@(owner: User, signedIn: Option[String])
+
+<h3><a href="@routes.Application.index">@owner.displayName</a></h3>
+
+@signedIn.fold{
+    <a href="@routes.LoginController.login">Sign in</a>
+}{s =>
+    Signed in as @s <a href="@routes.LoginController.logout">Sign out</a>
+}
