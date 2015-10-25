@@ -1,6 +1,7 @@
 package services.ugc
 
 import model._
+import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
 import play.api.libs.ws.WS
@@ -13,9 +14,13 @@ trait UGCService {
 
   val apiUrl: String
   val user: String
+  val clientId: String
+  val clientSecret: String
 
   val reportsUrl: String = apiUrl + "/reports"
   val noticeboardsUrl: String = apiUrl + "/noticeboards"
+  val tokenUrl: String = apiUrl + "/token"
+  val verifyUrl: String = apiUrl + "/verify"
 
   def reports(pageSize: Int, page: Int, tag: Option[String]): Future[SearchResult] = {
     val u = reportsUrl + "?pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
@@ -33,6 +38,36 @@ trait UGCService {
     WS.url(u).get.map {
       response => {
         Json.parse(response.body).as[Report]
+      }
+    }
+  }
+
+  def token(username: String, password: String): Future[Option[String]] = {
+
+    val clientAuthorizationHeader = "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
+    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
+
+    val eventualResponse = WS.url(tokenUrl).
+      withHeaders(clientAuthorizationHeader, formUrlEncodedContentTypeHeader).
+      post("grant_type=password&username=" + username + "&password=" + password)
+
+    eventualResponse.map(r => {
+      Logger.info(r.body)
+      val responseJson = Json.parse(r.body)
+      (responseJson \ "access_token").asOpt[String]
+    })
+  }
+
+  def verify(token: String): Future[Option[User]] = {
+
+    val authorizationHeader = ("Authorization" -> ("Bearer " + token))
+
+    WS.url(verifyUrl).
+      withHeaders(authorizationHeader).
+      post("").map {
+      response => {
+        val jsonResponse: JsValue = Json.parse(response.body)
+        (jsonResponse \ "user").asOpt[User]
       }
     }
   }
@@ -93,6 +128,8 @@ object UGCService extends UGCService {
 
   override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
   override lazy val user: String = Play.configuration.getString("ugc.user").get
+  override lazy val clientId: String = Play.configuration.getString("ugc.client.id").get
+  override lazy val clientSecret: String = Play.configuration.getString("ugc.client.secret").get
 
 }
 

@@ -1,6 +1,6 @@
 GET        /                        controllers.Application.index
 
-GET        /login                   controllers.LoginController.login
+GET        /login                   controllers.LoginController.login(username: String , password: String)
 GET        /logout                   controllers.LoginController.logout
 
 GET        /noticeboards/:id        controllers.Application.noticeboard(id: String)
