@@ -9,6 +9,7 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import play.api.data.validation.Constraints._
 
 object LoginController extends Controller with PageSize {
 
@@ -16,8 +17,8 @@ object LoginController extends Controller with PageSize {
 
   val loginForm: Form[(String, String)] = Form(
     tuple(
-      "username" -> text,
-      "password" -> text
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
     )
   )
 
