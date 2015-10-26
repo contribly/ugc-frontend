@@ -4,7 +4,7 @@
 <h3><a href="@routes.Application.index">@owner.displayName</a></h3>
 
 @signedIn.fold{
-    Not signed in
+    <a href="@routes.LoginController.prompt">Sign in</a>
 }{s =>
     Signed in as @s <a href="@routes.LoginController.logout">Sign out</a>
 }
