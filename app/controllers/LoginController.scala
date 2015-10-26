@@ -38,7 +38,7 @@ object LoginController extends Controller with PageSize {
         val eventualMaybeToken: Future[Option[String]] = signedInUserService.signin(userData._1, userData._2, request)
         eventualMaybeToken.map(to => {
           to.fold(
-            BadRequest(Json.toJson("No token"))
+            Ok(views.html.login(loginForm.withGlobalError("Invalid credentials")))
           )(t => {
             Logger.info("Setting session token: " + t)
             Redirect(routes.Application.index()).withSession("token" -> t)

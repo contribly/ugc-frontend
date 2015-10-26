@@ -9,6 +9,12 @@
 
 <h4>Login</h4>
 
+@if(loginForm.hasGlobalErrors) {
+    <p class="error">
+        @loginForm.globalError
+    </p>
+}
+
 @helper.form(action = routes.LoginController.submit) {
     @helper.inputText(loginForm("username"))
     @helper.inputText(loginForm("password"))
