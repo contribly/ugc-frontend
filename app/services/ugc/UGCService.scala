@@ -22,6 +22,8 @@ trait UGCService {
   val tokenUrl: String = apiUrl + "/token"
   val verifyUrl: String = apiUrl + "/verify"
 
+  val Ok: Int = 200
+
   def reports(pageSize: Int, page: Int, tag: Option[String]): Future[SearchResult] = {
     val u = reportsUrl + "?pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
     Logger.info("Fetching from url: " + u)
@@ -52,22 +54,29 @@ trait UGCService {
       post("grant_type=password&username=" + username + "&password=" + password)
 
     eventualResponse.map(r => {
-      Logger.info(r.body)
-      val responseJson = Json.parse(r.body)
-      (responseJson \ "access_token").asOpt[String]
+      if (r.status == Ok) {
+        val responseJson = Json.parse(r.body)
+        (responseJson \ "access_token").asOpt[String]
+      } else {
+        Logger.info(r.status + ": " + r.body)
+        None
+      }
     })
   }
 
   def verify(token: String): Future[Option[User]] = {
-
     val authorizationHeader = ("Authorization" -> ("Bearer " + token))
 
-    WS.url(verifyUrl).
-      withHeaders(authorizationHeader).
+    WS.url(verifyUrl).withHeaders(authorizationHeader).
       post("").map {
-      response => {
-        val jsonResponse: JsValue = Json.parse(response.body)
-        (jsonResponse \ "user").asOpt[User]
+      r => {
+        if (r.status == Ok) {
+          val jsonResponse: JsValue = Json.parse(r.body)
+          (jsonResponse \ "user").asOpt[User]
+        } else {
+          Logger.info(r.status + ": " + r.body)
+          None
+        }
       }
     }
   }
