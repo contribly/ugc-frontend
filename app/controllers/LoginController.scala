@@ -32,7 +32,7 @@ object LoginController extends Controller with PageSize {
 
     boundForm.fold(
       formWithErrors => {
-        Future.successful(BadRequest(Json.toJson("Bad form data: " + formWithErrors.errors)))
+        Future.successful(Ok(views.html.login(formWithErrors)))
       },
       userData => {
         val eventualMaybeToken: Future[Option[String]] = signedInUserService.signin(userData._1, userData._2, request)
