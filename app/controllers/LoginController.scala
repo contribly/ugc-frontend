@@ -4,12 +4,10 @@ package controllers
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.data.validation.Constraints._
 
 object LoginController extends Controller with PageSize {
 
@@ -41,7 +39,7 @@ object LoginController extends Controller with PageSize {
             Ok(views.html.login(loginForm.withGlobalError("Invalid credentials")))
           )(t => {
             Logger.info("Setting session token: " + t)
-            Redirect(routes.Application.index()).withSession("token" -> t)
+            Redirect(routes.Application.index()).withSession(SignedInUserService.sessionTokenKey -> t)
           })
         })
       }
