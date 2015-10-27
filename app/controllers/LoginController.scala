@@ -13,12 +13,14 @@ object LoginController extends Controller with PageSize {
 
   val signedInUserService = SignedInUserService
 
-  val loginForm: Form[(String, String)] = Form(
-    tuple(
+  val loginForm: Form[LoginDetails] = Form(
+    map(
       "username" -> nonEmptyText,
       "password" -> nonEmptyText
-    )
+    ).
   )
+
+  case class LoginDetails(username: String, password: String)
 
   def prompt() = Action.async {
     Future.successful(Ok(views.html.login(loginForm)))
@@ -26,14 +28,14 @@ object LoginController extends Controller with PageSize {
 
   def submit() = Action.async { request =>
 
-    val boundForm: Form[(String, String)] = loginForm.bindFromRequest()(request)
+    val boundForm: Form[LoginDetails] = loginForm.bindFromRequest()(request)
 
     boundForm.fold(
       formWithErrors => {
         Future.successful(Ok(views.html.login(formWithErrors)))
       },
-      userData => {
-        val eventualMaybeToken: Future[Option[String]] = signedInUserService.signin(userData._1, userData._2, request)
+      loginDetails => {
+        val eventualMaybeToken: Future[Option[String]] = signedInUserService.signin(loginDetails.username, loginDetails.password, request)
         eventualMaybeToken.map(to => {
           to.fold(
             Ok(views.html.login(loginForm.withGlobalError("Invalid credentials")))
