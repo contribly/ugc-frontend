@@ -1,6 +1,7 @@
 
 package controllers
 
+import model.LoginDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
@@ -14,13 +15,11 @@ object LoginController extends Controller with PageSize {
   val signedInUserService = SignedInUserService
 
   val loginForm: Form[LoginDetails] = Form(
-    map(
+    mapping(
       "username" -> nonEmptyText,
       "password" -> nonEmptyText
-    ).
+    )(LoginDetails.apply)(LoginDetails.unapply)
   )
-
-  case class LoginDetails(username: String, password: String)
 
   def prompt() = Action.async {
     Future.successful(Ok(views.html.login(loginForm)))
