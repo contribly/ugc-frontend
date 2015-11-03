@@ -4,6 +4,9 @@ GET        /prompt                   controllers.LoginController.prompt
 POST       /submit                   controllers.LoginController.submit
 GET        /logout                   controllers.LoginController.logout
 
+GET        /register                controllers.RegisterController.prompt
+GET        /register/submit         controllers.RegisterController.submit
+
 GET        /noticeboards/:id        controllers.Application.noticeboard(id: String)
 GET        /reports/:id             controllers.Application.report(id: String)
 GET        /tags                    controllers.TagsController.tags
