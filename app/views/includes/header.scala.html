@@ -5,6 +5,7 @@
 
 @signedIn.fold{
     <a href="@routes.LoginController.prompt">Sign in</a>
+    <a href="@routes.RegisterController.prompt">Register</a>
 }{s =>
     Signed in as @s <a href="@routes.LoginController.logout">Sign out</a>
 }

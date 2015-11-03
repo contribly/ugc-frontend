@@ -1,6 +1,7 @@
 @import model.Report
 @import model.Tag
-@(tag: Tag, reports: Seq[Report])
+@import model.User
+@(tag: Tag, reports: Seq[Report], owner: User, signedIn: Option[User], tags: Seq[Tag])
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,12 +9,23 @@
 </head>
 <body>
 
-<hr/>
-
-    <h4>@tag.name</h4>
-
-    @includes.reports(reports)
+@includes.header(owner, signedIn)
 
 <hr/>
+<h4>@tag.name</h4>
+
+<table border="1">
+    <tr valign="top">
+        <td>
+            @includes.sidenav(tags)
+        </td>
+        <td>
+            @includes.reports(reports)
+        </td>
+    </tr>
+</table>
+</p>
+<hr/>
+
 </body>
 </html>

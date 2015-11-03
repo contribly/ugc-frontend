@@ -9,25 +9,38 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object TagsController extends Controller with PageSize {
 
   val ugcService = UGCService
+  val signedInUserService = SignedInUserService
 
-  def tags = Action.async {
+  def tags = Action.async { request =>
+
     val eventualTags = ugcService.tags()
+    val eventualOwner = ugcService.owner
+
     for {
       tags <- eventualTags
+      owner <- eventualOwner
+      signedIn <- signedInUserService.signedIn(request)
+
     } yield {
-      Ok(views.html.tags(tags))
+      Ok(views.html.tags(tags, owner, signedIn))
     }
   }
 
-  def tag(id: String) = Action.async {
+  def tag(id: String) = Action.async { request =>
     val eventualTag = ugcService.tag(id)
     val eventualReports = ugcService.reports(pageSize, 1, Some(id))
+    val eventualOwner = ugcService.owner
+    val eventualTags = ugcService.tags()
 
     for {
       tag <- eventualTag
       reports <- eventualReports
+      owner <- eventualOwner
+      signedIn <- signedInUserService.signedIn(request)
+      tags <- eventualTags
+
     } yield {
-      Ok(views.html.tag(tag, reports.results))
+      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags))
     }
   }
 

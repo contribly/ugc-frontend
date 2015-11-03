@@ -20,9 +20,14 @@ trait UGCService {
   val reportsUrl: String = apiUrl + "/reports"
   val noticeboardsUrl: String = apiUrl + "/noticeboards"
   val tokenUrl: String = apiUrl + "/token"
+  val usersUrl: String = apiUrl + "/users"
   val verifyUrl: String = apiUrl + "/verify"
 
   val Ok: Int = 200
+
+  def clientAuthHeader: (String, String) = {
+    "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
+  }
 
   def reports(pageSize: Int, page: Int, tag: Option[String]): Future[SearchResult] = {
     val u = reportsUrl + "?pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
@@ -44,9 +49,19 @@ trait UGCService {
     }
   }
 
+  def register(registrationDetails: RegistrationDetails) = {
+    WS.url(usersUrl).
+      withHeaders(clientAuthHeader).
+      post(Json.toJson(registrationDetails)).map {
+        response => {
+          Logger.info("Register response: " + response.body)
+        }
+    }
+  }
+
   def token(username: String, password: String): Future[Option[String]] = {
 
-    val clientAuthorizationHeader = "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
+    val clientAuthorizationHeader = clientAuthHeader
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val eventualResponse = WS.url(tokenUrl).
@@ -80,7 +95,7 @@ trait UGCService {
       }
     }
   }
-  
+
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
     val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&noticeboardOwnedBy=" + user
     Logger.info("Fetching from url: " + u)
@@ -133,7 +148,7 @@ trait UGCService {
 
 }
 
-object UGCService extends UGCService {
+  object UGCService extends UGCService {
 
   override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
   override lazy val user: String = Play.configuration.getString("ugc.user").get

@@ -14,9 +14,7 @@
     <table border="1">
         <tr valign="top">
             <td>
-            @tags.map{t =>
-                <h4><a href="@routes.TagsController.tag(t.id)">@t.name</a></h4>
-            }
+                @includes.sidenav(tags)
             </td>
             <td>
               @includes.reports(reports)

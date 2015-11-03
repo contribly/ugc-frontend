@@ -1,10 +1,13 @@
 @import model.Tag
-@(tags: Seq[Tag])
+@import model.User
+@(tags: Seq[Tag], owner: User, signedIn: Option[User])
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
 </head>
 <body>
+
+    @includes.header(owner, signedIn)
 
     <hr/>
     @tags.map{t =>
