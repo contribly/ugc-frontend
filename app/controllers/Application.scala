@@ -30,6 +30,20 @@ object Application extends Controller with PageSize {
     }
   }
 
+  def report(id: String) = Action.async { request =>
+    val eventualReport = ugcService.report(id)
+    val eventualOwner = ugcService.owner
+
+    for {
+      report <- eventualReport
+      owner <- eventualOwner
+      signedIn <- signedInUserService.signedIn(request)
+
+    } yield {
+      Ok(views.html.report(report, owner, signedIn))
+    }
+  }
+  
   def noticeboard(id: String) = Action.async {
     val eventualNoticeboard = ugcService.noticeboard(id)
     val eventualReports = ugcService.reports(pageSize, 1, None)
@@ -40,11 +54,6 @@ object Application extends Controller with PageSize {
     } yield {
       Ok(views.html.noticeboard(noticeboard, reports.results))
     }
-  }
-
-  def report(id: String) = Action.async {
-    val eventualReport = ugcService.report(id)
-    eventualReport.map(r => Ok(views.html.report(r)))
   }
 
 }

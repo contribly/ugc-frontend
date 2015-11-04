@@ -60,12 +60,10 @@ trait UGCService {
   }
 
   def token(username: String, password: String): Future[Option[String]] = {
-
-    val clientAuthorizationHeader = clientAuthHeader
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val eventualResponse = WS.url(tokenUrl).
-      withHeaders(clientAuthorizationHeader, formUrlEncodedContentTypeHeader).
+      withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post("grant_type=password&username=" + username + "&password=" + password)
 
     eventualResponse.map(r => {
@@ -79,8 +77,28 @@ trait UGCService {
     })
   }
 
+  def submit(headline: String, body: String, token: String): Future[Option[Report]] = {
+    val applicationJsonHeader = "Content-Type" -> "application/json"
+
+    val eventualResponse = WS.url(reportsUrl).
+      withHeaders(bearerTokenHeader(token), applicationJsonHeader).
+      post(Json.obj("headline" -> headline,
+        "body" -> body,
+        "media" -> Json.toJson(Seq[String]())))
+
+    eventualResponse.map(r => {
+      if (r.status == Ok) {
+        Logger.info("Submission accepted: " + r.body)
+        Some(Json.parse(r.body).as[Report])
+      } else {
+        Logger.info("Submisssion rejected: " + r.status + " " + r.body)
+        None
+      }
+    })
+  }
+
   def verify(token: String): Future[Option[User]] = {
-    val authorizationHeader = ("Authorization" -> ("Bearer " + token))
+    val authorizationHeader = bearerTokenHeader(token)
 
     WS.url(verifyUrl).withHeaders(authorizationHeader).
       post("").map {
@@ -94,6 +112,10 @@ trait UGCService {
         }
       }
     }
+  }
+
+  def bearerTokenHeader(token: String): (String, String) = {
+    ("Authorization" -> ("Bearer " + token))
   }
 
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {

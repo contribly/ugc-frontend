@@ -1,0 +1,31 @@
+@import model.SubmissionDetails
+@import model.User
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+@(submitForm: Form[SubmissionDetails], owner: User, signedIn: Option[User])
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+</head>
+<body>
+
+@includes.header(owner, signedIn)
+
+<h4>Submit</h4>
+
+@if(submitForm.hasGlobalErrors) {
+    <p class="error">
+        @submitForm.globalError
+    </p>
+}
+
+@helper.form(action = routes.SubmitController.submit) {
+    @helper.inputText(submitForm("headline"))
+    @helper.inputText(submitForm("body"))
+    <p class="buttons">
+        <input type="submit" id="submit">
+    <p>
+}
+
+</body>
+</html>

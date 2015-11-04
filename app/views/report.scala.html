@@ -1,12 +1,15 @@
-@import model.Report
-@(r: Report)
+@import model.{Report, User}
+@(r: Report, owner: User, signedIn: Option[User])
 <!DOCTYPE html>
 <html>
 <head>
     <title>@r.headline</title>
 </head>
 <body>
-<hr/>
+
+    @includes.header(owner, signedIn)
+
+    <hr/>
     <h4>@r.headline</h4>
 
     @r.created<br/>
@@ -16,6 +19,7 @@
     @r.body.map{b =>
         <p>@b</p>
     }
-<hr/>
+    <hr/>
+
 </body>
 </html>
