@@ -11,7 +11,7 @@ object SearchResult {
 }
 
 case class Report(val id: String, val headline: String, created: Date, noticeboard: Option[Noticeboard],
-                  user: User, body: Option[String], image: Option[Image], tags: Seq[Tag])
+                  user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place])
 
 object Report {
   implicit val formats: Format[Report] = Json.format[Report]
@@ -29,13 +29,25 @@ object User {
   implicit val formats: Format[User] = Json.format[User]
 }
 
+case class LatLong(val latitude: Double, val longitude: Double)
+
+object LatLong {
+  implicit val formats: Format[LatLong] = Json.format[LatLong]
+}
+
+case class Osm(val osmId: Long, osmType: String)
+
+object Osm {
+  implicit val formats: Format[Osm] = Json.format[Osm]
+}
+
 case class Tag(val id: String, val name: String)
 
 object Tag {
   implicit val formats: Format[Tag] = Json.format[Tag]
 }
 
-case class Place(val name: String, latitude: Double, longitude: Double)
+case class Place(val name: Option[String], val latLong: Option[LatLong], val osm: Option[Osm])
 
 object Place {
   implicit val formats: Format[Place] = Json.format[Place]
