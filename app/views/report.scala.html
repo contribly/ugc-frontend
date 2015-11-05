@@ -22,8 +22,9 @@
         <p>@b</p>
     }
 
-    @r.noticeboard
-
+    @r.noticeboard.map{n =>
+        <p><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></p>
+    }
     <hr/>
 
 </body>

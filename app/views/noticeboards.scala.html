@@ -1,0 +1,23 @@
+@import model.{Report, User}
+@import model.Noticeboard
+@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Noticeboards</title>
+</head>
+<body>
+
+    @includes.header(owner, signedIn)
+    <hr/>
+
+    @noticeboards.map{n =>
+        <h4><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></h4>
+        @n.description.map{d =>
+            <p>@Html(d)</p>
+        }
+        <hr/>
+    }
+
+</body>
+</html>

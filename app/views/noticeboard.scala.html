@@ -1,6 +1,6 @@
-@import model.Report
+@import model.{Report, User}
 @import model.Noticeboard
-@(noticeboard: Noticeboard, reports: Seq[Report])
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User])
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,8 +8,7 @@
 </head>
 <body>
 
-<hr/>
-
+    @includes.header(owner, signedIn)
 
     <h4>@noticeboard.name</h4>
     <p>@Html(noticeboard.description.fold("")(d => d))</p>

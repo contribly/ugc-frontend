@@ -29,8 +29,8 @@ trait UGCService {
     "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
   }
 
-  def reports(pageSize: Int, page: Int, tag: Option[String]): Future[SearchResult] = {
-    val u = reportsUrl + "?ownedBy=" + user + "&pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
+  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String]): Future[SearchResult] = {
+    val u = reportsUrl + "?ownedBy=" + user + "&pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t) + noticeboard.fold("")(n => "&noticeboard=" + n)
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
