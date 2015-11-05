@@ -12,6 +12,8 @@
     <hr/>
     <h4>@r.headline</h4>
 
+    @includes.media(r)
+
     @r.created<br/>
     @r.image.map{i =>
         <p>@i</p>

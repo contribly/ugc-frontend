@@ -2,6 +2,9 @@
 @(reports: Seq[Report])
 @reports.map{r =>
     <a href="@routes.Application.report(r.id)"><h5>@r.headline</h5></a>
+
+    @includes.media(r)
+
     @r.created<br/>
     @r.image.map{i =>
         <p>@i</p>

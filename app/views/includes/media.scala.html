@@ -1,0 +1,8 @@
+@import model.Report
+@(r: Report)
+
+@r.media.headOption.map{m =>
+    @m.artifacts.headOption.map{a =>
+        <a href="@routes.Application.report(r.id)"><img src="@a.url" /></a>
+    }
+}

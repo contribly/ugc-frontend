@@ -10,8 +10,15 @@ object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]
 }
 
+case class Artifact(val contentType: String, val url: String)
+
+object Artifact {
+  implicit val formats: Format[Artifact] = Json.format[Artifact]
+}
+
 case class Report(val id: String, val headline: String, created: Date, noticeboard: Option[Noticeboard],
-                  user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place])
+                  user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place],
+                  media: Seq[Media])
 
 object Report {
   implicit val formats: Format[Report] = Json.format[Report]
@@ -33,6 +40,12 @@ case class LatLong(val latitude: Double, val longitude: Double)
 
 object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
+}
+
+case class Media(val id: String, val artifacts: Seq[Artifact])
+
+object Media {
+  implicit val formats: Format[Media] = Json.format[Media]
 }
 
 case class Osm(val osmId: Long, osmType: String)
