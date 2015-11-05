@@ -30,7 +30,7 @@ trait UGCService {
   }
 
   def reports(pageSize: Int, page: Int, tag: Option[String]): Future[SearchResult] = {
-    val u = reportsUrl + "?pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
+    val u = reportsUrl + "?ownedBy=" + user + "&pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t)
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -119,7 +119,7 @@ trait UGCService {
   }
 
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
-    val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&noticeboardOwnedBy=" + user
+    val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&ownedBy=" + user
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -139,7 +139,7 @@ trait UGCService {
   }
 
   def owner(): Future[User] = {
-    val u = apiUrl + "/users/" + "wellynews"
+    val u = apiUrl + "/users/" + user
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -159,7 +159,7 @@ trait UGCService {
   }
 
   def tags(): Future[Seq[Tag]] = {
-    val u = apiUrl + "/tags"
+    val u = apiUrl + "/tags?ownedBy=" + user
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
