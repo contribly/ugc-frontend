@@ -1,8 +1,7 @@
 @import model.Report
-@(r: Report)
+@(r: Report, width: Int)
 
 @r.media.headOption.map{m =>
-    @m.artifacts.headOption.map{a =>
-        <a href="@routes.Application.report(r.id)"><img src="@a.url" /></a>
-    }
-}
+@m.artifacts.find(a => a.width == width).map{b =>
+    <a href="@routes.Application.report(r.id)"><img src="@b.url" /></a>
+}}
