@@ -7,7 +7,8 @@
     }
     @includes.media(r, 80)
 
-    @r.created<br/>
+    <p>@r.created.format("d MMM YYYY HH:mm")</p>
+
     @r.image.map{i =>
         <p>@i</p>
     }
