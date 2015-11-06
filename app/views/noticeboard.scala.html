@@ -11,7 +11,10 @@
     @includes.header(owner, signedIn)
 
     <h4>@noticeboard.name</h4>
-    <p>@Html(noticeboard.description.fold("")(d => d))</p>
+
+    @noticeboard.description.map{d =>
+        <p>@Html(d)</p>
+    }
     <hr/>
 
     @includes.reports(reports)
