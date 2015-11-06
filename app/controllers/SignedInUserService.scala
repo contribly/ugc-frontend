@@ -24,7 +24,7 @@ class SignedInUserService {
     })
   }
 
-  def signedIn(request: Request[AnyContent]): Future[Option[User]] = {
+  def signedIn(request: Request[Any]): Future[Option[User]] = {
     val token: Option[String] = request.session.get(sessionTokenKey)
     Logger.info("Token on request: " + token)
 

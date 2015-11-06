@@ -2,7 +2,9 @@ package model
 
 import java.util.Date
 
-import play.api.libs.json.{Json, Format}
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import play.api.libs.json._
 
 case class SearchResult(val numberFound: Long, val startIndex: Long, results: Seq[Report])
 
@@ -42,7 +44,7 @@ object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
 }
 
-case class Media(val id: String, val artifacts: Seq[Artifact])
+case class Media(val id: String, val artifacts: Seq[Artifact], val owner: User)
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]

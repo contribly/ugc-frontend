@@ -1,9 +1,11 @@
 package controllers
 
-import model.{Report, SubmissionDetails}
+import model.{Media, Report, SubmissionDetails}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
@@ -34,7 +36,7 @@ object SubmitController extends Controller {
     }
   }
 
-  def submit() = Action.async { request =>
+  def submit() = Action.async(parse.multipartFormData) { request =>
     val eventualOwner = ugcService.owner
     eventualOwner.flatMap(owner => {
 
@@ -52,18 +54,33 @@ object SubmitController extends Controller {
           submissionDetails => {
             Logger.info("Successfully validated submission details: " + submissionDetails)
 
-            val submissionResult: Future[Option[Report]] = ugcService.submit(submissionDetails.headline, submissionDetails.body, request.session.get("token").get)  //TODO should be on the signed in user
-            submissionResult.map(or => {
-              Logger.info("Submission result: " + or)
-              or.fold({
-                Logger.info("Redirecting to homepage")
-                Redirect(routes.Application.index())
-              }
-              )(r => {
-                Logger.info("Redirecting to report: " + r.id)
-                Redirect(routes.Application.report(r.id))
+            val bearerToken = request.session.get("token").get
+
+            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+            val noMedia: Future[Option[Media]] = Future.successful(None)
+
+            val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia)(mf => {
+              Logger.info("Found media file on request: " + mf)
+              ugcService.submitMedia(mf.ref.file, bearerToken)
+            })
+
+            eventualMedia.flatMap(media => {
+              Logger.info("Media: " + media)
+
+              val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
+              submissionResult.map(or => {
+                Logger.info("Submission result: " + or)
+                or.fold({
+                  Logger.info("Redirecting to homepage")
+                  Redirect(routes.Application.index())
+                }
+                )(r => {
+                  Logger.info("Redirecting to report: " + r.id)
+                  Redirect(routes.Application.report(r.id))
+                })
               })
             })
+
           }
         )
       })

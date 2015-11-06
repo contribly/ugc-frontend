@@ -6,6 +6,7 @@ import play.api.Play.current
 import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.{Logger, Play}
+import java.io.File
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
@@ -18,12 +19,14 @@ trait UGCService {
   val clientSecret: String
 
   val reportsUrl: String = apiUrl + "/reports"
+  val mediaUrl: String = apiUrl + "/media"
   val noticeboardsUrl: String = apiUrl + "/noticeboards"
   val tokenUrl: String = apiUrl + "/token"
   val usersUrl: String = apiUrl + "/users"
   val verifyUrl: String = apiUrl + "/verify"
 
   val Ok: Int = 200
+  val Accepted: Int = 202
 
   def clientAuthHeader: (String, String) = {
     "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
@@ -77,21 +80,41 @@ trait UGCService {
     })
   }
 
-  def submit(headline: String, body: String, token: String): Future[Option[Report]] = {
+  def submit(headline: String, body: String, media: Option[Media], token: String): Future[Option[Report]] = {
     val applicationJsonHeader = "Content-Type" -> "application/json"
+
+    val submissionJson = Json.obj("headline" -> headline,
+      "body" -> body,
+      "media" -> Json.toJson(Seq(media.map(m => m))))
+
+    Logger.info("Submission JSON: " + submissionJson.toString())
 
     val eventualResponse = WS.url(reportsUrl).
       withHeaders(bearerTokenHeader(token), applicationJsonHeader).
-      post(Json.obj("headline" -> headline,
-        "body" -> body,
-        "media" -> Json.toJson(Seq[String]())))
+      post(submissionJson)
 
     eventualResponse.map(r => {
       if (r.status == Ok) {
         Logger.info("Submission accepted: " + r.body)
         Some(Json.parse(r.body).as[Report])
       } else {
-        Logger.info("Submisssion rejected: " + r.status + " " + r.body)
+        Logger.info("Submission rejected: " + r.status + " " + r.body)
+        None
+      }
+    })
+  }
+
+  def submitMedia(mf: File, token: String): Future[Option[Media]] = {
+    val eventualResponse = WS.url(mediaUrl).
+      withHeaders(bearerTokenHeader(token)).
+      post(mf)
+
+    eventualResponse.map(r => {
+      Logger.info("Submit media status: " + r.status)
+      if (r.status == Accepted) {
+        Logger.info("Submit media response: " + r.body)
+        Some(Json.parse(r.body).as[Media])
+      } else {
         None
       }
     })
@@ -112,10 +135,6 @@ trait UGCService {
         }
       }
     }
-  }
-
-  def bearerTokenHeader(token: String): (String, String) = {
-    ("Authorization" -> ("Bearer " + token))
   }
 
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
@@ -168,9 +187,13 @@ trait UGCService {
     }
   }
 
+  private def bearerTokenHeader(token: String): (String, String) = {
+    ("Authorization" -> ("Bearer " + token))
+  }
+
 }
 
-  object UGCService extends UGCService {
+object UGCService extends UGCService {
 
   override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
   override lazy val user: String = Play.configuration.getString("ugc.user").get

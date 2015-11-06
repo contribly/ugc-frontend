@@ -19,9 +19,12 @@
     </p>
 }
 
-@helper.form(action = routes.SubmitController.submit) {
+@helper.form(action = routes.SubmitController.submit, 'enctype -> "multipart/form-data") {
     @helper.inputText(submitForm("headline"))
     @helper.inputText(submitForm("body"))
+
+    <input type="file" name="media">
+
     <p class="buttons">
         <input type="submit" id="submit">
     <p>
