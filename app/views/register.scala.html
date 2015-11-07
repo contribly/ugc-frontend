@@ -10,10 +10,8 @@
 
 <h4>Register</h4>
 
-@if(registerForm.hasGlobalErrors) {
-    <p class="error">
-        @registerForm.globalError
-    </p>
+@registerForm.globalError.map { error =>
+    <p class="error">@error.message</p>
 }
 
 @helper.form(action = routes.RegisterController.submit) {

@@ -13,9 +13,8 @@
 
 <h4>Login</h4>
 
-
 @loginForm.globalError.map { error =>
-    <div>@error</div>
+    <p class="error">@error.message</p>
 }
 
 @helper.form(action = routes.LoginController.submit) {
