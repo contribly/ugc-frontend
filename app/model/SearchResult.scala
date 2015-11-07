@@ -44,7 +44,7 @@ object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
 }
 
-case class Media(val id: String, val artifacts: Seq[Artifact], val owner: User)
+case class Media(val id: String, val artifacts: Seq[Artifact])
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]

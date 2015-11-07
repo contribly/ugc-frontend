@@ -85,7 +85,7 @@ trait UGCService {
 
     val submissionJson = Json.obj("headline" -> headline,
       "body" -> body,
-      "media" -> Json.toJson(Seq(media.map(m => m))))
+      "media" -> Json.toJson(Seq(media.map(m => Map("id" -> m.id)))))
 
     Logger.info("Submission JSON: " + submissionJson.toString())
 
