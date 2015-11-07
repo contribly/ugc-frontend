@@ -3,8 +3,22 @@ package model
 import java.util.Date
 
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.{ISODateTimeFormat, DateTimeFormatter}
 import play.api.libs.json._
+
+class DateTimeFormat extends Reads[DateTime] {
+
+  private val isoDateTimeNoMillis : DateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis()
+
+  override def reads(json: JsValue): JsResult[DateTime] = {
+    json match {
+      case JsString(s) => JsSuccess(isoDateTimeNoMillis.parseDateTime(s))
+      case _ => throw new RuntimeException()
+    }
+  }
+}
+
+object DateTimeFormat extends DateTimeFormat
 
 case class SearchResult(val numberFound: Long, val startIndex: Long, results: Seq[Report])
 
@@ -18,11 +32,12 @@ object Artifact {
   implicit val formats: Format[Artifact] = Json.format[Artifact]
 }
 
-case class Report(val id: String, val headline: String, created: Date, noticeboard: Option[Noticeboard],
+case class Report(val id: String, val headline: String, created: DateTime, noticeboard: Option[Noticeboard],
                   user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place],
                   media: Seq[Media])
 
 object Report {
+  implicit val df: Reads[DateTime] = DateTimeFormat
   implicit val formats: Format[Report] = Json.format[Report]
 }
 

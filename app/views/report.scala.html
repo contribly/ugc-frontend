@@ -14,7 +14,7 @@
 
     @includes.media(r, 640)
 
-    <p>@r.created.format("d MMM YYYY HH:mm")</p>
+    <p>@r.created.toDate.format("d MMM YYYY HH:mm")</p>
 
     @r.image.map{i =>
         <p>@i</p>
