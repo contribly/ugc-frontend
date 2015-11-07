@@ -9,11 +9,16 @@
 <body>
 
     @includes.header(owner, signedIn)
+    <hr/>
 
     <h4>@noticeboard.name</h4>
 
     @noticeboard.description.map{d =>
         <p>@Html(d)</p>
+    }
+
+    @noticeboard.endDate.map{ed =>
+        <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
     <hr/>
 

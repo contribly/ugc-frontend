@@ -16,7 +16,10 @@
         @n.description.map{d =>
             <p>@Html(d)</p>
         }
-        <hr/>
+        @n.endDate.map{ed =>
+            <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
+        }
+    <hr/>
     }
 
 </body>

@@ -85,9 +85,10 @@ object Place {
 
 case class Noticeboard(val id: String, val name: String, val description: Option[String],
                         val geoCodingResolution:  Option[String],
-                        val endDate: Option[Date], val embargoDate: Option[Date], val scheduledDate: Option[Date])
+                        val endDate: Option[DateTime], val embargoDate: Option[DateTime], val scheduledDate: Option[DateTime])
 
 object Noticeboard {
+  implicit val df: Reads[DateTime] = DateTimeFormat
   implicit  val formats: Format[Noticeboard] = Json.format[Noticeboard]
 }
 

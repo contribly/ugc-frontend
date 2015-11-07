@@ -10,6 +10,11 @@
     @includes.header(owner, signedIn)
 
     <hr/>
+
+    @r.noticeboard.map{n =>
+        <p><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></p>
+    }
+
     <h4>@r.headline</h4>
 
     @includes.media(r, 640)
@@ -23,9 +28,6 @@
         <p>@b</p>
     }
 
-    @r.noticeboard.map{n =>
-        <p><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></p>
-    }
     <hr/>
 
 </body>
