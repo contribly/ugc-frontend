@@ -1,0 +1,21 @@
+@import model.{User, Report}
+@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@user.displayName</title>
+</head>
+<body>
+
+    @includes.header(owner, signedIn)
+    <hr/>
+
+    <h4>@user.displayName</h4>
+
+    <p>@user</p>
+
+    @includes.reports(reports)
+    <hr/>
+
+</body>
+</html>

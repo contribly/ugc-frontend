@@ -28,7 +28,7 @@ object TagsController extends Controller with PageSize {
 
   def tag(id: String) = Action.async { request =>
     val eventualTag = ugcService.tag(id)
-    val eventualReports = ugcService.reports(pageSize, 1, Some(id), None)
+    val eventualReports = ugcService.reports(pageSize, 1, Some(id), None, None)
     val eventualOwner = ugcService.owner
     val eventualTags = ugcService.tags()
 

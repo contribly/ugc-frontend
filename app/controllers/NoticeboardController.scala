@@ -12,7 +12,7 @@ object NoticeboardController extends Controller with PageSize {
 
   def noticeboards() = Action.async { request =>
     val eventualNoticeboards = ugcService.noticeboards(pageSize, 1)
-    val eventualReports = ugcService.reports(pageSize, 1, None, None)
+    val eventualReports = ugcService.reports(pageSize, 1, None, None, None)
     val eventualOwner = ugcService.owner
 
     for {
@@ -28,7 +28,7 @@ object NoticeboardController extends Controller with PageSize {
 
   def noticeboard(id: String) = Action.async { request =>
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(pageSize, 1, None, Some(id))
+    val eventualReports = ugcService.reports(pageSize, 1, None, Some(id), None)
     val eventualOwner = ugcService.owner
 
     for {

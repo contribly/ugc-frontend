@@ -16,7 +16,7 @@ object Application extends Controller with PageSize {
   def index = Action.async {request =>
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(pageSize, 1, None, None)
+    val eventualReports = ugcService.reports(pageSize, 1, None, None, None)
     val eventualOwner = ugcService.owner
 
     for {

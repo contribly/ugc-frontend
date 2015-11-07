@@ -14,7 +14,7 @@ import scala.concurrent.Future
 trait UGCService {
 
   val apiUrl: String
-  val user: String
+  val ownedBy: String
   val clientId: String
   val clientSecret: String
 
@@ -32,8 +32,12 @@ trait UGCService {
     "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
   }
 
-  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String]): Future[SearchResult] = {
-    val u = reportsUrl + "?ownedBy=" + user + "&pageSize=" + pageSize + "&page=" + page + tag.fold("")(t => "&tag=" + t) + noticeboard.fold("")(n => "&noticeboard=" + n)
+  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String], user: Option[String]): Future[SearchResult] = {
+    val u = reportsUrl + "?ownedBy=" + ownedBy + "&pageSize=" + pageSize + "&page=" + page +
+      tag.fold("")(t => "&tag=" + t) +
+      noticeboard.fold("")(n => "&noticeboard=" + n) +
+      user.fold("")(u => "&user=" + u)
+
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -59,6 +63,16 @@ trait UGCService {
         response => {
           Logger.info("Register response: " + response.body)
         }
+    }
+  }
+
+  def user(id: String): Future[User] = {
+    val u = usersUrl + "/" + id
+    Logger.info("Fetching from url: " + u)
+    WS.url(u).get.map {
+      response => {
+        Json.parse(response.body).as[User]
+      }
     }
   }
 
@@ -138,7 +152,7 @@ trait UGCService {
   }
 
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
-    val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&ownedBy=" + user
+    val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&ownedBy=" + ownedBy
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -158,7 +172,7 @@ trait UGCService {
   }
 
   def owner(): Future[User] = {
-    val u = apiUrl + "/users/" + user
+    val u = apiUrl + "/users/" + ownedBy
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -178,7 +192,7 @@ trait UGCService {
   }
 
   def tags(): Future[Seq[Tag]] = {
-    val u = apiUrl + "/tags?ownedBy=" + user
+    val u = apiUrl + "/tags?ownedBy=" + ownedBy
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -196,7 +210,7 @@ trait UGCService {
 object UGCService extends UGCService {
 
   override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
-  override lazy val user: String = Play.configuration.getString("ugc.user").get
+  override lazy val ownedBy: String = Play.configuration.getString("ugc.user").get
   override lazy val clientId: String = Play.configuration.getString("ugc.client.id").get
   override lazy val clientSecret: String = Play.configuration.getString("ugc.client.secret").get
 
