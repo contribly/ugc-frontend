@@ -26,7 +26,7 @@ object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]
 }
 
-case class Artifact(val contentType: String, val url: String, val width: Int)
+case class Artifact(val contentType: String, val url: String, val width: Int, val height: Int)
 
 object Artifact {
   implicit val formats: Format[Artifact] = Json.format[Artifact]
@@ -59,7 +59,7 @@ object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
 }
 
-case class Media(val id: String, val artifacts: Seq[Artifact])
+case class Media(val id: String, val contentType: Option[String], val artifacts: Seq[Artifact])
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]

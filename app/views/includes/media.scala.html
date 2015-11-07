@@ -2,7 +2,21 @@
 @(r: Report, width: Int)
 
 @r.media.headOption.map{m =>
-    @m.artifacts.find(a => a.width == width).map{b =>
-        <a href="@routes.Application.report(r.id)"><img src="@b.url" /></a>
+
+    @m.contentType.map{ct =>
+
+        @if(ct == "video") {
+            @m.artifacts.find(a => a.contentType == "video").map{v =>
+                <video src="@v.url" width="@v.width" height="@v.height" controls="true"
+                       @m.artifacts.find(a => a.contentType == "image").map{p => poster="@p.url"} ></video>
+            }
+        }
+
+        @if(ct == "image") {
+            @m.artifacts.find(a => a.contentType == "image" && a.width == width).map{i =>
+                <a href="@routes.Application.report(r.id)"><img src="@i.url" /></a>
+            }
+        }
     }
+
 }
