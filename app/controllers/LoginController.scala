@@ -50,7 +50,7 @@ object LoginController extends Controller {
               Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
             )(t => {
               Logger.info("Setting session token: " + t)
-              Redirect(routes.Application.index()).withSession(SignedInUserService.sessionTokenKey -> t)
+              Redirect(routes.Application.index(None)).withSession(SignedInUserService.sessionTokenKey -> t)
             })
           })
         }
@@ -60,7 +60,8 @@ object LoginController extends Controller {
   }
 
   def logout = Action {
-    Redirect(routes.Application.index()).withNewSession
+    Redirect(routes.Application.index(None
+    )).withNewSession
   }
 
 }

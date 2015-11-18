@@ -3,7 +3,7 @@
 @reports.map{r =>
     <a href="@routes.Application.report(r.id)"><h5>@r.headline</h5></a>
     @r.noticeboard.map{n =>
-        <p><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></p>
+        <p><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></p>
     }
     @includes.media(r, 80)
 

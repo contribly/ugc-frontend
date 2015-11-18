@@ -1,9 +1,9 @@
 @import model.User
 @(owner: User, signedIn: Option[User])
 
-<h3><a href="@routes.Application.index">@owner.displayName</a></h3>
+<h3><a href="@routes.Application.index(None)">@owner.displayName</a></h3>
 
-<p><a href="@routes.NoticeboardController.noticeboards">Noticeboards</a></p>
+<p><a href="@routes.NoticeboardController.noticeboards(None)">Noticeboards</a></p>
 
 @signedIn.fold{
     <a href="@routes.LoginController.prompt">Sign in</a>

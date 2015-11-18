@@ -13,10 +13,10 @@ object Application extends Controller with PageSize {
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
-  def index = Action.async {request =>
+  def index(page: Option[Int]) = Action.async {request =>
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(pageSize, 1, None, None, None)
+    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, None, None)
     val eventualOwner = ugcService.owner
 
     for {

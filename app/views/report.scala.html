@@ -12,7 +12,7 @@
     <hr/>
 
     @r.noticeboard.map{n =>
-        <p><a href="@routes.NoticeboardController.noticeboard(n.id)">@n.name</a></p>
+        <p><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></p>
     }
 
     <h4>@r.headline</h4>
