@@ -7,7 +7,7 @@ import play.api.data._
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object RegisterController extends Controller {
 
@@ -22,25 +22,37 @@ object RegisterController extends Controller {
   )
 
   def prompt() = Action.async {
-    Future.successful(Ok(views.html.register(registrationForm)))
+    val eventualOwner = ugcService.owner
+
+    for {
+      owner <- eventualOwner
+    } yield {
+      Ok(views.html.register(registrationForm, owner))
+    }
   }
 
   def submit() = Action.async { request =>
 
-    val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
+    val eventualOwner = ugcService.owner
+    for {
+      owner <- eventualOwner
+    } yield {
 
-    boundForm.fold(
-      formWithErrors => {
-        Future.successful(Ok(views.html.register(formWithErrors)))
-      },
-      registrationDetails => {
-        Logger.info("Attempting to register user: " + registrationForm)
+      val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
 
-        ugcService.register(registrationDetails)
+      boundForm.fold(
+        formWithErrors => {
+          Ok(views.html.register(formWithErrors, owner))
+        },
+        registrationDetails => {
+          Logger.info("Attempting to register user: " + registrationForm)
 
-        Future.successful(Ok(views.html.register(registrationForm)))
-      }
-    )
+          ugcService.register(registrationDetails)
+
+          Ok(views.html.register(registrationForm, owner))
+        }
+      )
+    }
   }
 
 }

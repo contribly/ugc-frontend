@@ -1,12 +1,15 @@
 @import model.RegistrationDetails
+@import model.User
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-@(registerForm: Form[RegistrationDetails])
+@(registerForm: Form[RegistrationDetails], owner: User)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
 </head>
 <body>
+
+@includes.header(owner, None)
 
 <h4>Register</h4>
 
