@@ -6,14 +6,14 @@
     @m.contentType.map{ct =>
 
         @if(ct == "video") {
-            @m.artifacts.find(a => a.contentType == "video").map{v =>
+            @m.artifacts.find(a => a.contentType.startsWith("video")).map{v =>
                 <video src="@v.url" width="@v.width" height="@v.height" controls="true"
-                       @m.artifacts.find(a => a.contentType == "image").map{p => poster="@p.url"} ></video>
+                       @m.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
             }
         }
 
         @if(ct == "image") {
-            @m.artifacts.find(a => a.contentType == "image" && a.width == width).map{i =>
+            @m.artifacts.find(a => a.contentType.startsWith("image") && a.width == width).map{i =>
                 <a href="@routes.Application.report(r.id)"><img src="@i.url" /></a>
             }
         }
