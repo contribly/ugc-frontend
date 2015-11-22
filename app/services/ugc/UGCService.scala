@@ -38,7 +38,7 @@ trait UGCService {
     val u = reportsUrl + "?ownedBy=" + ownedBy + "&pageSize=" + pageSize + "&page=" + page +
       tag.fold("")(t => "&tag=" + t) +
       noticeboard.fold("")(n => "&noticeboard=" + n) +
-      user.fold("")(u => "&user=" + u)
+      user.fold("")(u => "&user=" + helper.urlEncode(u))
 
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
