@@ -8,6 +8,8 @@ import play.api.libs.ws.WS
 import play.api.{Logger, Play}
 import java.io.File
 
+import views.html.helper
+
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
 
@@ -67,7 +69,7 @@ trait UGCService {
   }
 
   def user(id: String): Future[User] = {
-    val u = usersUrl + "/" + id
+    val u = usersUrl + "/" + helper.urlEncode(id)
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
