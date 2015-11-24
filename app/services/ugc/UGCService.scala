@@ -1,13 +1,14 @@
 package services.ugc
 
+import java.io.File
+
 import model._
 import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.{Logger, Play}
-import java.io.File
-
+import play.utils.UriEncoding
 import views.html.helper
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
@@ -69,7 +70,7 @@ trait UGCService {
   }
 
   def user(id: String): Future[User] = {
-    val u = usersUrl + "/" + helper.urlEncode(id)
+    val u = usersUrl + "/" + UriEncoding.encodePathSegment(id, "UTF-8")
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
