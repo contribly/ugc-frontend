@@ -1,6 +1,6 @@
 @import model.{Report, User}
 @import model.Noticeboard
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User])
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long)
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,6 +12,8 @@
     <hr/>
 
     <h4>@noticeboard.name</h4>
+
+    (@contributions)
 
     @noticeboard.description.map{d =>
         <p>@Html(d)</p>

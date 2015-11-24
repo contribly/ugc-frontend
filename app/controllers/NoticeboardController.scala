@@ -36,7 +36,7 @@ object NoticeboardController extends Controller with PageSize {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn))
+      Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn, reports.numberFound))
     }
   }
 
