@@ -20,12 +20,11 @@
     @noticeboard.endDate.map{ed =>
         <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
-
-    <p><a href="@routes.NoticeboardController.gallery(noticeboard.id, None)">Gallery</a>
-
     <hr/>
 
-    @includes.reports(reports)
+    @reports.map{r =>
+        @includes.media(r, 320)
+    }
 
 <hr/>
 </body>

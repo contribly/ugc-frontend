@@ -1,9 +1,7 @@
 
 package controllers
 
-import model.User
-import play.api.Logger
-import play.api.mvc.{AnyContent, Request, Action, Controller}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +14,7 @@ object Application extends Controller with PageSize {
   def index(page: Option[Int]) = Action.async {request =>
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, None, None)
+    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, None, None, None)
     val eventualOwner = ugcService.owner
 
     for {

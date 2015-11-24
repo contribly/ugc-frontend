@@ -13,7 +13,7 @@ object UserController extends Controller with PageSize {
   def user(id: String) = Action.async { request =>
     val eventualUser = ugcService.user(id)
     val eventualOwner = ugcService.owner
-    val eventualReports = ugcService.reports(pageSize, 1, None, None, Some(id))
+    val eventualReports = ugcService.reports(pageSize, 1, None, None, Some(id), None)
 
     for {
       user <- eventualUser

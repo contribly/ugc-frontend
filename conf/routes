@@ -12,6 +12,7 @@ POST       /submit                  controllers.SubmitController.submit
 
 GET        /noticeboards            controllers.NoticeboardController.noticeboards(page: Option[Int])
 GET        /noticeboards/:id        controllers.NoticeboardController.noticeboard(id: String, page: Option[Int])
+GET        /noticeboards/:id/gallery        controllers.NoticeboardController.gallery(id: String, page: Option[Int])
 
 GET        /reports/:id             controllers.Application.report(id: String)
 
