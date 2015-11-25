@@ -1,6 +1,6 @@
 @import model.{Report, User}
 @import model.Noticeboard
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long)
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long, pages: Range)
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,6 +24,8 @@
     }
 
     <p><a href="@routes.NoticeboardController.gallery(noticeboard.id, None)">Gallery</a>
+        
+    @includes.pages(pages)
 
     <hr/>
 

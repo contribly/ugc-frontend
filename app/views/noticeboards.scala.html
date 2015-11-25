@@ -11,10 +11,7 @@
     @includes.header(owner, signedIn)
     <hr/>
 
-    <p> @pages.map{p =>
-            <a href="@routes.NoticeboardController.noticeboards(Some(p))">@p</a>
-        }
-    </p>
+    @includes.pages(pages)
 
     @noticeboards.map{n =>
         <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></h4>

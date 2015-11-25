@@ -6,7 +6,7 @@ import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object Application extends Controller with PageSize {
+object Application extends Controller with Pages {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
@@ -14,7 +14,7 @@ object Application extends Controller with PageSize {
   def index(page: Option[Int]) = Action.async {request =>
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, None, None, None)
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, None)
     val eventualOwner = ugcService.owner
 
     for {

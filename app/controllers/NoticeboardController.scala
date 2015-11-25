@@ -5,13 +5,14 @@ import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object NoticeboardController extends Controller with PageSize {
+object NoticeboardController extends Controller with Pages {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
   def noticeboards(page: Option[Int]) = Action.async { request =>
-    val eventualNoticeboards = ugcService.noticeboards(pageSize, page.fold(1)(p => p))
+
+    val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
     val eventualOwner = ugcService.owner
 
     for {
@@ -20,14 +21,13 @@ object NoticeboardController extends Controller with PageSize {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      val pages = Range(1, noticeboards.numberFound.toInt / pageSize)
-      Ok(views.html.noticeboards(noticeboards.results, owner, signedIn, pages))
+      Ok(views.html.noticeboards(noticeboards.results, owner, signedIn, pagesFor(noticeboards.numberFound.toInt)))
     }
   }
 
   def noticeboard(id: String, page: Option[Int]) = Action.async { request =>
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, Some(id), None, None)
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, None)
     val eventualOwner = ugcService.owner
 
     for {
@@ -37,13 +37,13 @@ object NoticeboardController extends Controller with PageSize {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn, reports.numberFound))
+      Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn, reports.numberFound, pagesFor(reports.numberFound.toInt)))
     }
   }
 
   def gallery(id: String, page: Option[Int]) = Action.async { request =>
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(pageSize, page.fold(1)(p => p), None, Some(id), None, Some("image"))
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, Some("image"))
     val eventualOwner = ugcService.owner
 
     for {
@@ -56,6 +56,5 @@ object NoticeboardController extends Controller with PageSize {
       Ok(views.html.gallery(noticeboard, reports.results, owner, signedIn))
     }
   }
-
 
 }
