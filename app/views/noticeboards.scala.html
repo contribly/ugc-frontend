@@ -1,6 +1,6 @@
 @import model.{Report, User}
 @import model.Noticeboard
-@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User])
+@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User], pages: Range)
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +10,11 @@
 
     @includes.header(owner, signedIn)
     <hr/>
+
+    <p> @pages.map{p =>
+            <a href="@routes.NoticeboardController.noticeboards(Some(p))">@p</a>
+        }
+    </p>
 
     @noticeboards.map{n =>
         <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></h4>

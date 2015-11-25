@@ -20,7 +20,8 @@ object NoticeboardController extends Controller with PageSize {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboards(noticeboards.results, owner, signedIn))
+      val pages = Range(1, noticeboards.numberFound.toInt / pageSize)
+      Ok(views.html.noticeboards(noticeboards.results, owner, signedIn, pages))
     }
   }
 
@@ -39,7 +40,6 @@ object NoticeboardController extends Controller with PageSize {
       Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn, reports.numberFound))
     }
   }
-
 
   def gallery(id: String, page: Option[Int]) = Action.async { request =>
     val eventualNoticeboard = ugcService.noticeboard(id)
