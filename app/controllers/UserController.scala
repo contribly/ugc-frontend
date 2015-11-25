@@ -22,7 +22,7 @@ object UserController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.user(user, owner, signedIn, reports.results))
+      Ok(views.html.user(user, owner, signedIn, reports.results, pagesFor(reports.numberFound)))
     }
   }
 

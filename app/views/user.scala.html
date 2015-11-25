@@ -1,5 +1,5 @@
 @import model.{User, Report}
-@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report])
+@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report], pages: Range)
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +14,9 @@
 
     <p>@user.registered</p>
 
+    @includes.pages(pages)
+
+    <hr/>
     @includes.reports(reports)
     <hr/>
 

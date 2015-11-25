@@ -1,6 +1,6 @@
 @import model.{Report, User}
 @import model.Noticeboard
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User])
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Range)
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,6 +20,9 @@
     @noticeboard.endDate.map{ed =>
         <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
+
+    @includes.pages(pages)
+
     <hr/>
 
     @reports.map{r =>

@@ -40,7 +40,7 @@ object TagsController extends Controller with Pages {
       tags <- eventualTags
 
     } yield {
-      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags))
+      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags, pagesFor(reports.numberFound)))
     }
   }
 
