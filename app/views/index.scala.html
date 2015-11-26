@@ -1,7 +1,7 @@
 @import model.Report
 @import model.Tag
 @import model.User
-@(tags: Seq[Tag], reports: Seq[Report], owner: User, signedIn: Option[User])
+@(tags: Seq[Tag], reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long, pages: Range)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -17,7 +17,12 @@
                 @includes.sidenav(tags)
             </td>
             <td>
-              @includes.reports(reports)
+
+                (@contributions)
+
+                @includes.pages(pages)
+
+                @includes.reports(reports)
             </td>
         </tr>
     </table>

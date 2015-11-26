@@ -24,7 +24,7 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.index(tags, reports.results, owner, signedIn))
+      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesFor(reports.numberFound)))
     }
   }
 
