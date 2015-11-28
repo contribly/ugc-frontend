@@ -24,7 +24,18 @@
 
         <p>Moderated: @n.moderated</p>
         <p>Featured: @n.featured</p>
-    <hr/>
+
+        @n.cover.map{m =>
+            @m.contentType.map{ct =>
+                @if(ct == "image") {
+                    @m.artifacts.find(a => a.contentType.startsWith("image") && a.width == 320).map{i =>
+                        <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
+                    }
+                }
+            }
+        }
+
+        <hr/>
     }
 
 </body>
