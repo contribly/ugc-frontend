@@ -1,8 +1,9 @@
-
 package controllers
 
+import model.Tag
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
+import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -27,6 +28,11 @@ object TagsController extends Controller with Pages {
   }
 
   def tag(id: String) = Action.async { request =>
+
+    def pageLinksFor(tag: Tag, totalNumber: Long): Seq[PageLink] = {
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.TagsController.tag(tag.id).url))  // TODO page
+    }
+
     val eventualTag = ugcService.tag(id)
     val eventualReports = ugcService.reports(PageSize, 1, Some(id), None, None, None)
     val eventualOwner = ugcService.owner
@@ -40,7 +46,7 @@ object TagsController extends Controller with Pages {
       tags <- eventualTags
 
     } yield {
-      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags, pagesFor(reports.numberFound)))
+      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags, pageLinksFor(tag, reports.numberFound)))
     }
   }
 

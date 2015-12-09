@@ -1,8 +1,10 @@
 
 package controllers
 
+import play.api.Logger
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
+import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -12,6 +14,10 @@ object Application extends Controller with Pages {
   val signedInUserService = SignedInUserService
 
   def index(page: Option[Int]) = Action.async {request =>
+
+    def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p)).url))
+    }
 
     val eventualTags = ugcService.tags()
     val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, None)
@@ -24,7 +30,7 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesFor(reports.numberFound)))
+      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound)))
     }
   }
 

@@ -1,5 +1,7 @@
-@(pages: Range)
+@import views.PageLink
+@(pages: Seq[PageLink])
 <p> @pages.map{p =>
-    <a href="@routes.NoticeboardController.noticeboards(Some(p))">@p</a>
+    <a href="@p.link">@p.page</a>
     }
 </p>
+

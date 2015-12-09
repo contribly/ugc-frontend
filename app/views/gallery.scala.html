@@ -1,6 +1,7 @@
 @import model.{Report, User}
 @import model.Noticeboard
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Range)
+@import views.PageLink
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])
 <!DOCTYPE html>
 <html>
 <head>

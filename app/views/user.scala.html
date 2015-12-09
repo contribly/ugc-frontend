@@ -1,5 +1,6 @@
 @import model.{User, Report}
-@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report], pages: Range)
+@import views.PageLink
+@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report], pages: Seq[PageLink])
 <!DOCTYPE html>
 <html>
 <head>

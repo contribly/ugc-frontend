@@ -1,7 +1,8 @@
 @import model.Report
 @import model.Tag
 @import model.User
-@(tag: Tag, reports: Seq[Report], owner: User, signedIn: Option[User], tags: Seq[Tag], pages: Range)
+@import views.PageLink
+@(tag: Tag, reports: Seq[Report], owner: User, signedIn: Option[User], tags: Seq[Tag], pages: Seq[PageLink])
 <!DOCTYPE html>
 <html>
 <head>
