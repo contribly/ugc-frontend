@@ -12,10 +12,10 @@ object UserController extends Controller with Pages {
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
-  def user(id: String) = Action.async { request =>
+  def user(id: String, page: Option[Int]) = Action.async { request =>
 
     def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id).url)) // TODO page
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
     }
 
     val eventualUser = ugcService.user(id)

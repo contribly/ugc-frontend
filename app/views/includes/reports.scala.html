@@ -9,7 +9,7 @@
 
     <p>@r.created.toDate.format("d MMM YYYY HH:mm")</p>
 
-    <p><a href="@routes.UserController.user(r.user.id)">@r.user.displayName</a>
+    <p><a href="@routes.UserController.user(r.user.id, None)">@r.user.displayName</a>
         @r.created.toDate.format("d MMM YYYY HH:mm")</p>
 
     @r.image.map{i =>
@@ -25,7 +25,7 @@
     }
     <p>
         @r.tags.map{t =>
-        <a href="@routes.TagsController.tag(t.id)">@t.name</a>
+        <a href="@routes.TagsController.tag(t.id, None)">@t.name</a>
         }
     </p>
 

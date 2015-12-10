@@ -2,5 +2,5 @@
 @(tags: Seq[Tag])
 
 @tags.map{t =>
-    <h4><a href="@routes.TagsController.tag(t.id)">@t.name</a></h4>
+    <h4><a href="@routes.TagsController.tag(t.id, None)">@t.name</a></h4>
 }

@@ -17,6 +17,6 @@ GET        /noticeboards/:id/gallery        controllers.NoticeboardController.ga
 GET        /reports/:id             controllers.Application.report(id: String)
 
 GET        /tags                    controllers.TagsController.tags
-GET        /tags/:id                controllers.TagsController.tag(id: String)
+GET        /tags/:id                controllers.TagsController.tag(id: String, page: Option[Int])
 
-GET        /users/:id               controllers.UserController.user(id: String)
+GET        /users/:id               controllers.UserController.user(id: String, page: Option[Int])

@@ -27,10 +27,10 @@ object TagsController extends Controller with Pages {
     }
   }
 
-  def tag(id: String) = Action.async { request =>
+  def tag(id: String, page: Option[Int]) = Action.async { request =>
 
     def pageLinksFor(tag: Tag, totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.TagsController.tag(tag.id).url))  // TODO page
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.TagsController.tag(tag.id, Some(p)).url))
     }
 
     val eventualTag = ugcService.tag(id)
