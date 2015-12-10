@@ -1,14 +1,21 @@
 @import model.Report
-@(r: Report, width: Int)
+@(r: Report, width: Int, preview: Boolean)
 
 @r.media.headOption.map{m =>
 
     @m.contentType.map{ct =>
 
         @if(ct == "video") {
-            @m.artifacts.find(a => a.contentType.startsWith("video")).map{v =>
-                <video src="@v.url" width="@v.width" height="@v.height" controls="true"
+            @if(preview) {
+                @m.artifacts.find(a => a.contentType.startsWith("image") && a.width == width).map{v =>
+                    <a href="@routes.Application.report(r.id)"><img src="@v.url" /></a>
+                }
+
+            } else {
+                @m.artifacts.find(a => a.contentType.startsWith("video/theora")).map{v =>
+                    <video src="@v.url" width="@v.width" height="@v.height" controls="true"
                        @m.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
+                }
             }
         }
 

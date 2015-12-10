@@ -17,7 +17,7 @@
 
     <h4>@r.headline</h4>
 
-    @includes.media(r, 640)
+    @includes.media(r, 640, false)
 
     <p><a href="@routes.UserController.user(r.user.id, None)">@r.user.displayName</a>
         @r.created.toDate.format("d MMM YYYY HH:mm")</p>
