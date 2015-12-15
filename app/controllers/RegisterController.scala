@@ -4,10 +4,11 @@ import model.RegistrationDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Result, Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object RegisterController extends Controller {
 
@@ -35,22 +36,23 @@ object RegisterController extends Controller {
 
     val eventualOwner = ugcService.owner
 
-    eventualOwner.map { owner =>
+    eventualOwner.flatMap { owner =>
 
       val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
 
       boundForm.fold(
         formWithErrors => {
-          Ok(views.html.register(formWithErrors, owner))
+          Future.successful(Ok(views.html.register(formWithErrors, owner)))
         },
         registrationDetails => {
           Logger.info("Attempting to register user: " + registrationForm)
 
           ugcService.register(registrationDetails).map { mu =>
-            Logger.info("Register user result: " + mu)
+            mu.fold(Ok(views.html.register(registrationForm, owner))) { u =>
+              Logger.info("Registered : " + u)
+              Ok(views.html.register(registrationForm, owner))
+            }
           }
-
-          Ok(views.html.register(registrationForm, owner))
         }
       )
 
