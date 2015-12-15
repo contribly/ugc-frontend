@@ -34,9 +34,8 @@ object RegisterController extends Controller {
   def submit() = Action.async { request =>
 
     val eventualOwner = ugcService.owner
-    for {
-      owner <- eventualOwner
-    } yield {
+
+    eventualOwner.map { owner =>
 
       val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
 
@@ -47,11 +46,14 @@ object RegisterController extends Controller {
         registrationDetails => {
           Logger.info("Attempting to register user: " + registrationForm)
 
-          ugcService.register(registrationDetails)
+          ugcService.register(registrationDetails).map { mu =>
+            Logger.info("Register user result: " + mu)
+          }
 
           Ok(views.html.register(registrationForm, owner))
         }
       )
+
     }
   }
 
