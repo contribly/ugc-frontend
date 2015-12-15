@@ -19,7 +19,7 @@
 
 @helper.form(action = routes.LoginController.submit) {
     @helper.inputText(loginForm("username"))
-    @helper.inputText(loginForm("password"))
+    @helper.inputPassword(loginForm("password"))
     <p class="buttons">
         <input type="submit" id="submit">
     <p>
