@@ -6,13 +6,9 @@ lazy val `ugc-frontend` = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
-libraryDependencies ++= Seq(jdbc , cache , ws)
-
-libraryDependencies += "com.typesafe.play" %% "anorm" % "2.4.0"
+libraryDependencies ++= Seq(ws)
 
 libraryDependencies += specs2 % Test
-
-unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 
 maintainer in Linux := "Tony McCrae <tony@eelpieconsulting.co.uk>"
 
