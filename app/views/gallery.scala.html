@@ -1,26 +1,18 @@
 @import model.{Report, User}
 @import model.Noticeboard
 @import views.PageLink
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])
+@(reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@noticeboard.name</title>
+    <title>Gallery</title>
 </head>
 <body>
 
     @includes.header(owner, signedIn)
     <hr/>
 
-    <h4>@noticeboard.name</h4>
-
-    @noticeboard.description.map{d =>
-        <p>@Html(d)</p>
-    }
-
-    @noticeboard.endDate.map{ed =>
-        <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
-    }
+    <h4>Gallery</h4>
 
     @includes.pages(pages)
 

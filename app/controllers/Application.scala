@@ -1,7 +1,6 @@
 
 package controllers
 
-import play.api.Logger
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
@@ -31,6 +30,25 @@ object Application extends Controller with Pages {
 
     } yield {
       Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound)))
+    }
+  }
+
+  def gallery(page: Option[Int]) = Action.async { request =>
+
+    def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
+    }
+
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"))
+    val eventualOwner = ugcService.owner
+
+    for {
+      reports <- eventualReports
+      owner <- eventualOwner
+      signedIn <- signedInUserService.signedIn(request)
+
+    } yield {
+      Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound)))
     }
   }
 

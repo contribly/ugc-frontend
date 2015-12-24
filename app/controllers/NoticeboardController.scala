@@ -70,7 +70,7 @@ object NoticeboardController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.gallery(noticeboard, reports.results, owner, signedIn, pageLinksFor(noticeboard, reports.numberFound)))
+      Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn, pageLinksFor(noticeboard, reports.numberFound)))
     }
   }
 
