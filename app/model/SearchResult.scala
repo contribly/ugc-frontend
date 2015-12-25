@@ -87,7 +87,8 @@ case class Noticeboard(val id: String, val name: String, val description: Option
                         val geoCodingResolution:  Option[String],
                         val endDate: Option[DateTime], val embargoDate: Option[DateTime], val scheduledDate: Option[DateTime],
                         val moderated: Boolean, val featured: Boolean, val cover: Option[Media],
-                        val supportedMediaTypes: Set[String])
+                        val supportedMediaTypes: Set[String],
+                        val contributions: Option[Int])
 
 object Noticeboard {
   implicit val df: Reads[DateTime] = DateTimeFormat
