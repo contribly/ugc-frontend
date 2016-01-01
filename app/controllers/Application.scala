@@ -14,8 +14,8 @@ object Application extends Controller with Pages {
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async {request =>
 
-    def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), None).url))
+    def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
     }
 
     val eventualTags = ugcService.tags()
@@ -29,7 +29,7 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound)))
+      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
     }
   }
 
