@@ -1,4 +1,4 @@
-GET        /                        controllers.Application.index(page: Option[Int])
+GET        /                        controllers.Application.index(page: Option[Int], hasMediaType: Option[String])
 GET        /gallery                 controllers.Application.gallery(page: Option[Int])
 
 GET        /login/prompt            controllers.LoginController.prompt

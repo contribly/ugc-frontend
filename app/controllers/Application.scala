@@ -12,14 +12,14 @@ object Application extends Controller with Pages {
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
-  def index(page: Option[Int]) = Action.async {request =>
+  def index(page: Option[Int], hasMediaType: Option[String]) = Action.async {request =>
 
     def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p)).url))
     }
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, None)
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, hasMediaType)
     val eventualOwner = ugcService.owner
 
     for {
