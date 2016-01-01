@@ -72,7 +72,7 @@ object SubmitController extends Controller {
                 Logger.info("Submission result: " + or)
                 or.fold({
                   Logger.info("Redirecting to homepage")
-                  Redirect(routes.Application.index(None))
+                  Redirect(routes.Application.index(None, None))
                 }
                 )(r => {
                   Logger.info("Redirecting to report: " + r.id)

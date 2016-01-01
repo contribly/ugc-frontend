@@ -1,7 +1,7 @@
 @import model.User
 @(owner: User, signedIn: Option[User])
 
-<h3><a href="@routes.Application.index(None)">@owner.displayName</a></h3>
+<h3><a href="@routes.Application.index(None, None)">@owner.displayName</a></h3>
 
 <p><a href="@routes.NoticeboardController.noticeboards(None)">Noticeboards</a></p>
 
