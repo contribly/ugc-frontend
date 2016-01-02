@@ -151,8 +151,7 @@ trait UGCService {
       post("").map {
       r => {
         if (r.status == Ok) {
-          val jsonResponse: JsValue = Json.parse(r.body)
-          (jsonResponse \ "user").asOpt[User]
+          Some(Json.parse(r.body).as[User])
         } else {
           Logger.info(r.status + ": " + r.body)
           None
@@ -185,8 +184,8 @@ trait UGCService {
     val u = apiUrl + "/users/" + ownedBy
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[User]
+      r => {
+        Json.parse(r.body).as[User]
       }
     }
   }
