@@ -34,7 +34,7 @@ object Artifact {
 
 case class Report(val id: String, val headline: String, created: DateTime, noticeboard: Option[Noticeboard],
                   user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place],
-                  media: Seq[Media])
+                  mediaUsages: Seq[MediaUsage])
 
 object Report {
   implicit val df: Reads[DateTime] = DateTimeFormat
@@ -63,6 +63,12 @@ case class Media(val id: String, val contentType: Option[String], val artifacts:
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]
+}
+
+case class MediaUsage(val media: Media, val orientation: Option[Int])
+
+object MediaUsage {
+  implicit val formats: Format[MediaUsage] = Json.format[MediaUsage]
 }
 
 case class Osm(val osmId: Long, osmType: String)
