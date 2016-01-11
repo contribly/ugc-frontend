@@ -1,5 +1,5 @@
 @import model.Report
-@(r: Report, width: Int, preview: Boolean)
+@(r: Report, imageType: String, preview: Boolean)
 
 @r.mediaUsages.headOption.map{ mu =>
 
@@ -7,7 +7,7 @@
 
         @if(ct == "video") {
             @if(preview) {
-                @mu.media.artifacts.find(a => a.contentType.startsWith("image") && a.width == width).map{v =>
+                @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{v =>
                     <a href="@routes.Application.report(r.id)"><img src="@v.url" /></a>
                 }
 
@@ -20,7 +20,7 @@
         }
 
         @if(ct == "image") {
-            @mu.media.artifacts.find(a => a.contentType.startsWith("image") && a.width == width).map{i =>
+            @mu.media.artifacts.find(a => a.contentType.startsWith("image") && a.label == imageType).map{i =>
                 <a href="@routes.Application.report(r.id)"><img src="@i.url" /></a>
             }
         }

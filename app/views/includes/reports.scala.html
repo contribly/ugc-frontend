@@ -5,7 +5,7 @@
     @r.noticeboard.map{n =>
         <p><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></p>
     }
-    @includes.media(r, 320, true)
+    @includes.media(r, "medium", true)
 
     <p>@r.created.toDate.format("d MMM YYYY HH:mm")</p>
 
