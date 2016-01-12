@@ -12,7 +12,7 @@
                 }
 
             } else {
-                @mu.media.artifacts.find(a => a.contentType.startsWith("video/theora")).map{v =>
+                @mu.media.artifacts.find(a => a.contentType.startsWith("video/mp4")).map{v =>
                     <video src="@v.url" width="@v.width" height="@v.height" controls="true"
                        @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
                 }
