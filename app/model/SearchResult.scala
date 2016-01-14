@@ -20,6 +20,12 @@ class DateTimeFormat extends Reads[DateTime] {
 
 object DateTimeFormat extends DateTimeFormat
 
+case class Authority(val client: String)
+
+object Authority {
+  implicit val formats: Format[Authority] = Json.format[Authority]
+}
+
 case class SearchResult(val numberFound: Long, val startIndex: Long, results: Seq[Report])
 
 object SearchResult {
@@ -34,7 +40,7 @@ object Artifact {
 
 case class Report(val id: String, val headline: String, created: DateTime, noticeboard: Option[Noticeboard],
                   user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place],
-                  mediaUsages: Seq[MediaUsage])
+                  mediaUsages: Seq[MediaUsage], via: Option[Authority])
 
 object Report {
   implicit val df: Reads[DateTime] = DateTimeFormat
