@@ -7,12 +7,12 @@
 
         @if(ct == "video") {
             @if(preview) {
-                @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{v =>
+                @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("image")).map{v =>
                     <a href="@routes.Application.report(r.id)"><img src="@v.url" /></a>
                 }
 
             } else {
-                @mu.media.artifacts.find(a => a.contentType.startsWith("video/mp4")).map{v =>
+                @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("video/mp4")).map{v =>
                     <video src="@v.url" width="@v.width" height="@v.height" controls="true"
                        @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
                 }
