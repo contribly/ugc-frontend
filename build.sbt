@@ -17,3 +17,7 @@ packageSummary in Linux := "UGC Frontend"
 packageDescription := "UGC Frontend"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.2"
+
+import com.typesafe.sbt.packager.archetypes.ServerLoader
+
+serverLoading in Debian:= ServerLoader.Systemd
