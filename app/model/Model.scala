@@ -32,7 +32,7 @@ object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]
 }
 
-case class Artifact(val contentType: String, val url: String, val width: Int, val height: Int, val label: String)
+case class Artifact(val contentType: String, val url: String, val width: Option[Int], val height: Option[Int], val label: String)
 
 object Artifact {
   implicit val formats: Format[Artifact] = Json.format[Artifact]
