@@ -18,10 +18,12 @@
                 @includes.sidenav(tags)
             </td>
             <td>
-
                 (@contributions)
 
-                <p><a href="@routes.Application.gallery(None)">Gallery</a>
+                <p>
+                    <a href="@routes.Application.gallery(None)">Gallery</a>
+                    <a href="@routes.Application.videos(None)">Videos</a>
+                </p>
 
                 @includes.pages(pages)
 

@@ -66,4 +66,23 @@ object Application extends Controller with Pages {
     }
   }
 
+  def videos(page: Option[Int]) = Action.async { request =>
+
+    def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
+      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
+    }
+
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"))
+    val eventualOwner = ugcService.owner
+
+    for {
+      reports <- eventualReports
+      owner <- eventualOwner
+      signedIn <- signedInUserService.signedIn(request)
+
+    } yield {
+      Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound)))
+    }
+  }
+
 }
