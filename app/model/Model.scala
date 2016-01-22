@@ -20,10 +20,16 @@ class DateTimeFormat extends Reads[DateTime] {
 
 object DateTimeFormat extends DateTimeFormat
 
-case class Authority(val client: String)
+case class Authority(val client: Option[Client])
 
 object Authority {
   implicit val formats: Format[Authority] = Json.format[Authority]
+}
+
+case class Client(val id: String, val name: String)
+
+object Client {
+  implicit val formats: Format[Client] = Json.format[Client]
 }
 
 case class SearchResult(val numberFound: Long, val startIndex: Long, results: Seq[Report])
@@ -53,7 +59,7 @@ object Image {
   implicit val formats: Format[Image] = Json.format[Image]
 }
 
-case class User(val id: String, val displayName: String, registered: Option[Date], via: Option[String])
+case class User(val id: String, val displayName: String, registered: Option[Date], via: Option[Authority])
 
 object User {
   implicit val formats: Format[User] = Json.format[User]
