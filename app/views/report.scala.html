@@ -23,8 +23,10 @@
         @r.created.toDate.format("d MMM YYYY HH:mm")
     </p>
     
-    @r.via.map{v =>
-        <p>via @v</p>
+    @r.via.map { v =>
+        @v.client.map { c =>
+            Via @c.name
+        }
     }
 
     @r.image.map{i =>
