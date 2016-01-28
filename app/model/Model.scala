@@ -8,11 +8,11 @@ import play.api.libs.json._
 
 class DateTimeFormat extends Reads[DateTime] {
 
-  private val isoDateTimeNoMillis : DateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis()
+  private val isoDateTime = ISODateTimeFormat.dateTime
 
   override def reads(json: JsValue): JsResult[DateTime] = {
     json match {
-      case JsString(s) => JsSuccess(isoDateTimeNoMillis.parseDateTime(s))
+      case JsString(s) => JsSuccess(isoDateTime.parseDateTime(s))
       case _ => throw new RuntimeException()
     }
   }
