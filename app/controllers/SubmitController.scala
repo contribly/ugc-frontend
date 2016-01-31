@@ -57,8 +57,8 @@ object SubmitController extends Controller {
             val bearerToken = request.session.get("token").get
 
             val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
-            val noMedia: Future[Option[Media]] = Future.successful(None)
 
+            val noMedia: Future[Option[Media]] = Future.successful(None)
             val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia)(mf => {
               Logger.info("Found media file on request: " + mf)
               ugcService.submitMedia(mf.ref.file, bearerToken)

@@ -107,9 +107,10 @@ trait UGCService {
 
     val submissionJson = Json.obj("headline" -> headline,
       "body" -> body,
-      "media" -> Json.toJson(Seq(media.map(m => Map("id" -> m.id)))))
+      "media" -> media.map(m => Json.toJson(Seq(Map("id" -> m.id))))
+    )
 
-    Logger.info("Submission JSON: " + submissionJson.toString())
+    Logger.info("Report submission JSON: " + submissionJson.toString())
 
     val eventualResponse = WS.url(reportsUrl).
       withHeaders(bearerTokenHeader(token), applicationJsonHeader).
