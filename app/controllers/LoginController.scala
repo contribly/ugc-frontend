@@ -44,15 +44,14 @@ object LoginController extends Controller {
           Future.successful(Ok(views.html.login(formWithErrors, owner)))
         },
         loginDetails => {
-          val eventualMaybeToken: Future[Option[String]] = signedInUserService.signin(loginDetails.username, loginDetails.password, request)
-          eventualMaybeToken.map(to => {
+          signedInUserService.signin(loginDetails.username, loginDetails.password, request).map{ to =>
             to.fold(
               Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
-            )(t => {
+            ){ t =>
               Logger.info("Setting session token: " + t)
               Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
-            })
-          })
+            }
+          }
         }
       )
     })

@@ -164,6 +164,7 @@ trait UGCService {
   }
 
   def token(username: String, password: String): Future[Option[String]] = {
+    Logger.info("Requesting token for: " + Seq(username, password, clientId).mkString(", "))
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val eventualResponse = WS.url(tokenUrl).
