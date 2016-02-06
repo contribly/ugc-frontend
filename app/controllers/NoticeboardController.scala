@@ -39,7 +39,7 @@ object NoticeboardController extends Controller with Pages {
     }
 
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, None)
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, None, None)
     val eventualOwner = ugcService.owner
 
     for {
@@ -60,7 +60,7 @@ object NoticeboardController extends Controller with Pages {
     }
 
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, Some("image"))
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, Some("image"), None)
     val eventualOwner = ugcService.owner
 
     for {

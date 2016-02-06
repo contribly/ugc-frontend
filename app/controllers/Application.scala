@@ -19,7 +19,7 @@ object Application extends Controller with Pages {
     }
 
     val eventualTags = ugcService.tags()
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, hasMediaType)
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, hasMediaType, None)
     val eventualOwner = ugcService.owner
 
     for {
@@ -39,7 +39,7 @@ object Application extends Controller with Pages {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
     }
 
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"))
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"), None)
     val eventualOwner = ugcService.owner
 
     for {
@@ -72,7 +72,7 @@ object Application extends Controller with Pages {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
     }
 
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"))
+    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"), None)
     val eventualOwner = ugcService.owner
 
     for {

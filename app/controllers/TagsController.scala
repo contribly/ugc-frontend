@@ -34,7 +34,7 @@ object TagsController extends Controller with Pages {
     }
 
     val eventualTag = ugcService.tag(id)
-    val eventualReports = ugcService.reports(PageSize, 1, Some(id), None, None, None)
+    val eventualReports = ugcService.reports(PageSize, 1, Some(id), None, None, None, None)
     val eventualOwner = ugcService.owner
     val eventualTags = ugcService.tags()
 

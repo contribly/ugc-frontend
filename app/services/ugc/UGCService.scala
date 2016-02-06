@@ -77,7 +77,8 @@ trait UGCService {
     }
   }
 
-  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String], user: Option[String], hasMediaType: Option[String]): Future[SearchResult] = {
+  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String], user: Option[String],
+              hasMediaType: Option[String], token: Option[String]): Future[SearchResult] = {
     val u = reportsUrl + "?ownedBy=" + ownedBy + "&pageSize=" + pageSize + "&page=" + page +
       tag.fold("")(t => "&tag=" + t) +
       noticeboard.fold("")(n => "&noticeboard=" + n) +
@@ -85,7 +86,9 @@ trait UGCService {
       hasMediaType.fold("")(mt => "&hasMediaType=" + mt)
 
     Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
+    val url = WS.url(u)
+    val withToken = token.fold(url){ t => url.withHeaders(bearerTokenHeader(t))}
+    withToken.get.map {
       response => {
         Json.parse(response.body).as[SearchResult]
       }

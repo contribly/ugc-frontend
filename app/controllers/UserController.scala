@@ -18,19 +18,27 @@ object UserController extends Controller with Pages {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
     }
 
-    val eventualUser = ugcService.user(id)
-    val eventualOwner = ugcService.owner
-    val eventualReports = ugcService.reports(PageSize, 1, None, None, Some(id), None)
-
     for {
-      user <- eventualUser
-      owner <- eventualOwner
-      reports <- eventualReports
+      user <- ugcService.user(id)
+      owner <- ugcService.owner
+      reports <- ugcService.reports(PageSize, 1, None, None, Some(id), None, None)
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
       Ok(views.html.user(user, owner, signedIn, reports.results, pageLinksFor(user, reports.numberFound)))
     }
+  }
+
+  def profile = Action.async { request =>
+
+    ugcService.owner.flatMap { owner =>
+      signedInUserService.signedIn(request).flatMap { signedIn =>
+        ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
+          Ok(views.html.profile(signedIn.get, owner, signedIn, reports.results))
+        }
+      }
+    }
+
   }
 
 }

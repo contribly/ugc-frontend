@@ -75,8 +75,8 @@ object SubmitController extends Controller {
                   Redirect(routes.Application.index(None, None))
                 }
                 )(r => {
-                  Logger.info("Redirecting to report: " + r.id)
-                  Redirect(routes.Application.report(r.id))
+                  Logger.info("Redirecting to profile page: " + r.id)
+                  Redirect(routes.UserController.profile())
                 })
               })
             })
