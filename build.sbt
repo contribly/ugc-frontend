@@ -8,6 +8,8 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(ws)
 
+libraryDependencies ++= Seq("com.restfb" % "restfb" % "1.19.0")
+
 libraryDependencies += specs2 % Test
 
 maintainer in Linux := "Tony McCrae <tony@eelpieconsulting.co.uk>"
