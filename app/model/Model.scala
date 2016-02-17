@@ -38,25 +38,19 @@ object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]
 }
 
-case class Artifact(val contentType: String, val url: String, val width: Option[Int], val height: Option[Int], val label: String)
+case class Artifact(val contentType: String, val url: Option[String], val width: Option[Int], val height: Option[Int], val label: String)
 
 object Artifact {
   implicit val formats: Format[Artifact] = Json.format[Artifact]
 }
 
 case class Report(val id: String, val headline: String, created: DateTime, noticeboard: Option[Noticeboard],
-                  user: User, body: Option[String], image: Option[Image], tags: Seq[Tag], place: Option[Place],
+                  user: User, body: Option[String], tags: Seq[Tag], place: Option[Place],
                   mediaUsages: Seq[MediaUsage], via: Option[Authority])
 
 object Report {
   implicit val df: Reads[DateTime] = DateTimeFormat
   implicit val formats: Format[Report] = Json.format[Report]
-}
-
-case class Image(val id: String)
-
-object Image {
-  implicit val formats: Format[Image] = Json.format[Image]
 }
 
 case class User(val id: String, val displayName: String, registered: Option[Date], via: Option[Authority])
