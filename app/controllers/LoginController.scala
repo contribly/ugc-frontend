@@ -4,7 +4,7 @@ import model.LoginDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AnyContent, Request, Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,9 +34,16 @@ object LoginController extends Controller {
 
   def submit() = Action.async { request =>
 
-    val eventualOwner = ugcService.owner
-
-    eventualOwner.flatMap(owner => {
+    def auth(username: String, password: String): Future[Option[String]] = {  // TODO belongs in the controller!
+      Logger.info("Attempting to set signed in user token")
+      ugcService.token(username, password).map(to => {
+        to.map(t => {
+          Logger.info("Got token: " + t)
+          t
+        })
+      })
+    }
+    ugcService.owner.flatMap(owner => {
 
       val boundForm: Form[LoginDetails] = loginForm.bindFromRequest()(request)
       boundForm.fold(
@@ -44,7 +51,7 @@ object LoginController extends Controller {
           Future.successful(Ok(views.html.login(formWithErrors, owner)))
         },
         loginDetails => {
-          signedInUserService.signin(loginDetails.username, loginDetails.password, request).map{ to =>
+          auth(loginDetails.username, loginDetails.password).map{ to =>
             to.fold(
               Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
             ){ t =>

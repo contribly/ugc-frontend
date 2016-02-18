@@ -174,7 +174,7 @@ trait UGCService {
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post("grant_type=password&username=" + username + "&password=" + password)
 
-    eventualResponse.map(r => {
+    eventualResponse.map{ r =>
       if (r.status == Ok) {
         val responseJson = Json.parse(r.body)
         (responseJson \ "access_token").asOpt[String]
@@ -182,7 +182,7 @@ trait UGCService {
         Logger.info(r.status + ": " + r.body)
         None
       }
-    })
+    }
   }
 
   def tokenFacebook(facebookAccessToken: String): Future[Option[String]] = {
@@ -193,7 +193,7 @@ trait UGCService {
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post("grant_type=facebook&token=" + facebookAccessToken)
 
-    eventualResponse.map(r => {
+    eventualResponse.map{ r =>
       if (r.status == Ok) {
         val responseJson = Json.parse(r.body)
         (responseJson \ "access_token").asOpt[String]
@@ -201,7 +201,7 @@ trait UGCService {
         Logger.info(r.status + ": " + r.body)
         None
       }
-    })
+    }
   }
 
   def user(id: String): Future[User] = {

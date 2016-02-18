@@ -14,16 +14,6 @@ class SignedInUserService {
 
   val ugcService = UGCService
 
-  def signin(username: String, password: String, request: Request[AnyContent]): Future[Option[String]] = {
-    Logger.info("Attempting to set signed in user token")
-    ugcService.token(username, password).map(to => {
-      to.map(t => {
-        Logger.info("Got token: " + t)
-        t
-      })
-    })
-  }
-
   def signedIn(request: Request[Any]): Future[Option[User]] = {
     val token: Option[String] = request.session.get(sessionTokenKey)
     Logger.info("Token on request: " + token)

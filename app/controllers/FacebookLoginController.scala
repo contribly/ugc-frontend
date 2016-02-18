@@ -14,6 +14,7 @@ import scala.concurrent.Future
 trait FacebookLoginController extends Controller {
 
   val ugcService = UGCService
+  val signedInUserService = SignedInUserService
 
   val rootUrl: String
   val appId: String
@@ -46,15 +47,14 @@ trait FacebookLoginController extends Controller {
       Logger.info("Exchanging Facebook verification code for an access token: " + code)
       val client: FacebookClient = new DefaultFacebookClient(Version.VERSION_2_5)
 
-      val userAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, redirectUrl, c) // TODO exception handling
-      Logger.info("Obtained user access token: " + userAccessToken)
+      val facebookAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, redirectUrl, c) // TODO exception handling
+      Logger.info("Obtained user access token: " + facebookAccessToken)
 
-      val eventualMaybeToken: Future[Option[String]] = ugcService.tokenFacebook(userAccessToken.getAccessToken)
-      eventualMaybeToken.map { to =>
-        to.fold(
-          Redirect(routes.LoginController.prompt) // TODO user notification of error
+      ugcService.tokenFacebook(facebookAccessToken.getAccessToken).map { to =>
+        to.fold {
+        Redirect(routes.LoginController.prompt) // TODO user notification of error
 
-        ){ t =>
+      }{ t =>
           Logger.info("Setting session token: " + t)
           Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
         }
