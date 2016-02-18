@@ -60,7 +60,6 @@ trait FacebookLoginController extends Controller {
         }
       }
 
-      Future.successful(Redirect(routes.Application.index(None, None)))
     }
 
   }
