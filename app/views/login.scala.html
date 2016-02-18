@@ -13,17 +13,21 @@
 
 <h4>Login</h4>
 
-@loginForm.globalError.map { error =>
-    <p class="error">@error.message</p>
-}
+    @loginForm.globalError.map { error =>
+        <p class="error">@error.message</p>
+    }
 
-@helper.form(action = routes.LoginController.submit) {
-    @helper.inputText(loginForm("username"))
-    @helper.inputPassword(loginForm("password"))
-    <p class="buttons">
-        <input type="submit" id="submit">
-    <p>
-}
+    @helper.form(action = routes.LoginController.submit) {
+        @helper.inputText(loginForm("username"))
+        @helper.inputPassword(loginForm("password"))
+        <p class="buttons">
+            <input type="submit" id="submit">
+        <p>
+    }
+
+<h4>Facebook</h4>
+
+    <p><a href="@routes.FacebookLoginController.redirect">Login with Facebook</p>
 
 </body>
 </html>

@@ -4,6 +4,10 @@ GET        /videos                  controllers.Application.videos(page: Option[
 
 GET        /login/prompt            controllers.LoginController.prompt
 POST       /login/submit            controllers.LoginController.submit
+
+GET         /login/facebook             controllers.FacebookLoginController.redirect
+GET         /login/facebook/callback    controllers.FacebookLoginController.callback(code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String])
+
 GET        /logout                  controllers.LoginController.logout
 
 GET        /register                controllers.RegisterController.prompt
