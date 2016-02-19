@@ -1,5 +1,5 @@
-@import model.{Report, User}
-@(r: Report, owner: User, signedIn: Option[User])
+@import model.{FlagType, Report, User}
+@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[FlagType])
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,6 +31,11 @@
 
     @r.body.map{b =>
         <p>@b</p>
+    }
+
+    <h6>Report a problem with this report</h6>
+    @flagTypes.map { ft =>
+        @ft.name
     }
 
     <hr/>

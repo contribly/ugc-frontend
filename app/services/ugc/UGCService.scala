@@ -32,6 +32,14 @@ trait UGCService {
   val Ok: Int = 200
   val Accepted: Int = 202
 
+  def flagTypes: Future[Seq[FlagType]] = {
+    WS.url(apiUrl + "/flag-types").get.map {
+      response => {
+        Json.parse(response.body).as[Seq[FlagType]]
+      }
+    }
+  }
+
   def noticeboard(id: String): Future[Noticeboard] = {
     val u = noticeboardsUrl + "/" + id
     Logger.info("Fetching from url: " + u)

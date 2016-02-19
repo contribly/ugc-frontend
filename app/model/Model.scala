@@ -32,6 +32,12 @@ object Client {
   implicit val formats: Format[Client] = Json.format[Client]
 }
 
+case class FlagType(val id: String, val name: String)
+
+object FlagType {
+  implicit val formats: Format[FlagType] = Json.format[FlagType]
+}
+
 case class SearchResult(val numberFound: Long, val startIndex: Long, results: Seq[Report])
 
 object SearchResult {
