@@ -3,7 +3,7 @@ package services.ugc
 import java.io.File
 
 import model._
-import model.forms.RegistrationDetails
+import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
@@ -21,6 +21,8 @@ trait UGCService {
   val ownedBy: String
   val clientId: String
   val clientSecret: String
+
+  val applicationJsonHeader = "Content-Type" -> "application/json"
 
   val reportsUrl: String = apiUrl + "/reports"
   val mediaUrl: String = apiUrl + "/media"
@@ -115,7 +117,6 @@ trait UGCService {
   }
 
   def submit(headline: String, body: String, media: Option[Media], token: String): Future[Option[Report]] = {
-    val applicationJsonHeader = "Content-Type" -> "application/json"
 
     val submissionJson = Json.obj("headline" -> headline,
       "body" -> body,
@@ -137,6 +138,14 @@ trait UGCService {
         None
       }
     })
+  }
+
+  def submitFlag(reportId: String, flagSubmission: FlagSubmission): Future[Unit] = {
+    WS.url(reportsUrl + "/" + reportId + "/flag").
+      withHeaders(applicationJsonHeader).
+      post(Json.toJson(flagSubmission)).map { response =>
+      Logger.info("Response: " + response)
+    }
   }
 
   def submitMedia(mf: File, token: String): Future[Option[Media]] = {
@@ -250,11 +259,9 @@ trait UGCService {
 }
 
 object UGCService extends UGCService {
-
   override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
   override lazy val ownedBy: String = Play.configuration.getString("ugc.user").get
   override lazy val clientId: String = Play.configuration.getString("ugc.client.id").get
   override lazy val clientSecret: String = Play.configuration.getString("ugc.client.secret").get
-
 }
 

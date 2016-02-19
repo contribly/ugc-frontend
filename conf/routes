@@ -23,6 +23,7 @@ GET        /noticeboards/:id        controllers.NoticeboardController.noticeboar
 GET        /noticeboards/:id/gallery        controllers.NoticeboardController.gallery(id: String, page: Option[Int])
 
 GET        /reports/:id             controllers.ReportController.report(id: String)
+POST        /reports/:id/flag       controllers.ReportController.flag(id: String)
 
 GET        /tags                    controllers.TagsController.tags
 GET        /tags/:id                controllers.TagsController.tag(id: String, page: Option[Int])

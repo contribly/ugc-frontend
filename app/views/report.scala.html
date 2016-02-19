@@ -1,5 +1,8 @@
+@import model.forms.FlagSubmission
 @import model.{FlagType, Report, User}
-@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[FlagType])
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[FlagType], flagForm: Form[FlagSubmission])
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,10 +37,13 @@
     }
 
     <h6>Report a problem with this report</h6>
-    @flagTypes.map { ft =>
-        @ft.name
-    }
 
+    @helper.form(action = routes.ReportController.flag(r.id)) {
+        @helper.inputText(flagForm("type"))
+        @helper.inputText(flagForm("notes"))
+
+        <input type="submit" id="submit">
+    }
     <hr/>
 
 </body>
