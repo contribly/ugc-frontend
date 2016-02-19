@@ -1,6 +1,6 @@
 package controllers
 
-import model.RegistrationDetails
+import model.forms.RegistrationDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._

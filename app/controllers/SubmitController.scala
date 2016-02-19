@@ -1,6 +1,7 @@
 package controllers
 
-import model.{Media, Report, SubmissionDetails}
+import model.forms.SubmissionDetails
+import model.{Media, Report}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._

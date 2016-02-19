@@ -1,4 +1,4 @@
-package model
+package model.forms
 
 import play.api.libs.json._
 

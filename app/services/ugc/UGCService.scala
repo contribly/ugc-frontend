@@ -3,6 +3,7 @@ package services.ugc
 import java.io.File
 
 import model._
+import model.forms.RegistrationDetails
 import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
