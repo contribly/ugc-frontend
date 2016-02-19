@@ -52,20 +52,6 @@ object Application extends Controller with Pages {
     }
   }
 
-  def report(id: String) = Action.async { request =>
-    val eventualReport = ugcService.report(id)
-    val eventualOwner = ugcService.owner
-
-    for {
-      report <- eventualReport
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
-
-    } yield {
-      Ok(views.html.report(report, owner, signedIn))
-    }
-  }
-
   def videos(page: Option[Int]) = Action.async { request =>
 
     def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
