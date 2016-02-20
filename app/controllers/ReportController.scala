@@ -52,7 +52,7 @@ object ReportController {
         },
         submissionDetails => {
           Logger.info("Successfully validated flag submission: " + submissionDetails)
-          ugcService.submitFlag(r.id, submissionDetails).map { r =>
+          ugcService.submitFlag(r.id, submissionDetails, request.session.get("token")).map { r =>
             Logger.info("Submitted flag")
           }
         }

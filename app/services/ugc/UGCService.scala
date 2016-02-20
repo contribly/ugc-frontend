@@ -140,9 +140,11 @@ trait UGCService {
     })
   }
 
-  def submitFlag(reportId: String, flagSubmission: FlagSubmission): Future[Unit] = {
+  def submitFlag(reportId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
+    val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
+
     WS.url(reportsUrl + "/" + reportId + "/flag").
-      withHeaders(applicationJsonHeader).
+      withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
       Logger.info("Response: " + response)
     }
