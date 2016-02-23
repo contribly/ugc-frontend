@@ -46,7 +46,6 @@ trait FacebookLoginController extends Controller {
     }{ c =>
       Logger.info("Exchanging Facebook verification code for an access token: " + code)
       val client: FacebookClient = new DefaultFacebookClient(Version.VERSION_2_5)
-
       val facebookAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, redirectUrl, c) // TODO exception handling
       Logger.info("Obtained user access token: " + facebookAccessToken)
 
