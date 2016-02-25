@@ -10,6 +10,8 @@ libraryDependencies ++= Seq(ws)
 
 libraryDependencies ++= Seq("com.restfb" % "restfb" % "1.19.0")
 
+libraryDependencies ++= Seq("org.twitter4j" % "twitter4j-core" % "4.0.4")
+
 libraryDependencies += specs2 % Test
 
 maintainer in Linux := "Tony McCrae <tony@eelpieconsulting.co.uk>"

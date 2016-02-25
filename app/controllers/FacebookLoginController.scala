@@ -20,14 +20,14 @@ trait FacebookLoginController extends Controller {
   val appId: String
   val appSecret: String
 
-  val redirectUrl = rootUrl + routes.FacebookLoginController.callback(None, None, None, None)
+  val callbackUrl = rootUrl + routes.FacebookLoginController.callback(None, None, None, None)
 
   def redirect() = Action.async { request =>
     val scopeBuilder: ScopeBuilder  = new ScopeBuilder()
     scopeBuilder.addPermission(ExtendedPermissions.EMAIL)
 
     val client: FacebookClient  = new DefaultFacebookClient(Version.VERSION_2_5)
-    val loginDialogUrlString = client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder)
+    val loginDialogUrlString = client.getLoginDialogUrl(appId, callbackUrl, scopeBuilder)
 
     Logger.info("Redirecting to Facebook login dialog: " + loginDialogUrlString)
     Future.successful(Redirect(loginDialogUrlString))
@@ -46,7 +46,7 @@ trait FacebookLoginController extends Controller {
     }{ c =>
       Logger.info("Exchanging Facebook verification code for an access token: " + code)
       val client: FacebookClient = new DefaultFacebookClient(Version.VERSION_2_5)
-      val facebookAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, redirectUrl, c) // TODO exception handling
+      val facebookAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, callbackUrl, c) // TODO exception handling
       Logger.info("Obtained user access token: " + facebookAccessToken)
 
       ugcService.tokenFacebook(facebookAccessToken.getAccessToken).map { to =>

@@ -8,6 +8,9 @@ POST       /login/submit            controllers.LoginController.submit
 GET         /login/facebook             controllers.FacebookLoginController.redirect
 GET         /login/facebook/callback    controllers.FacebookLoginController.callback(code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String])
 
+GET         /login/twitter             controllers.TwitterLoginController.redirect
+GET         /login/twitter/call        controllers.TwitterLoginController.callback(oauth_token: Option[String], oauth_verifier: Option[String])
+
 GET        /logout                  controllers.LoginController.logout
 
 GET        /register                controllers.RegisterController.prompt
