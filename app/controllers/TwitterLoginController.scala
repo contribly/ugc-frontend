@@ -9,6 +9,7 @@ import services.ugc.UGCService
 import twitter4j.auth.{AccessToken, RequestToken}
 import twitter4j.{Twitter, TwitterException, TwitterFactory}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TwitterLoginController extends Controller {
