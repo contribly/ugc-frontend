@@ -27,7 +27,7 @@ trait TwitterLoginController extends Controller {
 
     val requestToken: RequestToken = twitterApi.getOAuthRequestToken(callbackUrl)
     //requestTokens.put(requestToken.getToken, requestToken)  TODO need state
-    val loginDialogUrlString = requestToken.getAuthorizationURL
+    val loginDialogUrlString = requestToken.getAuthenticationURL
 
     Logger.info("Redirecting to Twitter login dialog: " + loginDialogUrlString)
     Future.successful(Redirect(loginDialogUrlString))
