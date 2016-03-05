@@ -14,7 +14,7 @@
 
     @includes.pages(pages)
 
-    @noticeboards.map{n =>
+    @noticeboards.map { n =>
         <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a> (@n.contributions)</h4>
         @n.description.map{d =>
             <p>@Html(d)</p>
@@ -27,16 +27,17 @@
         <p>Featured: @n.featured</p>
         <p>@n.supportedMediaTypes</p>
 
-        @n.cover.map{m =>
-            @m.contentType.map{ct =>
-                @if(ct == "image") {
-                    @m.artifacts.find(a => a.contentType.startsWith("image") && a.width == 320).map{i =>
-                        <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
+        @n.cover.map{ c =>
+            @defining(c.`type`) { cmt =>
+                @cmt.map { mt =>
+                    @if(mt == "image") {
+                        @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
+                            <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
+                        }
                     }
                 }
             }
         }
-
         <hr/>
     }
 

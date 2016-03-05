@@ -50,7 +50,7 @@ object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
 }
 
-case class Media(val id: String, val contentType: Option[String], val artifacts: Seq[Artifact])
+case class Media(val id: String, val `type`: Option[String], val artifacts: Seq[Artifact])
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]

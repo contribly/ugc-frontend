@@ -3,25 +3,27 @@
 
 @r.mediaUsages.headOption.map{ mu =>
 
-    @mu.media.contentType.map{ct =>
+    @defining(mu.media.`type`) { t =>
 
-        @if(ct == "video") {
-            @if(preview) {
-                @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("image") && a.url.nonEmpty).map{v =>
-                    <a href="@routes.ReportController.report(r.id)"><img src="@v.url" /></a>
-                }
+        @t.map{ ct =>
+            @if(ct == "video") {
+                @if(preview) {
+                    @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("image") && a.url.nonEmpty).map{v =>
+                        <a href="@routes.ReportController.report(r.id)"><img src="@v.url" /></a>
+                    }
 
-            } else {
-                @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("video/mp4") && a.url.nonEmpty).map{v =>
-                    <video src="@v.url" width="@v.width" height="@v.height" controls="true"
-                       @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
+                } else {
+                    @mu.media.artifacts.find(a => a.label == "nHD" && a.contentType.startsWith("video/mp4") && a.url.nonEmpty).map{v =>
+                        <video src="@v.url" width="@v.width" height="@v.height" controls="true"
+                           @mu.media.artifacts.find(a => a.contentType.startsWith("image")).map{p => poster="@p.url"} ></video>
+                    }
                 }
             }
-        }
 
-        @if(ct == "image") {
-            @mu.media.artifacts.find(a => a.contentType.startsWith("image") && a.label == imageType && a.url.nonEmpty).map{i =>
-                <a href="@routes.ReportController.report(r.id)"><img src="@i.url" /></a>
+            @if(ct == "image") {
+                @mu.media.artifacts.find(a => a.contentType.startsWith("image") && a.label == imageType && a.url.nonEmpty).map{i =>
+                    <a href="@routes.ReportController.report(r.id)"><img src="@i.url" /></a>
+                }
             }
         }
     }
