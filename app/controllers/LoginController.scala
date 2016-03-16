@@ -4,7 +4,7 @@ import model.LoginDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{AnyContent, Request, Action, Controller}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,7 +28,9 @@ object LoginController extends Controller {
     for {
       owner <- eventualOwner
     } yield {
-      Ok(views.html.login(loginForm, owner))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.login(loginForm, o))
+      }
     }
   }
 
@@ -43,26 +45,27 @@ object LoginController extends Controller {
         })
       })
     }
-    ugcService.owner.flatMap(owner => {
 
-      val boundForm: Form[LoginDetails] = loginForm.bindFromRequest()(request)
-      boundForm.fold(
-        formWithErrors => {
-          Future.successful(Ok(views.html.login(formWithErrors, owner)))
-        },
-        loginDetails => {
-          auth(loginDetails.username, loginDetails.password).map{ to =>
-            to.fold(
-              Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
-            ){ t =>
-              Logger.info("Setting session token: " + t)
-              Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+    ugcService.owner.flatMap { owner =>
+      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
+        val boundForm: Form[LoginDetails] = loginForm.bindFromRequest()(request)
+        boundForm.fold(
+          formWithErrors => {
+            Future.successful(Ok(views.html.login(formWithErrors, o)))
+          },
+          loginDetails => {
+            auth(loginDetails.username, loginDetails.password).map { to =>
+              to.fold(
+                Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), o))
+              ) { t =>
+                Logger.info("Setting session token: " + t)
+                Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+              }
             }
           }
-        }
-      )
-    })
-
+        )
+      }
+    }
   }
 
   def logout = Action {

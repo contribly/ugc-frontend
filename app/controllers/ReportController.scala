@@ -34,7 +34,9 @@ object ReportController {
       flagTypes <- eventualFlagTypes
 
     } yield {
-      Ok(views.html.report(report, owner, signedIn, flagTypes, flagForm))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.report(report, o, signedIn, flagTypes, flagForm))
+      }
     }
   }
 

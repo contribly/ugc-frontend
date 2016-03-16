@@ -6,6 +6,7 @@ import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object UserController extends Controller with Pages {
 
@@ -25,16 +26,22 @@ object UserController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.user(user, owner, signedIn, reports.results, pageLinksFor(user, reports.numberFound)))
+      user.fold(NotFound(views.html.notFound())) { u =>
+        owner.fold(NotFound(views.html.notFound())) { o =>
+          Ok(views.html.user(u, o, signedIn, reports.results, pageLinksFor(u, reports.numberFound)))
+        }
+      }
     }
   }
 
   def profile = Action.async { request =>
 
     ugcService.owner.flatMap { owner =>
-      signedInUserService.signedIn(request).flatMap { signedIn =>
-        ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
-          Ok(views.html.profile(signedIn.get, owner, signedIn, reports.results))
+      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
+        signedInUserService.signedIn(request).flatMap { signedIn =>
+          ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
+            Ok(views.html.profile(signedIn.get, o, signedIn, reports.results))
+          }
         }
       }
     }

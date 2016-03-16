@@ -29,7 +29,9 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.index(tags, reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.index(tags, reports.results, o, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
+      }
     }
   }
 
@@ -48,7 +50,9 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound)))
+      }
     }
   }
 
@@ -67,7 +71,9 @@ object Application extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound)))
+      }
     }
   }
 

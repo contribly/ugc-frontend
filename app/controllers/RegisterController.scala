@@ -1,5 +1,6 @@
 package controllers
 
+import controllers.Application._
 import model.forms.RegistrationDetails
 import play.api.Logger
 import play.api.data.Forms._
@@ -28,7 +29,9 @@ object RegisterController extends Controller {
     for {
       owner <- eventualOwner
     } yield {
-      Ok(views.html.register(registrationForm, owner))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.register(registrationForm, o))
+      }
     }
   }
 
@@ -38,24 +41,26 @@ object RegisterController extends Controller {
 
     eventualOwner.flatMap { owner =>
 
-      val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
+      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
 
-      boundForm.fold(
-        formWithErrors => {
-          Future.successful(Ok(views.html.register(formWithErrors, owner)))
-        },
-        registrationDetails => {
-          Logger.info("Attempting to register user: " + registrationForm)
+        val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
 
-          ugcService.register(registrationDetails).map { mu =>
-            mu.fold(Ok(views.html.register(registrationForm, owner))) { u =>
-              Logger.info("Registered : " + u)
-              Ok(views.html.register(registrationForm, owner))
+        boundForm.fold(
+          formWithErrors => {
+            Future.successful(Ok(views.html.register(formWithErrors, o)))
+          },
+          registrationDetails => {
+            Logger.info("Attempting to register user: " + registrationForm)
+
+            ugcService.register(registrationDetails).map { mu =>
+              mu.fold(Ok(views.html.register(registrationForm, o))) { u =>
+                Logger.info("Registered : " + u)
+                Ok(views.html.register(registrationForm, o))
+              }
             }
           }
-        }
-      )
-
+        )
+      }
     }
   }
 

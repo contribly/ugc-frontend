@@ -62,14 +62,8 @@ trait UGCService {
     }
   }
 
-  def owner(): Future[User] = {
-    val u = apiUrl + "/users/" + ownedBy
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      r => {
-        Json.parse(r.body).as[User]
-      }
-    }
+  def owner(): Future[Option[User]] = {
+    user(ownedBy)
   }
 
   def register(registrationDetails: RegistrationDetails): Future[Option[User]] = {
@@ -243,12 +237,14 @@ trait UGCService {
     }
   }
 
-  def user(id: String): Future[User] = {
+  def user(id: String): Future[Option[User]] = {
     val u = usersUrl + "/" + UriEncoding.encodePathSegment(id, "UTF-8")
     Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[User]
+    WS.url(u).get.map { response =>
+      if (response.status == Ok) {
+        Some(Json.parse(response.body).as[User])
+      } else {
+        None
       }
     }
   }

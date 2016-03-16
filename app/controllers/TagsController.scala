@@ -1,5 +1,6 @@
 package controllers
 
+import controllers.Application._
 import model.Tag
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
@@ -23,7 +24,9 @@ object TagsController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.tags(tags, owner, signedIn))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.tags(tags, o, signedIn))
+      }
     }
   }
 
@@ -46,7 +49,9 @@ object TagsController extends Controller with Pages {
       tags <- eventualTags
 
     } yield {
-      Ok(views.html.tag(tag, reports.results, owner, signedIn, tags, pageLinksFor(tag, reports.numberFound)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.tag(tag, reports.results, o, signedIn, tags, pageLinksFor(tag, reports.numberFound)))
+      }
     }
   }
 

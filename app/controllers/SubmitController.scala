@@ -33,7 +33,9 @@ object SubmitController extends Controller {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.submit(submitForm, owner, signedIn))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.submit(submitForm, o, signedIn))
+      }
     }
   }
 
@@ -41,51 +43,52 @@ object SubmitController extends Controller {
     val eventualOwner = ugcService.owner
     eventualOwner.flatMap(owner => {
 
-      val signedIn = signedInUserService.signedIn(request)
+      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
 
-      signedIn.flatMap(signedIn => {
+        val signedIn = signedInUserService.signedIn(request)
 
-        val boundForm: Form[SubmissionDetails] = submitForm.bindFromRequest()(request)
-        Logger.info("Bound submission form: " + boundForm)
-        boundForm.fold(
-          formWithErrors => {
-            Logger.info("Form failed to validate: " + formWithErrors)
-            Future.successful(Ok(views.html.submit(formWithErrors, owner, signedIn)))
-          },
-          submissionDetails => {
-            Logger.info("Successfully validated submission details: " + submissionDetails)
+        signedIn.flatMap(signedIn => {
 
-            val bearerToken = request.session.get("token").get
+          val boundForm: Form[SubmissionDetails] = submitForm.bindFromRequest()(request)
+          Logger.info("Bound submission form: " + boundForm)
+          boundForm.fold(
+            formWithErrors => {
+              Logger.info("Form failed to validate: " + formWithErrors)
+              Future.successful(Ok(views.html.submit(formWithErrors, o, signedIn)))
+            },
+            submissionDetails => {
+              Logger.info("Successfully validated submission details: " + submissionDetails)
 
-            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+              val bearerToken = request.session.get("token").get
 
-            val noMedia: Future[Option[Media]] = Future.successful(None)
-            val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia)(mf => {
-              Logger.info("Found media file on request: " + mf)
-              ugcService.submitMedia(mf.ref.file, bearerToken)
-            })
+              val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
 
-            eventualMedia.flatMap(media => {
-              Logger.info("Media: " + media)
+              val noMedia: Future[Option[Media]] = Future.successful(None)
+              val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia)(mf => {
+                Logger.info("Found media file on request: " + mf)
+                ugcService.submitMedia(mf.ref.file, bearerToken)
+              })
 
-              val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
-              submissionResult.map(or => {
-                Logger.info("Submission result: " + or)
-                or.fold({
-                  Logger.info("Redirecting to homepage")
-                  Redirect(routes.Application.index(None, None))
-                }
-                )(r => {
-                  Logger.info("Redirecting to profile page: " + r.id)
-                  Redirect(routes.UserController.profile())
+              eventualMedia.flatMap(media => {
+                Logger.info("Media: " + media)
+
+                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
+                submissionResult.map(or => {
+                  Logger.info("Submission result: " + or)
+                  or.fold({
+                    Logger.info("Redirecting to homepage")
+                    Redirect(routes.Application.index(None, None))
+                  }
+                  )(r => {
+                    Logger.info("Redirecting to profile page: " + r.id)
+                    Redirect(routes.UserController.profile())
+                  })
                 })
               })
-            })
-
-          }
-        )
-      })
-
+            }
+          )
+        })
+      }
     })
   }
 

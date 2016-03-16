@@ -1,6 +1,5 @@
 package controllers
 
-import controllers.Application._
 import model.Noticeboard
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
@@ -28,7 +27,9 @@ object NoticeboardController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboards(noticeboards.results, owner, signedIn, pagesLinkFor(noticeboards.numberFound.toInt)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.noticeboards(noticeboards.results, o, signedIn, pagesLinkFor(noticeboards.numberFound.toInt)))
+      }
     }
   }
 
@@ -49,7 +50,9 @@ object NoticeboardController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn, reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.noticeboard(noticeboard, reports.results, o, signedIn, reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
+      }
     }
   }
 
@@ -70,7 +73,9 @@ object NoticeboardController extends Controller with Pages {
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
-      Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn, pageLinksFor(noticeboard, reports.numberFound)))
+      owner.fold(NotFound(views.html.notFound())) { o =>
+        Ok(views.html.noticeboardGallery(noticeboard, reports.results, o, signedIn, pageLinksFor(noticeboard, reports.numberFound)))
+      }
     }
   }
 
