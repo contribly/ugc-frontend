@@ -28,14 +28,8 @@
         <p>@n.supportedMediaTypes</p>
 
         @n.cover.map{ c =>
-            @defining(c.`type`) { cmt =>
-                @cmt.map { mt =>
-                    @if(mt == "image") {
-                        @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
-                            <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
-                        }
-                    }
-                }
+            @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
+                <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
             }
         }
         <hr/>

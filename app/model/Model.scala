@@ -50,13 +50,13 @@ object LatLong {
   implicit val formats: Format[LatLong] = Json.format[LatLong]
 }
 
-case class Media(val id: String, val `type`: Option[String], val artifacts: Seq[Artifact])
+case class Media(val id: String, val `type`: Option[String])
 
 object Media {
   implicit val formats: Format[Media] = Json.format[Media]
 }
 
-case class MediaUsage(val media: Media, val orientation: Option[Int])
+case class MediaUsage(val media: Media, val orientation: Option[Int], val artifacts: Seq[Artifact])
 
 object MediaUsage {
   implicit val formats: Format[MediaUsage] = Json.format[MediaUsage]
@@ -65,7 +65,7 @@ object MediaUsage {
 case class Noticeboard(val id: String, val name: String, val description: Option[String],
                        val geoCodingResolution:  Option[String],
                        val endDate: Option[DateTime], val embargoDate: Option[DateTime], val scheduledDate: Option[DateTime],
-                       val moderated: Boolean, val featured: Boolean, val cover: Option[Media],
+                       val moderated: Boolean, val featured: Boolean, val cover: Option[MediaUsage],
                        val supportedMediaTypes: Set[String],
                        val contributions: Option[Int])
 
