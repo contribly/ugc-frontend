@@ -9,7 +9,10 @@ GET         /login/facebook             controllers.FacebookLoginController.redi
 GET         /login/facebook/callback    controllers.FacebookLoginController.callback(code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String])
 
 GET         /login/twitter             controllers.TwitterLoginController.redirect
-GET         /login/twitter/call        controllers.TwitterLoginController.callback(oauth_token: Option[String], oauth_verifier: Option[String])
+GET         /login/twitter/callback        controllers.TwitterLoginController.callback(oauth_token: Option[String], oauth_verifier: Option[String])
+
+GET         /login/google              controllers.GoogleLoginController.redirect
+GET         /login/google/callback     controllers.GoogleLoginController.callback(code: Option[String], error: Option[String])
 
 GET        /logout                  controllers.LoginController.logout
 
