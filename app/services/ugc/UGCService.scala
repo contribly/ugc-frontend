@@ -199,6 +199,25 @@ trait UGCService {
     }
   }
 
+  def tokenGoogle(googleToken: String): Future[Option[String]] = {
+    Logger.info("Requesting token for Google access token: " + googleToken)
+    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
+
+    val eventualResponse = WS.url(tokenUrl).
+      withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
+      post("grant_type=google&token=" + googleToken)
+
+    eventualResponse.map{ r =>
+      if (r.status == Ok) {
+        val responseJson = Json.parse(r.body)
+        (responseJson \ "access_token").asOpt[String]
+      } else {
+        Logger.info(r.status + ": " + r.body)
+        None
+      }
+    }
+  }
+
   def tokenFacebook(facebookAccessToken: String): Future[Option[String]] = {
     Logger.info("Requesting token for facebook access token: " + facebookAccessToken)
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"

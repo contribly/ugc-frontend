@@ -41,7 +41,7 @@ trait FacebookLoginController extends Controller {
       error.map { e =>
         Logger.error("Error was: " + e + ", " + error_reason + ", " + error_description)
       }
-      Future.successful(Redirect(routes.Application.index(None, None)))
+      Future.successful(Redirect(routes.LoginController.prompt()))
 
     }{ c =>
       Logger.info("Exchanging Facebook verification code for an access token: " + code)

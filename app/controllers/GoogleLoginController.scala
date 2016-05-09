@@ -4,7 +4,7 @@ import com.netaporter.uri.dsl._
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Result, Action, Controller}
 import play.api.{Logger, Play}
 import services.ugc.UGCService
 
@@ -37,10 +37,11 @@ trait GoogleLoginController extends Controller {
   }
 
   def callback(code: Option[String], error: Option[String]) = Action.async { request =>
-    code.fold{
+    code.fold {
       Logger.warn("Not code parameter seen on callback. error parameter was: " + error)
+      Future.successful(Redirect(routes.LoginController.prompt()))
 
-    }{ c =>
+    } { c =>
       Logger.info("Received code from oauth callback: " + code)
 
       val tokenParams = Map(
@@ -51,20 +52,33 @@ trait GoogleLoginController extends Controller {
         "grant_type" -> Seq("authorization_code")
       )
 
-      val tokenUrl ="https://www.googleapis.com/oauth2/v4/token"
+      val tokenUrl = "https://www.googleapis.com/oauth2/v4/token"
 
       Logger.info("Exchanging code for token: " + tokenUrl)
-      WS.url(tokenUrl).post(tokenParams).map { r => {
-          Logger.info("Token response: " + r.body)
-          val token = Json.parse(r.body).as[Map[String, String]]
-          Logger.info("Got token: " + token)
+      WS.url(tokenUrl).post(tokenParams).flatMap { r => {
+        Logger.info("Token response: " + r.body)
+
+        implicit val tr = Json.reads[TokenResponse]
+        val token = Json.parse(r.body).as[TokenResponse]
+        Logger.info("Got token: " + token)
+
+        ugcService.tokenGoogle(token.access_token).map { to =>
+          to.fold {
+            Redirect(routes.LoginController.prompt) // TODO user notification of error
+
+          } { t =>
+            Logger.info("Setting session token: " + t)
+            Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+          }
         }
+      }
       }
 
     }
 
-    Future.successful(Ok(Json.toJson("TODO")))
   }
+
+  private case class TokenResponse(access_token: String)
 
 }
 
