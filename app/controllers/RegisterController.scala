@@ -1,11 +1,10 @@
 package controllers
 
-import controllers.Application._
 import model.forms.RegistrationDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{Result, Action, Controller}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,10 +23,8 @@ object RegisterController extends Controller {
   )
 
   def prompt() = Action.async {
-    val eventualOwner = ugcService.owner
-
     for {
-      owner <- eventualOwner
+      owner <- ugcService.owner
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
         Ok(views.html.register(registrationForm, o))
@@ -41,21 +38,33 @@ object RegisterController extends Controller {
 
     eventualOwner.flatMap { owner =>
 
-      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
+      owner.fold {
+        Logger.warn("Invalid owner; returning 404")
+        Future.successful(NotFound(views.html.notFound()))
+      } { o =>
 
-        val boundForm: Form[RegistrationDetails] = registrationForm.bindFromRequest()(request)
-
-        boundForm.fold(
+        registrationForm.bindFromRequest()(request).fold(
           formWithErrors => {
             Future.successful(Ok(views.html.register(formWithErrors, o)))
           },
           registrationDetails => {
-            Logger.info("Attempting to register user: " + registrationForm)
-
-            ugcService.register(registrationDetails).map { mu =>
-              mu.fold(Ok(views.html.register(registrationForm, o))) { u =>
+            Logger.info("Attempting to register user: " + registrationDetails)
+            ugcService.register(registrationDetails).flatMap { mu =>
+              mu.fold {
+                Logger.warn("Failed to register user") // TODO user feedback
+                Future.successful(Ok(views.html.register(registrationForm, o)))
+              } { u =>
                 Logger.info("Registered : " + u)
-                Ok(views.html.register(registrationForm, o))
+
+                Logger.info("Attempting to set signed in user token") // TODO Register end point should provide a token as well
+                ugcService.token(u.username, registrationDetails.password).map { to =>
+                  to.fold {
+                    Redirect(routes.Application.index(None, None))
+                  } { t =>
+                    Logger.info("Got token: " + t)
+                    Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+                  }
+                }
               }
             }
           }

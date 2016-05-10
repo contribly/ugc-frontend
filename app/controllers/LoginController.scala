@@ -36,25 +36,14 @@ object LoginController extends Controller {
 
   def submit() = Action.async { request =>
 
-    def auth(username: String, password: String): Future[Option[String]] = {  // TODO belongs in the controller!
-      Logger.info("Attempting to set signed in user token")
-      ugcService.token(username, password).map(to => {
-        to.map(t => {
-          Logger.info("Got token: " + t)
-          t
-        })
-      })
-    }
-
     ugcService.owner.flatMap { owner =>
       owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
-        val boundForm: Form[LoginDetails] = loginForm.bindFromRequest()(request)
-        boundForm.fold(
+        loginForm.bindFromRequest()(request).fold(
           formWithErrors => {
             Future.successful(Ok(views.html.login(formWithErrors, o)))
           },
           loginDetails => {
-            auth(loginDetails.username, loginDetails.password).map { to =>
+            ugcService.token(loginDetails.username, loginDetails.password).map { to =>
               to.fold(
                 Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), o))
               ) { t =>
