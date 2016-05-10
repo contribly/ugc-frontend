@@ -1,51 +1,52 @@
 package controllers
 
 import model.User
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Result, Request, Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object UserController extends Controller with Pages {
+object UserController extends Controller with Pages with WithOwner {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
   def user(id: String, page: Option[Int]) = Action.async { request =>
 
-    def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
-    }
+    val userPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    for {
-      user <- ugcService.user(id)
-      owner <- ugcService.owner
-      reports <- ugcService.reports(PageSize, 1, None, None, Some(id), None, None)
-      signedIn <- signedInUserService.signedIn(request)
+      def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
+      }
 
-    } yield {
-      user.fold(NotFound(views.html.notFound())) { u =>
-        owner.fold(NotFound(views.html.notFound())) { o =>
-          Ok(views.html.user(u, o, signedIn, reports.results, pageLinksFor(u, reports.numberFound)))
+      for {
+        user <- ugcService.user(id)
+        reports <- ugcService.reports(PageSize, 1, None, None, Some(id), None, None)
+        signedIn <- signedInUserService.signedIn(request)
+
+      } yield {
+        user.fold(NotFound(views.html.notFound())) { u =>
+          Ok(views.html.user(u, owner, signedIn, reports.results, pageLinksFor(u, reports.numberFound)))
         }
       }
     }
+
+    withOwner(request, userPage)
   }
 
   def profile = Action.async { request =>
 
-    ugcService.owner.flatMap { owner =>
-      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
-        signedInUserService.signedIn(request).flatMap { signedIn =>
-          ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
-            Ok(views.html.profile(signedIn.get, o, signedIn, reports.results))
-          }
+    val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+      signedInUserService.signedIn(request).flatMap { signedIn =>
+        ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
+          Ok(views.html.profile(signedIn.get, owner, signedIn, reports.results))
         }
       }
     }
 
+    withOwner(request, profilePage)
   }
 
 }
