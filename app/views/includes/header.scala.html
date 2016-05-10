@@ -3,12 +3,16 @@
 
 <h3><a href="@routes.Application.index(None, None)">@owner.displayName</a></h3>
 
-<p><a href="@routes.NoticeboardController.noticeboards(None)">Noticeboards</a></p>
+<ul>
+    <li><a href="@routes.NoticeboardController.noticeboards(None)">Noticeboards</a></li>
+    <li><a href="@routes.Application.gallery(None)">Gallery</a></li>
+    <li><a href="@routes.Application.videos(None)">Videos</a></li>
+</ul>
 
 @signedIn.fold{
     <a href="@routes.LoginController.prompt">Sign in</a>
     <a href="@routes.RegisterController.prompt">Register</a>
-}{s =>
+}{ s =>
     Signed in as <a href="@routes.UserController.profile">@s.displayName</a>
     <a href="@routes.LoginController.logout">Sign out</a>
     <a href="@routes.SubmitController.prompt">Submit</a>
