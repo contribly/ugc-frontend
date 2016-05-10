@@ -18,19 +18,17 @@ object Application extends Controller with Pages {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
     }
 
-    val eventualTags = ugcService.tags()
     val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, hasMediaType, None)
     val eventualOwner = ugcService.owner
 
     for {
-      tags <- eventualTags
       reports <- eventualReports
       owner <- eventualOwner
       signedIn <- signedInUserService.signedIn(request)
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.index(tags, reports.results, o, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
+        Ok(views.html.index(reports.results, o, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
       }
     }
   }
