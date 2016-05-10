@@ -39,9 +39,13 @@ object UserController extends Controller with Pages with WithOwner {
   def profile = Action.async { request =>
 
     val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-      signedInUserService.signedIn(request).flatMap { signedIn =>
-        ugcService.reports(PageSize, 1, None, None, Some(signedIn.get.id), None, request.session.get("token")).map { reports =>
-          Ok(views.html.profile(signedIn.get, owner, signedIn, reports.results))
+      signedInUserService.signedIn(request).flatMap { so =>
+        so.fold{
+          Future.successful(Redirect(routes.LoginController.prompt()))
+        } { signedIn =>
+          ugcService.reports(PageSize, 1, None, None, Some(signedIn.id), None, request.session.get("token")).map { reports =>
+            Ok(views.html.profile(signedIn, owner, Some(signedIn), reports.results))
+          }
         }
       }
     }
