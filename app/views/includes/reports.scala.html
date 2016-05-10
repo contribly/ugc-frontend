@@ -1,22 +1,11 @@
 @import model.Report
 @(reports: Seq[Report])
-@reports.map{r =>
-    <a href="@routes.ReportController.report(r.id)"><h5>@r.headline</h5></a>
-    @r.noticeboard.map{n =>
-        <p><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a></p>
-    }
+
+@reports.map{ r =>
+    <hr/>
+    <a href="@routes.ReportController.report(r.id)"><h4>@r.headline</h4></a>
+    @includes.reportAttributes(r)
     @includes.media(r, "medium", true)
-
-    <p>@r.created.toDate.format("d MMM YYYY HH:mm")</p>
-
-    <p><a href="@routes.UserController.user(r.user.id, None)">@r.user.displayName</a>
-        @r.created.toDate.format("d MMM YYYY HH:mm")
-        @r.via.map { v =>
-            @v.client.map { c =>
-                via @c.name
-            }
-        }
-    </p>
 
     @r.body.map{b =>
         <p>@b</p>
