@@ -1,7 +1,7 @@
 @import model.{Report, User}
 @import model.Noticeboard
 @import views.PageLink
-@(reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])
+@(reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributions: Long)
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +14,7 @@
 
     <h4>Gallery</h4>
 
+    (@contributions)
     @includes.pages(pages)
 
     <hr/>

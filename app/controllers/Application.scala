@@ -49,7 +49,7 @@ object Application extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound)))
+        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
   }
@@ -70,7 +70,7 @@ object Application extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound)))
+        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
   }
