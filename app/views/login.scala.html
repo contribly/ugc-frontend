@@ -11,19 +11,23 @@
 
 @includes.header(owner, None)
 
-<h4>Login</h4>
+<hr/>
+<h4>Sign in</h4>
+
+    <p>Not already registered? <a href="@routes.RegisterController.prompt">Register now</a></p>
 
     @loginForm.globalError.map { error =>
         <p class="error">@error.message</p>
     }
 
-    @helper.form(action = routes.LoginController.submit) {
-        @helper.inputText(loginForm("username"))
-        @helper.inputPassword(loginForm("password"))
-        <p class="buttons">
-            <input type="submit" id="submit">
-        <p>
-    }
+<h4>Username / password</h4>
+@helper.form(action = routes.LoginController.submit) {
+    @helper.inputText(loginForm("username"))
+    @helper.inputPassword(loginForm("password"))
+    <p class="buttons">
+        <input type="submit" id="submit">
+    <p>
+}
 
 <h4>Facebook</h4>
 <p><a href="@routes.FacebookLoginController.redirect">Login with Facebook</a></p>
@@ -34,5 +38,6 @@
 <h4>Google</h4>
 <p><a href="@routes.GoogleLoginController.redirect">Login with Google</a></p>
 
+<hr/>
 </body>
 </html>
