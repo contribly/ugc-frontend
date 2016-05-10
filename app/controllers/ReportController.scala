@@ -1,16 +1,18 @@
 package controllers
 
 import controllers.SubmitController._
+import model.User
 import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.Action
+import play.api.mvc.{Result, Request, Action}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-object ReportController {
+object ReportController extends WithOwner {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
@@ -23,22 +25,24 @@ object ReportController {
   )
 
   def report(id: String) = Action.async { request =>
-    val eventualReport = ugcService.report(id)
-    val eventualOwner = ugcService.owner
-    val eventualFlagTypes = ugcService.flagTypes
 
-    for {
-      report <- eventualReport
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
-      flagTypes <- eventualFlagTypes
+    val reportPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        val flagTypeTuples = flagTypes.map (ft => (ft.id, ft.name))
-        Ok(views.html.report(report, o, signedIn, flagTypeTuples, flagForm))
+      val eventualReport = ugcService.report(id)
+      val eventualFlagTypes = ugcService.flagTypes
+
+      for {
+        report <- eventualReport
+        signedIn <- signedInUserService.signedIn(request)
+        flagTypes <- eventualFlagTypes
+
+      } yield {
+        val flagTypeTuples = flagTypes.map(ft => (ft.id, ft.name))
+        Ok(views.html.report(report, owner, signedIn, flagTypeTuples, flagForm))
       }
     }
+
+    withOwner(request, reportPage)
   }
 
   def flag(id: String) = Action.async { request =>
@@ -65,6 +69,5 @@ object ReportController {
     }
 
   }
-
 
 }

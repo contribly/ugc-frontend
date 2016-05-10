@@ -3,15 +3,14 @@ package controllers
 
 import model.User
 import play.api.Logger
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
-import play.api.mvc.{Request, Result}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object Application extends Controller with Pages {
+object Application extends Controller with Pages with WithOwner {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
@@ -41,55 +40,49 @@ object Application extends Controller with Pages {
 
   def gallery(page: Option[Int]) = Action.async { request =>
 
-    def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
-    }
+    val galleryPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"), None)
-    val eventualOwner = ugcService.owner
+      def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
+      }
 
-    for {
-      reports <- eventualReports
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"), None)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
 
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
+      for {
+        reports <- eventualReports
+        signedIn <- eventualVerifiedSignedInUser
+
+      } yield {
+        Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
+
+    withOwner(request, galleryPage)
   }
 
   def videos(page: Option[Int]) = Action.async { request =>
 
-    def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
-    }
+    val videoPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"), None)
-    val eventualOwner = ugcService.owner
 
-    for {
-      reports <- eventualReports
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
+      }
 
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.gallery(reports.results, o, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
+      val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"), None)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
+
+      for {
+        reports <- eventualReports
+        signedIn <- eventualVerifiedSignedInUser
+
+      } yield {
+        Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
-  }
 
-  private def withOwner[T](request: Request[T], handlerFunction: (Request[T], User) => Future[Result]): Future[Result] = {
-    ugcService.owner.flatMap { oo =>
-      oo.fold {
-        Logger.warn("Owner not found; returning 404")
-        Future.successful(NotFound(views.html.notFound()))
-      } { o =>
-        handlerFunction(request, o)
-      }
-    }
+    withOwner(request, videoPage)
   }
 
 }
