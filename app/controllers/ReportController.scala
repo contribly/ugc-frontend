@@ -17,13 +17,6 @@ object ReportController extends WithOwner {
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
-  val flagForm: Form[FlagSubmission] = Form(
-    mapping(
-      "type" -> optional(text),
-      "notes" -> optional(text)
-    )(FlagSubmission.apply)(FlagSubmission.unapply)
-  )
-
   def report(id: String) = Action.async { request =>
 
     val reportPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
@@ -49,10 +42,7 @@ object ReportController extends WithOwner {
 
     ugcService.report(id).map { r =>
 
-      val boundForm: Form[FlagSubmission] = flagForm.bindFromRequest()(request)
-      Logger.info("Bound submission form: " + boundForm)
-
-      boundForm.fold(
+      flagForm.bindFromRequest()(request).fold(
         formWithErrors => {
           Logger.info("Form failed to validate: " + formWithErrors)
 
@@ -69,5 +59,12 @@ object ReportController extends WithOwner {
     }
 
   }
+
+  private val flagForm: Form[FlagSubmission] = Form(
+    mapping(
+      "type" -> optional(text),
+      "notes" -> optional(text)
+    )(FlagSubmission.apply)(FlagSubmission.unapply)
+  )
 
 }
