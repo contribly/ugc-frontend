@@ -2,7 +2,7 @@
 @import model.{FlagType, Report, User}
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[FlagType], flagForm: Form[FlagSubmission])
+@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,7 +25,7 @@
     <h6>Report a problem with this report</h6>
 
     @helper.form(action = routes.ReportController.flag(r.id)) {
-        @helper.inputText(flagForm("type"))
+        @helper.select(flagForm("type"), options = flagTypes)
         @helper.inputText(flagForm("notes"))
 
         <input type="submit" id="submit">

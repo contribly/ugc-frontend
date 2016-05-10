@@ -35,7 +35,8 @@ object ReportController {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.report(report, o, signedIn, flagTypes, flagForm))
+        val flagTypeTuples = flagTypes.map (ft => (ft.id, ft.name))
+        Ok(views.html.report(report, o, signedIn, flagTypeTuples, flagForm))
       }
     }
   }
