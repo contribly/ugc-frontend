@@ -22,12 +22,15 @@ object RegisterController extends Controller {
     )(RegistrationDetails.apply)(RegistrationDetails.unapply)
   )
 
-  def prompt() = Action.async {
+  def prompt() = Action.async { request =>
     for {
       owner <- ugcService.owner
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.register(registrationForm, o))
+        val withErrors = request.session.get("error").fold(registrationForm){ e =>
+          registrationForm.withGlobalError(e)
+        }
+        Ok(views.html.register(registrationForm, o)).withSession(request.session - "error")
       }
     }
   }
@@ -50,14 +53,14 @@ object RegisterController extends Controller {
           registrationDetails => {
             Logger.info("Attempting to register user: " + registrationDetails)
             ugcService.register(registrationDetails).flatMap { mu =>
-              mu.fold {
-                Logger.warn("Failed to register user") // TODO user feedback
-                Future.successful(Ok(views.html.register(registrationForm, o)))
-              } { u =>
-                Logger.info("Registered : " + u)
 
-                Logger.info("Attempting to set signed in user token") // TODO Register end point should provide a token as well
-                ugcService.token(u.username, registrationDetails.password).map { to =>
+              mu.fold ( { e =>
+                Logger.warn("Failed to register user: " + e)
+                val withErrors = request.session + ("error", e)
+                Future.successful(Ok(views.html.register(registrationForm, o)).withSession(withErrors))
+              }, { u =>
+                Logger.info("Registered new user: " + u)
+                ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
                   to.fold {
                     Redirect(routes.Application.index(None, None))
                   } { t =>
@@ -66,6 +69,7 @@ object RegisterController extends Controller {
                   }
                 }
               }
+              )
             }
           }
         )

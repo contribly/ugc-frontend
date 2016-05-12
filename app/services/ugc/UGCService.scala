@@ -66,19 +66,16 @@ trait UGCService {
     user(ownedBy)
   }
 
-  def register(registrationDetails: RegistrationDetails): Future[Option[User]] = {
-    WS.url(usersUrl).
-      withHeaders(clientAuthHeader).
-      post(Json.toJson(registrationDetails)).map {
-      response => {
-        if (response.status == Ok) {
-          Logger.info("Register response: " + response.body)
-          Some(Json.parse(response.body).as[User])
+  def register(registrationDetails: RegistrationDetails): Future[Either[String, User]] = {
+    WS.url(usersUrl).withHeaders(clientAuthHeader).
+      post(Json.toJson(registrationDetails)).map { r =>
+        if (r.status == Ok) {
+          Right(Json.parse(r.body).as[User])
+
         } else {
-          Logger.warn("Register request returned: " + response.status)
-          None
+          Logger.warn("Register request failed: " + r.status + " / " + r.body)
+          Left(r.body)
         }
-      }
     }
   }
 
