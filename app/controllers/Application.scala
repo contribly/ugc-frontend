@@ -65,7 +65,6 @@ object Application extends Controller with Pages with WithOwner {
 
     val videoPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
