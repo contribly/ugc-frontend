@@ -2,7 +2,7 @@ package controllers
 
 import model.User
 import play.api.Logger
-import play.api.mvc.Request
+import play.api.mvc.{Session, Request}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
@@ -10,9 +10,13 @@ import scala.concurrent.Future
 
 class SignedInUserService {
 
-  val sessionTokenKey: String = "token"
+  private val sessionTokenKey: String = "token"
 
   val ugcService = UGCService
+
+  def setSignedInUserOnSession(session: Session, token: String) = {
+    session + (sessionTokenKey, token)
+  }
 
   def signedIn(request: Request[Any]): Future[Option[(User, String)]] = {
     val token = request.session.get(sessionTokenKey)
@@ -30,4 +34,5 @@ class SignedInUserService {
 
 }
 
-object SignedInUserService extends SignedInUserService
+object SignedInUserService extends SignedInUserService {
+}

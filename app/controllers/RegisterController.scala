@@ -61,7 +61,7 @@ object RegisterController extends Controller with WithOwner {
 
                 }, { t =>
                   Logger.info("Got token: " + t)
-                  Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+                  Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
                 }
                 )
               }

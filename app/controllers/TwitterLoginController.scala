@@ -84,7 +84,7 @@ trait TwitterLoginController extends Controller {
 
         }, { t =>
           Logger.info("Setting session token: " + t)
-          Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
+          Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(withClearedRequestToken, t))
         }
         )
       }
