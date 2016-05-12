@@ -29,7 +29,7 @@ object RegisterController extends Controller with WithOwner {
       val withErrors = request.session.get("error").fold(registrationForm) { e =>
         registrationForm.withGlobalError(e)
       }
-      Future.successful(Ok(views.html.register(registrationForm, owner)).withSession(request.session - "error"))
+      Future.successful(Ok(views.html.register(withErrors, owner)).withSession(request.session - "error"))
     }
 
     withOwner(request, registerPromptPage)
