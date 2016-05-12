@@ -1,16 +1,16 @@
 package controllers
 
-import model.LoginDetails
+import model.{User, LoginDetails}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Result, Request, Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object LoginController extends Controller {
+object LoginController extends Controller with WithOwner {
 
   val signedInUserService = SignedInUserService
   val ugcService = UGCService
@@ -22,39 +22,37 @@ object LoginController extends Controller {
     )(LoginDetails.apply)(LoginDetails.unapply)
   )
 
-  def prompt() = Action.async {
+  def prompt() = Action.async { request =>
 
-    val eventualOwner = ugcService.owner
-    for {
-      owner <- eventualOwner
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.login(loginForm, o))
-      }
+    val loginPromptPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+      Future.successful(Ok(views.html.login(loginForm, owner)))
     }
+
+    withOwner(request, loginPromptPage)
   }
 
   def submit() = Action.async { request =>
 
-    ugcService.owner.flatMap { owner =>
-      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
-        loginForm.bindFromRequest()(request).fold(
-          formWithErrors => {
-            Future.successful(Ok(views.html.login(formWithErrors, o)))
-          },
-          loginDetails => {
-            ugcService.token(loginDetails.username, loginDetails.password).map { to =>
-              to.fold(
-                Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), o))
-              ) { t =>
-                Logger.info("Setting session token: " + t)
-                Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
-              }
+    val loginSubmit: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+
+      loginForm.bindFromRequest()(request).fold(
+        formWithErrors => {
+          Future.successful(Ok(views.html.login(formWithErrors, owner)))
+        },
+        loginDetails => {
+          ugcService.token(loginDetails.username, loginDetails.password).map { to =>
+            to.fold(
+              Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
+            ) { t =>
+              Logger.info("Setting session token: " + t)
+              Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
             }
           }
-        )
-      }
+        }
+      )
     }
+
+    withOwner(request, loginSubmit)
   }
 
   def logout = Action {
