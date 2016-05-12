@@ -8,7 +8,7 @@ import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
-import play.api.libs.ws.WS
+import play.api.libs.ws.{WSRequest, WS}
 import play.api.{Logger, Play}
 import play.utils.UriEncoding
 
@@ -98,9 +98,20 @@ trait UGCService {
     }
   }
 
-  def report(id: String): Future[Report] = {
-    WS.url(reportsUrl + "/" + id).get.map { r =>
-      Json.parse(r.body).as[Report]
+  def report(id: String, token: Option[String]): Future[Option[Report]] = {
+    val reportRequest: WSRequest = WS.url(reportsUrl + "/" + id)
+    val withToken = token.fold(reportRequest){ t => reportRequest.withHeaders(bearerTokenHeader(t))}
+
+    withToken.get.map { r =>
+      r.status match {
+        case 200 => {
+          Some(Json.parse(r.body).as[Report])
+        }
+        case _ => {
+          Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
+          None
+        }
+      }
     }
   }
 
