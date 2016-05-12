@@ -2,6 +2,7 @@ package services.ugc
 
 import java.io.File
 
+import com.netaporter.uri.dsl._
 import model._
 import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
@@ -10,7 +11,6 @@ import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.{Logger, Play}
 import play.utils.UriEncoding
-import views.html.helper
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
@@ -53,7 +53,13 @@ trait UGCService {
   }
 
   def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
-    val u = noticeboardsUrl + "?pageSize=" + pageSize + "&page=" + page + "&ownedBy=" + ownedBy
+    val params = Seq(
+      "pageSize" -> pageSize,
+      "page" -> page,
+      "ownedBy" -> ownedBy
+      )
+
+    val u = (noticeboardsUrl).addParams(params)
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
@@ -81,12 +87,18 @@ trait UGCService {
 
   def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String], user: Option[String],
               hasMediaType: Option[String], token: Option[String]): Future[SearchResult] = {
-    val u = reportsUrl + "?ownedBy=" + ownedBy + "&pageSize=" + pageSize + "&page=" + page +
-      tag.fold("")(t => "&tag=" + t) +
-      noticeboard.fold("")(n => "&noticeboard=" + n) +
-      user.fold("")(u => "&user=" + helper.urlEncode(u)) +
-      hasMediaType.fold("")(mt => "&hasMediaType=" + mt)
 
+    val params = Seq(
+      Some("ownedBy" -> ownedBy),
+      Some("pageSize" -> pageSize),
+      Some("page" -> page),
+      tag.map(t => "tag" -> t),
+      noticeboard.map(n => "noticeboard" -> n),
+      user.map(u => "user" -> u),
+      hasMediaType.map(mt => "hasMediaType" -> mt)
+    ).flatten
+
+    val u = (reportsUrl).addParams(params)
     Logger.info("Fetching from url: " + u)
     val url = WS.url(u)
     val withToken = token.fold(url){ t => url.withHeaders(bearerTokenHeader(t))}
@@ -168,7 +180,7 @@ trait UGCService {
   }
 
   def tags(): Future[Seq[Tag]] = {
-    val u = apiUrl + "/tags?ownedBy=" + ownedBy
+    val u = (apiUrl + "/tags").addParam("ownedBy", ownedBy)
     Logger.info("Fetching from url: " + u)
     WS.url(u).get.map {
       response => {
