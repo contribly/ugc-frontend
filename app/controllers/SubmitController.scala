@@ -1,19 +1,19 @@
 package controllers
 
-import model.Media
+import model.{User, Media}
 import model.forms.SubmissionDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData.FilePart
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object SubmitController extends Controller {
+object SubmitController extends Controller with WithOwner {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
@@ -27,69 +27,63 @@ object SubmitController extends Controller {
 
   def prompt() = Action.async { request =>
 
-    val eventualOwner = ugcService.owner
-    for {
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
-
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.submit(submitForm, o, signedIn.map(s => s._1)))
+    val submitPrompt: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+      for {
+        signedIn <- signedInUserService.signedIn(request)
+      } yield {
+        Ok(views.html.submit(submitForm, owner, signedIn.map(s => s._1)))
       }
     }
+
+    withOwner(request, submitPrompt)
   }
 
   def submit() = Action.async(parse.multipartFormData) { request =>
-    val eventualOwner = ugcService.owner
-    eventualOwner.flatMap(owner => {
 
-      owner.fold(Future.successful(NotFound(views.html.notFound()))) { o =>
+    val submitAction: (Request[MultipartFormData[TemporaryFile]], User) => Future[Result] = (request: Request[MultipartFormData[TemporaryFile]], owner: User) => {
 
-        val signedIn = signedInUserService.signedIn(request)
+      signedInUserService.signedIn(request).flatMap { signedIn =>
+        // TODO catch not signed in
 
-        signedIn.flatMap(signedIn => {
+        val boundForm: Form[SubmissionDetails] = submitForm.bindFromRequest()(request)
+        boundForm.fold(
+          formWithErrors => {
+            Logger.info("Form failed to validate: " + formWithErrors)
+            Future.successful(Ok(views.html.submit(formWithErrors, owner, signedIn.map(s => s._1))))
+          },
+          submissionDetails => {
+            Logger.info("Successfully validated submission details: " + submissionDetails)
 
-          val boundForm: Form[SubmissionDetails] = submitForm.bindFromRequest()(request)
-          Logger.info("Bound submission form: " + boundForm)
-          boundForm.fold(
-            formWithErrors => {
-              Logger.info("Form failed to validate: " + formWithErrors)
-              Future.successful(Ok(views.html.submit(formWithErrors, o, signedIn.map(s => s._1))))
-            },
-            submissionDetails => {
-              Logger.info("Successfully validated submission details: " + submissionDetails)
+            val bearerToken = request.session.get("token").get
 
-              val bearerToken = request.session.get("token").get
+            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
 
-              val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
-
-              val noMedia: Future[Option[Media]] = Future.successful(None)
-              val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia)(mf => {
-                Logger.info("Found media file on request: " + mf)
-                ugcService.submitMedia(mf.ref.file, bearerToken)
-              })
-
-              eventualMedia.flatMap(media => {
-                Logger.info("Media: " + media)
-
-                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
-                submissionResult.map(or => {
-                  Logger.info("Submission result: " + or)
-                  or.fold({
-                    Logger.info("Redirecting to homepage")
-                    Redirect(routes.Application.index(None, None))
-                  }
-                  )(r => {
-                    Logger.info("Redirecting to profile page: " + r.id)
-                    Redirect(routes.UserController.profile())
-                  })
-                })
-              })
+            val noMedia: Future[Option[Media]] = Future.successful(None)
+            val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
+              Logger.info("Found media file on request: " + mf)
+              ugcService.submitMedia(mf.ref.file, bearerToken)
             }
-          )
-        })
+
+            eventualMedia.flatMap { media =>
+              val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
+              submissionResult.map { or =>
+                Logger.info("Submission result: " + or)
+                or.fold({
+                  Logger.info("Redirecting to homepage")
+                  Redirect(routes.Application.index(None, None))
+                }
+                ) { r =>
+                  Logger.info("Redirecting to profile page: " + r.id)
+                  Redirect(routes.UserController.profile())
+                }
+              }
+            }
+          }
+        )
       }
-    })
+    }
+
+    withOwner(request, submitAction)
   }
 
 }
