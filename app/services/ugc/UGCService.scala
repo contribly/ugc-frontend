@@ -170,72 +170,94 @@ trait UGCService {
     Logger.info("Requesting token for: " + Seq(username, password, clientId).mkString(", "))
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
+    val params = Map(
+      "grant_type" -> Seq("password"),
+      "username" -> Seq(username),
+      "password" -> Seq(password)
+    )
+
     WS.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
-      post("grant_type=password&username=" + username + "&password=" + password).map{ r =>
-      if (r.status == Ok) {
-        val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
-        Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
+      post(params).map{ r =>
+        if (r.status == Ok) {
+          val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
+          Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
 
-      } else {
-        Logger.info("Token request failed: " + r.status + " / " + r.body)
-        Left(r.body)
+        } else {
+          Logger.info("Token request failed: " + r.status + " / " + r.body)
+          Left(r.body)
+        }
       }
-    }
   }
 
   def tokenGoogle(googleToken: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for Google access token: " + googleToken)
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
+    val params = Map(
+      "grant_type" -> Seq("google"),
+      "token" -> Seq(googleToken)
+    )
+
     WS.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
-      post("grant_type=google&token=" + googleToken).map{ r =>
-      if (r.status == Ok) {
-        val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
-        Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
+      post(params).map{ r =>
+        if (r.status == Ok) {
+          val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
+          Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
 
-      } else {
-        Logger.info("Google token request failed: " + r.status + " / " + r.body)
-        Left(r.body)
+        } else {
+          Logger.info("Google token request failed: " + r.status + " / " + r.body)
+          Left(r.body)
+        }
       }
-    }
   }
 
   def tokenFacebook(facebookAccessToken: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for facebook access token: " + facebookAccessToken)
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
+    val params = Map(
+      "grant_type" -> Seq("facebook"),
+      "token" -> Seq(facebookAccessToken)
+    )
+
     WS.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
-      post("grant_type=facebook&token=" + facebookAccessToken).map{ r =>
-      if (r.status == Ok) {
-        val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
-        Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
+      post(params).map{ r =>
+        if (r.status == Ok) {
+          val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
+          Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
 
-      } else {
-        Logger.info("Facebook token request failed: " + r.status + " / " + r.body)
-        Left(r.body)
+        } else {
+          Logger.info("Facebook token request failed: " + r.status + " / " + r.body)
+          Left(r.body)
+        }
       }
-    }
   }
 
   def tokenTwitter(token: String, secret: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for Twitter access token: " + token)
     val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
+    val params = Map(
+      "grant_type" -> Seq("twitter"),
+      "token" -> Seq(token),
+      "secret" -> Seq(secret)
+    )
+
     WS.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
-      post("grant_type=twitter&token=" + token + "&secret=" + secret).map{ r =>
-      if (r.status == Ok) {
-        val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
-        Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
+      post(params).map{ r =>
+        if (r.status == Ok) {
+          val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
+          Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
 
-      } else {
-        Logger.info("Twitter token request failed: " + r.status + " / " + r.body)
-        Left(r.body)
+        } else {
+          Logger.info("Twitter token request failed: " + r.status + " / " + r.body)
+          Left(r.body)
+        }
       }
-    }
   }
 
   def user(id: String): Future[Option[User]] = {
@@ -264,7 +286,7 @@ trait UGCService {
   }
 
   private def bearerTokenHeader(token: String): (String, String) = {
-    ("Authorization" -> ("Bearer " + token))
+    "Authorization" -> ("Bearer " + token)
   }
 
   private def clientAuthHeader: (String, String) = {
