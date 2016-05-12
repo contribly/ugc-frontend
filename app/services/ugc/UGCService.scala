@@ -35,20 +35,14 @@ trait UGCService {
   val Accepted: Int = 202
 
   def flagTypes: Future[Seq[FlagType]] = {
-    WS.url(apiUrl + "/flag-types").get.map {
-      response => {
-        Json.parse(response.body).as[Seq[FlagType]]
-      }
+    WS.url(apiUrl + "/flag-types").get.map { r =>
+      Json.parse(r.body).as[Seq[FlagType]]
     }
   }
 
   def noticeboard(id: String): Future[Noticeboard] = {
-    val u = noticeboardsUrl + "/" + id
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[Noticeboard]
-      }
+    WS.url(noticeboardsUrl + "/" + id).get.map { r =>
+      Json.parse(r.body).as[Noticeboard]
     }
   }
 
@@ -59,12 +53,8 @@ trait UGCService {
       "ownedBy" -> ownedBy
       )
 
-    val u = (noticeboardsUrl).addParams(params)
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[NoticeboardSearchResult]
-      }
+    WS.url((noticeboardsUrl).addParams(params)).get.map { r =>
+      Json.parse(r.body).as[NoticeboardSearchResult]
     }
   }
 
@@ -77,7 +67,6 @@ trait UGCService {
       post(Json.toJson(registrationDetails)).map { r =>
         if (r.status == Ok) {
           Right(Json.parse(r.body).as[User])
-
         } else {
           Logger.warn("Register request failed: " + r.status + " / " + r.body)
           Left(r.body)
@@ -110,12 +99,8 @@ trait UGCService {
   }
 
   def report(id: String): Future[Report] = {
-    val u = reportsUrl + "/" + id
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[Report]
-      }
+    WS.url(reportsUrl + "/" + id).get.map { r =>
+      Json.parse(r.body).as[Report]
     }
   }
 
@@ -170,22 +155,14 @@ trait UGCService {
   }
 
   def tag(id: String): Future[Tag] = {
-    val u = apiUrl + "/tags/" + id
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[Tag]
-      }
+    WS.url(apiUrl + "/tags/" + id).get.map { r =>
+      Json.parse(r.body).as[Tag]
     }
   }
 
   def tags(): Future[Seq[Tag]] = {
-    val u = (apiUrl + "/tags").addParam("ownedBy", ownedBy)
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map {
-      response => {
-        Json.parse(response.body).as[Seq[Tag]]
-      }
+    WS.url((apiUrl + "/tags").addParam("ownedBy", ownedBy)).get.map { r =>
+      Json.parse(r.body).as[Seq[Tag]]
     }
   }
 
@@ -262,11 +239,9 @@ trait UGCService {
   }
 
   def user(id: String): Future[Option[User]] = {
-    val u = usersUrl + "/" + UriEncoding.encodePathSegment(id, "UTF-8")
-    Logger.info("Fetching from url: " + u)
-    WS.url(u).get.map { response =>
-      if (response.status == Ok) {
-        Some(Json.parse(response.body).as[User])
+    WS.url(usersUrl + "/" + UriEncoding.encodePathSegment(id, "UTF-8")).get.map { r =>
+      if (r.status == Ok) {
+        Some(Json.parse(r.body).as[User])
       } else {
         None
       }
@@ -277,15 +252,14 @@ trait UGCService {
     val authorizationHeader = bearerTokenHeader(token)
 
     WS.url(verifyUrl).withHeaders(authorizationHeader).
-      post("").map {
-      r => {
-        if (r.status == Ok) {
-          Some(Json.parse(r.body).as[User])
-        } else {
-          Logger.info(r.status + ": " + r.body)
-          None
-        }
+      post("").map { r =>
+      if (r.status == Ok) {
+        Some(Json.parse(r.body).as[User])
+      } else {
+        Logger.info(r.status + ": " + r.body)
+        None
       }
+
     }
   }
 
