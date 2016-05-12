@@ -50,7 +50,8 @@ object RegisterController extends Controller with WithOwner {
             mu.fold({ e =>
               Logger.warn("Failed to register user: " + e)
               val withErrors = request.session +("error", e)
-              Future.successful(Ok(views.html.register(registrationForm, owner)).withSession(withErrors))
+              Future.successful(Redirect(routes.RegisterController.prompt()).withSession(withErrors))
+
             }, { u =>
               Logger.info("Registered new user: " + u)
               ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
