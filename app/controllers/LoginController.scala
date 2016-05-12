@@ -25,7 +25,10 @@ object LoginController extends Controller with WithOwner {
   def prompt() = Action.async { request =>
 
     val loginPromptPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-      Future.successful(Ok(views.html.login(loginForm, owner)))
+      val withErrors = request.session.get("error").fold(loginForm) { e =>
+        loginForm.withGlobalError(e)
+      }
+      Future.successful(Ok(views.html.login(withErrors, owner)).withSession(request.session - "error"))
     }
 
     withOwner(request, loginPromptPage)
