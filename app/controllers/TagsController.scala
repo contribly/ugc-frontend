@@ -25,7 +25,7 @@ object TagsController extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.tags(tags, o, signedIn))
+        Ok(views.html.tags(tags, o, signedIn.map(s => s._1)))
       }
     }
   }
@@ -50,7 +50,7 @@ object TagsController extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.tag(tag, reports.results, o, signedIn, tags, pageLinksFor(tag, reports.numberFound)))
+        Ok(views.html.tag(tag, reports.results, o, signedIn.map(s => s._1), tags, pageLinksFor(tag, reports.numberFound)))
       }
     }
   }

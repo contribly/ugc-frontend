@@ -34,7 +34,7 @@ object SubmitController extends Controller {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.submit(submitForm, o, signedIn))
+        Ok(views.html.submit(submitForm, o, signedIn.map(s => s._1)))
       }
     }
   }
@@ -54,7 +54,7 @@ object SubmitController extends Controller {
           boundForm.fold(
             formWithErrors => {
               Logger.info("Form failed to validate: " + formWithErrors)
-              Future.successful(Ok(views.html.submit(formWithErrors, o, signedIn)))
+              Future.successful(Ok(views.html.submit(formWithErrors, o, signedIn.map(s => s._1))))
             },
             submissionDetails => {
               Logger.info("Successfully validated submission details: " + submissionDetails)

@@ -2,7 +2,7 @@ package controllers
 
 import model.User
 import play.api.Logger
-import play.api.mvc.{Session, AnyContent, Request}
+import play.api.mvc.Request
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
@@ -14,14 +14,18 @@ class SignedInUserService {
 
   val ugcService = UGCService
 
-  def signedIn(request: Request[Any]): Future[Option[User]] = {
+  def signedIn(request: Request[Any]): Future[Option[(User, String)]] = {
     val token = request.session.get(sessionTokenKey)
     Logger.info("Token on request: " + token)
 
-    val noneUser: Future[Option[User]] = Future.successful(None)
-    token.fold(noneUser)(t => {
-      ugcService.verify(t)
-    })
+    val noneUser: Future[Option[(User, String)]] = Future.successful(None)
+    token.fold(noneUser){ t =>
+      ugcService.verify(t).map { uo =>
+        uo.map { u =>
+          (u, t)
+        }
+      }
+    }
   }
 
 }

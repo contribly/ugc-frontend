@@ -28,7 +28,7 @@ object NoticeboardController extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.noticeboards(noticeboards.results, o, signedIn, pagesLinkFor(noticeboards.numberFound.toInt)))
+        Ok(views.html.noticeboards(noticeboards.results, o, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt)))
       }
     }
   }
@@ -51,7 +51,7 @@ object NoticeboardController extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.noticeboard(noticeboard, reports.results, o, signedIn, reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
+        Ok(views.html.noticeboard(noticeboard, reports.results, o, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
       }
     }
   }
@@ -74,7 +74,7 @@ object NoticeboardController extends Controller with Pages {
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.noticeboardGallery(noticeboard, reports.results, o, signedIn, pageLinksFor(noticeboard, reports.numberFound)))
+        Ok(views.html.noticeboardGallery(noticeboard, reports.results, o, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
       }
     }
   }

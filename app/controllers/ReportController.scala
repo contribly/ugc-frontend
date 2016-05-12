@@ -31,7 +31,7 @@ object ReportController extends WithOwner {
 
       } yield {
         val flagTypeTuples = flagTypes.map(ft => (ft.id, ft.name))
-        Ok(views.html.report(report, owner, signedIn, flagTypeTuples, flagForm))
+        Ok(views.html.report(report, owner, signedIn.map(s => s._1), flagTypeTuples, flagForm))
       }
     }
 

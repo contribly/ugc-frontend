@@ -31,7 +31,7 @@ object Application extends Controller with Pages with WithOwner {
         signedIn <- eventualVerifiedSignedInUser
 
       } yield {
-        Ok(views.html.index(reports.results, owner, signedIn, reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
+        Ok(views.html.index(reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
       }
     }
 
@@ -54,7 +54,7 @@ object Application extends Controller with Pages with WithOwner {
         signedIn <- eventualVerifiedSignedInUser
 
       } yield {
-        Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
+        Ok(views.html.gallery(reports.results, owner, signedIn.map(s => s._1), pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
 
@@ -77,7 +77,7 @@ object Application extends Controller with Pages with WithOwner {
         signedIn <- eventualVerifiedSignedInUser
 
       } yield {
-        Ok(views.html.gallery(reports.results, owner, signedIn, pageLinksFor(reports.numberFound), reports.numberFound))
+        Ok(views.html.gallery(reports.results, owner, signedIn.map(s => s._1), pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
 

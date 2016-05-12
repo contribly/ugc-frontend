@@ -28,7 +28,7 @@ object UserController extends Controller with Pages with WithOwner {
 
       } yield {
         user.fold(NotFound(views.html.notFound())) { u =>
-          Ok(views.html.user(u, owner, signedIn, reports.results, pageLinksFor(u, reports.numberFound)))
+          Ok(views.html.user(u, owner, signedIn.map(s => s._1), reports.results, pageLinksFor(u, reports.numberFound)))
         }
       }
     }
@@ -43,8 +43,8 @@ object UserController extends Controller with Pages with WithOwner {
         so.fold{
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
-          ugcService.reports(PageSize, 1, None, None, Some(signedIn.id), None, request.session.get("token")).map { reports =>
-            Ok(views.html.profile(signedIn, owner, Some(signedIn), reports.results))
+          ugcService.reports(PageSize, 1, None, None, Some(signedIn._1.id), None, Some(signedIn._2)).map { reports =>
+            Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), reports.results))
           }
         }
       }
