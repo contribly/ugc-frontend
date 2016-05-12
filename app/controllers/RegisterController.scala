@@ -55,12 +55,15 @@ object RegisterController extends Controller with WithOwner {
             }, { u =>
               Logger.info("Registered new user: " + u)
               ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
-                to.fold {
-                  Redirect(routes.Application.index(None, None))
-                } { t =>
+                to.fold ({ e =>
+                  val withErrors = request.session +("error", e)
+                  Redirect(routes.Application.index(None, None)).withSession(withErrors)
+
+                }, { t =>
                   Logger.info("Got token: " + t)
                   Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
                 }
+                )
               }
             }
             )

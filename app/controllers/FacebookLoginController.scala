@@ -33,7 +33,6 @@ trait FacebookLoginController extends Controller {
     Future.successful(Redirect(loginDialogUrlString))
   }
 
-
   def callback(code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String]) = Action.async { request => // TODO use state CRSF parameter
 
     code.fold {
@@ -43,22 +42,22 @@ trait FacebookLoginController extends Controller {
       }
       Future.successful(Redirect(routes.LoginController.prompt()))
 
-    }{ c =>
+    } { c =>
       Logger.info("Exchanging Facebook verification code for an access token: " + code)
       val client: FacebookClient = new DefaultFacebookClient(Version.VERSION_2_5)
       val facebookAccessToken: AccessToken = client.obtainUserAccessToken(appId, appSecret, callbackUrl, c) // TODO exception handling
       Logger.info("Obtained user access token: " + facebookAccessToken)
 
       ugcService.tokenFacebook(facebookAccessToken.getAccessToken).map { to =>
-        to.fold {
-        Redirect(routes.LoginController.prompt) // TODO user notification of error
-
-      }{ t =>
+        to.fold({ e =>
+          val withErrors = request.session +("error", e)
+          Redirect(routes.LoginController.prompt).withSession(withErrors)
+        }, { t =>
           Logger.info("Setting session token: " + t)
           Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
         }
+        )
       }
-
     }
 
   }

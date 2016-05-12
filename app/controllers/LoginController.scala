@@ -44,12 +44,14 @@ object LoginController extends Controller with WithOwner {
         },
         loginDetails => {
           ugcService.token(loginDetails.username, loginDetails.password).map { to =>
-            to.fold(
-              Ok(views.html.login(loginForm.withGlobalError("Invalid credentials"), owner))
-            ) { t =>
+            to.fold({ e =>
+              val withErrors = request.session +("error", e)
+              Redirect(routes.LoginController.prompt()).withSession(withErrors)
+            }, { t =>
               Logger.info("Setting session token: " + t)
               Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
             }
+            )
           }
         }
       )

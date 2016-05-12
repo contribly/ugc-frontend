@@ -78,13 +78,15 @@ trait TwitterLoginController extends Controller {
     } { tat =>
 
       ugcService.tokenTwitter(tat.getToken, tat.getTokenSecret).map { to =>
-        to.fold {
+        to.fold({ e =>
+          val withErrors = withClearedRequestToken +("error", e)
           Redirect(routes.Application.index(None, None)).withSession(withClearedRequestToken)
 
-        }{ t =>
+        }, { t =>
           Logger.info("Setting session token: " + t)
           Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
         }
+        )
       }
     }
 

@@ -63,13 +63,14 @@ trait GoogleLoginController extends Controller {
         Logger.info("Got token: " + token)
 
         ugcService.tokenGoogle(token.access_token).map { to =>
-          to.fold {
-            Redirect(routes.LoginController.prompt) // TODO user notification of error
-
-          } { t =>
+          to.fold({ e =>
+            val withErrors = request.session +("error", e)
+            Redirect(routes.LoginController.prompt).withSession(withErrors)
+          }, { t =>
             Logger.info("Setting session token: " + t)
             Redirect(routes.Application.index(None, None)).withSession(SignedInUserService.sessionTokenKey -> t)
           }
+          )
         }
       }
       }
