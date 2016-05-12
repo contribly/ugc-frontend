@@ -5,8 +5,8 @@ trait Pages {
   val PageSize: Int = 40
 
   def pagesNumbersFor(totalNumber: Long): Range = {
-    // TODO tests around this rounding
-    Range(1, (totalNumber.toInt / PageSize) + 2)
+    val i: Int = (totalNumber.toInt - 1) / PageSize
+    1 to (i + 1)
   }
   
 }
