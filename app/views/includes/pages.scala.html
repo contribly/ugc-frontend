@@ -1,7 +1,9 @@
 @import views.PageLink
 @(pages: Seq[PageLink])
-<p> @pages.map{p =>
-    <a href="@p.link">@p.page</a>
-    }
-</p>
-
+@if(pages.size > 1) {
+    <ul>
+       @pages.map{ p =>
+            <li><a href="@p.link">@p.page</a></li>
+        }
+    </ul>
+}
