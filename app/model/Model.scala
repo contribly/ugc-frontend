@@ -113,7 +113,7 @@ object Tag {
   implicit val formats: Format[Tag] = Json.format[Tag]
 }
 
-case class User(id: String, username: String, displayName: String, registered: DateTime, via: Option[Authority])
+case class User(id: String, username: String, displayName: String, registered: DateTime, via: Option[Client])
 
 object User {
   implicit val df: Reads[DateTime] = DateTimeFormat
