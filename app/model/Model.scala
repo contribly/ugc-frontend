@@ -26,7 +26,7 @@ object Artifact {
   implicit val formats: Format[Artifact] = Json.format[Artifact]
 }
 
-case class Authority(client: Option[Client])
+case class Authority(client: Option[Client], user: Option[User])
 
 object Authority {
   implicit val formats: Format[Authority] = Json.format[Authority]
@@ -81,8 +81,8 @@ object NoticeboardSearchResult {
 }
 
 case class Report(id: String, headline: String, created: DateTime, noticeboard: Option[Noticeboard],
-                  user: User, body: Option[String], tags: Seq[Tag], place: Option[Place],
-                  mediaUsages: Seq[MediaUsage], via: Option[Authority])
+                  body: Option[String], tags: Seq[Tag], place: Option[Place],
+                  mediaUsages: Seq[MediaUsage], via: Authority)
 
 case class Osm(osmId: Long, osmType: String)
 

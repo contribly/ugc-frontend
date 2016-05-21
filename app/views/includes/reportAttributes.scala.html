@@ -1,11 +1,12 @@
 @import model.Report
 @(r: Report)
 <p>
-    <a href="@routes.UserController.user(r.user.id, None)">@r.user.displayName</a> | @r.created.toDate.format("d MMM YYYY HH:mm")
-    @r.via.map { v =>
-        @v.client.map { c =>
-            via @c.name
-        }
+    @r.via.user.map { u =>
+        <a href="@routes.UserController.user(u.id, None)">@u.displayName</a>
+    }
+    | @r.created.toDate.format("d MMM YYYY HH:mm")
+    @r.via.client.map { c =>
+        via @c.name
     }
     @r.noticeboard.map{ n =>
        | <a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a>
