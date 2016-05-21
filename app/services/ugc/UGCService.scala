@@ -90,10 +90,15 @@ trait UGCService {
     val u = (reportsUrl).addParams(params)
     Logger.info("Fetching from url: " + u)
     val url = WS.url(u)
-    val withToken = token.fold(url){ t => url.withHeaders(bearerTokenHeader(t))}
-    withToken.get.map {
-      response => {
-        Json.parse(response.body).as[SearchResult]
+    val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
+    withToken.get.map { r =>
+      r.status match {
+        case 200 => {
+          Json.parse(r.body).as[SearchResult]
+        }
+        case _ => {
+          SearchResult(0, 0, Seq())
+        }
       }
     }
   }
