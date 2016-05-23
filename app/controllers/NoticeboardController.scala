@@ -1,36 +1,43 @@
 package controllers
 
-import model.Noticeboard
-import play.api.mvc.{Action, Controller}
+import model.{User, Noticeboard}
+import play.api.mvc.{Result, Request, Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-object NoticeboardController extends Controller with Pages {
+object NoticeboardController extends Controller with Pages with WithOwner {
 
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
   def noticeboards(page: Option[Int]) = Action.async { request =>
 
-    def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboards(Some(p)).url))
-    }
+    val noticeboardsPages: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
-    val eventualOwner = ugcService.owner
-
-    for {
-      noticeboards <- eventualNoticeboards
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
-
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.noticeboards(noticeboards.results, o, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt)))
+      def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboards(Some(p)).url))
       }
+
+      val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
+      val eventualOwner = ugcService.owner
+
+      for {
+        noticeboards <- eventualNoticeboards
+        owner <- eventualOwner
+        signedIn <- signedInUserService.signedIn(request)
+
+      } yield {
+        owner.fold(NotFound(views.html.notFound())) { o =>
+          Ok(views.html.noticeboards(noticeboards.results, o, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt)))
+        }
+      }
+
     }
+
+    withOwner(request, noticeboardsPages)
   }
 
   def noticeboard(id: String, page: Option[Int]) = Action.async { request =>
