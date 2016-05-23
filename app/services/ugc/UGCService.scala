@@ -8,9 +8,9 @@ import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
 import play.api.Play.current
 import play.api.libs.json._
-import play.api.libs.ws.{WSRequest, WS}
+import play.api.libs.ws.{WS, WSRequest}
+import play.api.mvc.Results
 import play.api.{Logger, Play}
-import play.utils.UriEncoding
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
@@ -41,7 +41,7 @@ trait UGCService {
   }
 
   def noticeboard(id: String): Future[Noticeboard] = {
-    WS.url(noticeboardsUrl + "/" + id).get.map { r =>
+    WS.url(noticeboardsUrl / id).get.map { r =>
       Json.parse(r.body).as[Noticeboard]
     }
   }
@@ -104,7 +104,7 @@ trait UGCService {
   }
 
   def report(id: String, token: Option[String]): Future[Option[Report]] = {
-    val reportRequest: WSRequest = WS.url(reportsUrl + "/" + id)
+    val reportRequest: WSRequest = WS.url(reportsUrl / id)
     val withToken = token.fold(reportRequest){ t => reportRequest.withHeaders(bearerTokenHeader(t))}
 
     withToken.get.map { r =>
@@ -147,7 +147,7 @@ trait UGCService {
   def submitFlag(reportId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
     val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
 
-    WS.url(reportsUrl + "/" + reportId + "/flag").
+    WS.url(reportsUrl / reportId / "flag").
       withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
       Logger.info("Response: " + response)
@@ -277,7 +277,7 @@ trait UGCService {
   }
 
   def user(id: String): Future[Option[User]] = {
-    WS.url(usersUrl + "/" + UriEncoding.encodePathSegment(id, "UTF-8")).get.map { r =>
+    WS.url(usersUrl / id).get.map { r =>
       if (r.status == Ok) {
         Some(Json.parse(r.body).as[User])
       } else {
@@ -287,10 +287,8 @@ trait UGCService {
   }
 
   def verify(token: String): Future[Option[User]] = {
-    val authorizationHeader = bearerTokenHeader(token)
-
-    WS.url(verifyUrl).withHeaders(authorizationHeader).
-      post("").map { r =>
+    WS.url(verifyUrl).withHeaders(bearerTokenHeader(token)).
+      post(Results.EmptyContent).map { r =>
       if (r.status == Ok) {
         Some(Json.parse(r.body).as[User])
       } else {
@@ -317,4 +315,3 @@ object UGCService extends UGCService {
   override lazy val clientId: String = Play.configuration.getString("ugc.client.id").get
   override lazy val clientSecret: String = Play.configuration.getString("ugc.client.secret").get
 }
-
