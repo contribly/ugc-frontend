@@ -1,7 +1,7 @@
 package controllers
 
-import model.{SearchResult, User, Noticeboard}
-import play.api.mvc.{Result, Request, Action, Controller}
+import model.{Noticeboard, User}
+import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
 
@@ -15,7 +15,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
 
   def noticeboards(page: Option[Int]) = Action.async { request =>
 
-    val noticeboardsPages: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val noticeboardsPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboards(Some(p)).url))
@@ -33,56 +33,58 @@ object NoticeboardController extends Controller with Pages with WithOwner {
           val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get("noticeboard")
           Ok(views.html.noticeboards(noticeboards.results, owner, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt), contributionCounts))
       }
-
     }
 
-    withOwner(request, noticeboardsPages)
+    withOwner(request, noticeboardsPage)
   }
 
   def noticeboard(id: String, page: Option[Int]) = Action.async { request =>
 
-    def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboard(noticeboard.id, Some(p)).url))
-    }
+    val noticeboardPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(pageSize = PageSize, page, noticeboard = Some(id))
-    val eventualOwner = ugcService.owner
+      def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboard(noticeboard.id, Some(p)).url))
+      }
 
-    for {
-      noticeboard <- eventualNoticeboard
-      reports <- eventualReports
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      val eventualNoticeboard = ugcService.noticeboard(id)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page, noticeboard = Some(id))
 
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
-        Ok(views.html.noticeboard(noticeboard, reports.results, o, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
+      for {
+        noticeboard <- eventualNoticeboard
+        reports <- eventualReports
+        signedIn <- signedInUserService.signedIn(request)
+
+      } yield {
+        Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
       }
     }
+
+    withOwner(request, noticeboardPage)
   }
 
   def gallery(id: String, page: Option[Int]) = Action.async { request =>
 
-    def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
-      pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))
-    }
+    val galleyPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
-    val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(pageSize = PageSize, page = page, noticeboard = Some(id), hasMediaType = Some("image"))
-    val eventualOwner = ugcService.owner
+      def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))
+      }
 
-    for {
-      noticeboard <- eventualNoticeboard
-      reports <- eventualReports
-      owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      val eventualNoticeboard = ugcService.noticeboard(id)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, noticeboard = Some(id), hasMediaType = Some("image"))
 
-    } yield {
-      owner.fold(NotFound(views.html.notFound())) { o =>
+      for {
+        noticeboard <- eventualNoticeboard
+        reports <- eventualReports
+        signedIn <- signedInUserService.signedIn(request)
+
+      } yield {
         Ok(views.html.noticeboardGallery(noticeboard, reports.results, o, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
+
       }
     }
+
+    withOwner(request, galleyPage)
   }
 
 }
