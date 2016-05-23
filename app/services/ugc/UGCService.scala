@@ -74,8 +74,14 @@ trait UGCService {
     }
   }
 
-  def reports(pageSize: Int, page: Int, tag: Option[String], noticeboard: Option[String], user: Option[String],
-              hasMediaType: Option[String], token: Option[String]): Future[SearchResult] = {
+  def reports(pageSize: Int,
+              page: Option[Int] = None,
+              tag: Option[String] = None,
+              noticeboard: Option[String] = None,
+              user: Option[String] = None,
+              hasMediaType: Option[String] = None,
+              refinements: Option[Seq[String]] = None,
+              token: Option[String] = None): Future[SearchResult] = {
 
     val params = Seq(
       Some("ownedBy" -> ownedBy),
@@ -84,7 +90,8 @@ trait UGCService {
       tag.map(t => "tag" -> t),
       noticeboard.map(n => "noticeboard" -> n),
       user.map(u => "user" -> u),
-      hasMediaType.map(mt => "hasMediaType" -> mt)
+      hasMediaType.map(mt => "hasMediaType" -> mt),
+      refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten
 
     val u = (reportsUrl).addParams(params)
@@ -97,7 +104,7 @@ trait UGCService {
           Json.parse(r.body).as[SearchResult]
         }
         case _ => {
-          SearchResult(0, 0, Seq())
+          SearchResult(0, 0, Seq(), None) // TODO not really a proper fail return value
         }
       }
     }
@@ -288,7 +295,7 @@ trait UGCService {
 
   def verify(token: String): Future[Option[User]] = {
     WS.url(verifyUrl).withHeaders(bearerTokenHeader(token)).
-      post(Results.EmptyContent).map { r =>
+      post(Results.EmptyContent()).map { r =>
       if (r.status == Ok) {
         Some(Json.parse(r.body).as[User])
       } else {

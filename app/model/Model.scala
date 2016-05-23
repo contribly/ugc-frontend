@@ -66,8 +66,7 @@ case class Noticeboard(id: String, name: String, description: Option[String],
                        geoCodingResolution:  Option[String],
                        endDate: Option[DateTime], embargoDate: Option[DateTime], scheduledDate: Option[DateTime],
                        moderated: Boolean, featured: Boolean, cover: Option[MediaUsage],
-                       supportedMediaTypes: Set[String],
-                       contributions: Option[Int])
+                       supportedMediaTypes: Set[String])
 
 object Noticeboard {
   implicit val df: Reads[DateTime] = DateTimeFormat
@@ -101,7 +100,7 @@ object Report {
   implicit val formats: Format[Report] = Json.format[Report]
 }
 
-case class SearchResult(numberFound: Long, startIndex: Long, results: Seq[Report])
+case class SearchResult(numberFound: Long, startIndex: Long, results: Seq[Report], refinements: Option[Map[String, Map[String, Long]]])
 
 object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]

@@ -23,7 +23,7 @@ object UserController extends Controller with Pages with WithOwner {
 
       for {
         user <- ugcService.user(id)
-        reports <- ugcService.reports(PageSize, 1, None, None, Some(id), None, None)
+        reports <- ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(id))
         signedIn <- signedInUserService.signedIn(request)
 
       } yield {
@@ -43,7 +43,7 @@ object UserController extends Controller with Pages with WithOwner {
         so.fold{
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
-          ugcService.reports(PageSize, 1, None, None, Some(signedIn._1.id), None, Some(signedIn._2)).map { reports =>
+          ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), token = Some(signedIn._2)).map { reports =>
             Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), reports.results))
           }
         }

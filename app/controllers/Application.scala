@@ -23,7 +23,7 @@ object Application extends Controller with Pages with WithOwner {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
 
-      val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, hasMediaType, None)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = hasMediaType)
       val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
 
       for {
@@ -46,7 +46,7 @@ object Application extends Controller with Pages with WithOwner {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("image"), None)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("image"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
 
       for {
@@ -69,7 +69,7 @@ object Application extends Controller with Pages with WithOwner {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, None, None, Some("video"), None)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("video"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
 
       for {

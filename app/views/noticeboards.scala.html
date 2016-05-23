@@ -1,7 +1,7 @@
 @import model.{Report, User}
 @import model.Noticeboard
 @import views.PageLink
-@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User], pages: Seq[PageLink])
+@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,8 +15,9 @@
     @includes.pages(pages)
 
     @noticeboards.map { n =>
-        <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a> (@n.contributions)</h4>
-        @n.description.map{d =>
+        <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
+
+        @n.description.map{ d =>
             <p>@Html(d)</p>
         }
         @n.endDate.map{ed =>

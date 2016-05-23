@@ -1,6 +1,6 @@
 package controllers
 
-import model.{User, Noticeboard}
+import model.{SearchResult, User, Noticeboard}
 import play.api.mvc.{Result, Request, Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
@@ -22,17 +22,16 @@ object NoticeboardController extends Controller with Pages with WithOwner {
       }
 
       val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
-      val eventualOwner = ugcService.owner
+      val eventualNoticeboardContributionCounts = ugcService.reports(pageSize = 0, refinements = Some(Seq("noticeboard")))
 
       for {
         noticeboards <- eventualNoticeboards
-        owner <- eventualOwner
+        noticeboardContributionCounts <- eventualNoticeboardContributionCounts
         signedIn <- signedInUserService.signedIn(request)
 
       } yield {
-        owner.fold(NotFound(views.html.notFound())) { o =>
-          Ok(views.html.noticeboards(noticeboards.results, o, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt)))
-        }
+          val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get("noticeboard")
+          Ok(views.html.noticeboards(noticeboards.results, owner, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt), contributionCounts))
       }
 
     }
@@ -47,7 +46,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
     }
 
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, None, None)
+    val eventualReports = ugcService.reports(pageSize = PageSize, page, noticeboard = Some(id))
     val eventualOwner = ugcService.owner
 
     for {
@@ -70,7 +69,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
     }
 
     val eventualNoticeboard = ugcService.noticeboard(id)
-    val eventualReports = ugcService.reports(PageSize, page.fold(1)(p => p), None, Some(id), None, Some("image"), None)
+    val eventualReports = ugcService.reports(pageSize = PageSize, page = page, noticeboard = Some(id), hasMediaType = Some("image"))
     val eventualOwner = ugcService.owner
 
     for {
