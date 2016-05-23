@@ -79,7 +79,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
         signedIn <- signedInUserService.signedIn(request)
 
       } yield {
-        Ok(views.html.noticeboardGallery(noticeboard, reports.results, o, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
+        Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
 
       }
     }
