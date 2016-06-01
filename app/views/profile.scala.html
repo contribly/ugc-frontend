@@ -1,5 +1,5 @@
-@import model.{User, Report}
-@(user: User, owner: User, signedIn: Option[User], reports: Seq[Report])
+@import model.{User, Report, SearchResult}
+@(user: User, owner: User, signedIn: Option[User], approved: SearchResult, awaiting: SearchResult, rejected: SearchResult)
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,7 +19,15 @@
     <hr/>
     <h4>Your contributions</h4>
 
-    @includes.reports(reports)
+    <h5>Approved (@approved.numberFound)</h5>
+    @includes.reports(approved.results)
+
+    <h5>Awaiting (@awaiting.numberFound)</h5>
+    @includes.reports(awaiting.results)
+
+    <h5>Rejected (@rejected.numberFound)</h5>
+    @includes.reports(rejected.results)
+
     <hr/>
 </body>
 </html>

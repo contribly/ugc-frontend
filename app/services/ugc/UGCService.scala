@@ -80,6 +80,7 @@ trait UGCService {
               noticeboard: Option[String] = None,
               user: Option[String] = None,
               hasMediaType: Option[String] = None,
+              state: Option[String] = None,
               refinements: Option[Seq[String]] = None,
               token: Option[String] = None): Future[SearchResult] = {
 
@@ -91,6 +92,7 @@ trait UGCService {
       noticeboard.map(n => "noticeboard" -> n),
       user.map(u => "user" -> u),
       hasMediaType.map(mt => "hasMediaType" -> mt),
+      state.map(s => "state" -> s),
       refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten
 

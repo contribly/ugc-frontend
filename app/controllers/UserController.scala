@@ -44,13 +44,17 @@ object UserController extends Controller with Pages with WithOwner {
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
 
-          val eventualReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), token = Some(signedIn._2))
+          val eventualApprovedReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
+          val eventualAwaitingReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
+          val eventualRejectedReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
 
           for {
-            reports <- eventualReports
+            approved <- eventualApprovedReports
+            awaiting <- eventualAwaitingReports
+            rejected <- eventualRejectedReports
 
           } yield {
-            Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), reports.results))
+            Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), approved, awaiting, rejected))
           }
         }
       }
