@@ -1,7 +1,7 @@
 package controllers
 
 import model.User
-import play.api.mvc.{Result, Request, Action, Controller}
+import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
 
@@ -43,7 +43,13 @@ object UserController extends Controller with Pages with WithOwner {
         so.fold{
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
-          ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), token = Some(signedIn._2)).map { reports =>
+
+          val eventualReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), token = Some(signedIn._2))
+
+          for {
+            reports <- eventualReports
+
+          } yield {
             Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), reports.results))
           }
         }
