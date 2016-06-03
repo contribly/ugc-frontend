@@ -24,9 +24,9 @@ trait UGCService {
 
   val applicationJsonHeader = "Content-Type" -> "application/json"
 
-  val reportsUrl: String = apiUrl + "/reports"
+  val assignmentsUrl: String = apiUrl + "/assignments"
+  val contributionsUrl: String = apiUrl + "/contributions"
   val mediaUrl: String = apiUrl + "/media"
-  val noticeboardsUrl: String = apiUrl + "/noticeboards"
   val tokenUrl: String = apiUrl + "/token"
   val usersUrl: String = apiUrl + "/users"
   val verifyUrl: String = apiUrl + "/verify"
@@ -41,7 +41,7 @@ trait UGCService {
   }
 
   def noticeboard(id: String): Future[Noticeboard] = {
-    WS.url(noticeboardsUrl / id).get.map { r =>
+    WS.url(assignmentsUrl / id).get.map { r =>
       Json.parse(r.body).as[Noticeboard]
     }
   }
@@ -53,7 +53,7 @@ trait UGCService {
       "ownedBy" -> ownedBy
       )
 
-    WS.url((noticeboardsUrl).addParams(params)).get.map { r =>
+    WS.url((assignmentsUrl).addParams(params)).get.map { r =>
       Json.parse(r.body).as[NoticeboardSearchResult]
     }
   }
@@ -96,7 +96,7 @@ trait UGCService {
       refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten
 
-    val u = (reportsUrl).addParams(params)
+    val u = (contributionsUrl).addParams(params)
     Logger.info("Fetching from url: " + u)
     val url = WS.url(u)
     val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
@@ -113,7 +113,7 @@ trait UGCService {
   }
 
   def report(id: String, token: Option[String]): Future[Option[Report]] = {
-    val reportRequest: WSRequest = WS.url(reportsUrl / id)
+    val reportRequest: WSRequest = WS.url(contributionsUrl / id)
     val withToken = token.fold(reportRequest){ t => reportRequest.withHeaders(bearerTokenHeader(t))}
 
     withToken.get.map { r =>
@@ -138,7 +138,7 @@ trait UGCService {
 
     Logger.info("Report submission JSON: " + submissionJson.toString())
 
-    val eventualResponse = WS.url(reportsUrl).
+    val eventualResponse = WS.url(contributionsUrl).
       withHeaders(bearerTokenHeader(token), applicationJsonHeader).
       post(submissionJson)
 
@@ -156,7 +156,7 @@ trait UGCService {
   def submitFlag(reportId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
     val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
 
-    WS.url(reportsUrl / reportId / "flag").
+    WS.url(contributionsUrl / reportId / "flag").
       withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
       Logger.info("Response: " + response)

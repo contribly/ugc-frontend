@@ -79,7 +79,7 @@ object NoticeboardSearchResult {
   implicit val formats: Format[NoticeboardSearchResult] = Json.format[NoticeboardSearchResult]
 }
 
-case class Report(id: String, headline: String, created: DateTime, noticeboard: Option[Noticeboard],
+case class Report(id: String, headline: String, created: DateTime, assignment: Option[Noticeboard],
                   body: Option[String], tags: Seq[Tag], place: Option[Place],
                   mediaUsages: Seq[MediaUsage], via: Authority)
 

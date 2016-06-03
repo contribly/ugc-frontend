@@ -8,7 +8,7 @@
     @r.via.client.map { c =>
         via @c.name
     }
-    @r.noticeboard.map{ n =>
-       | <a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a>
+    @r.assignment.map{ a =>
+       | <a href="@routes.NoticeboardController.noticeboard(a.id, None)">@a.name</a>
     }
 </p>
