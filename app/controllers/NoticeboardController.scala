@@ -10,8 +10,10 @@ import scala.concurrent.Future
 
 object NoticeboardController extends Controller with Pages with WithOwner {
 
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+  private val Assignment = "assignment"
+
+  private val ugcService = UGCService
+  private val signedInUserService = SignedInUserService
 
   def noticeboards(page: Option[Int]) = Action.async { request =>
 
@@ -22,7 +24,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
       }
 
       val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
-      val eventualNoticeboardContributionCounts = ugcService.reports(pageSize = 0, refinements = Some(Seq("noticeboard")))
+      val eventualNoticeboardContributionCounts = ugcService.reports(pageSize = 0, refinements = Some(Seq(Assignment)))
 
       for {
         noticeboards <- eventualNoticeboards
@@ -30,7 +32,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
         signedIn <- signedInUserService.signedIn(request)
 
       } yield {
-          val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get("noticeboard")
+          val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get(Assignment)
           Ok(views.html.noticeboards(noticeboards.results, owner, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt), contributionCounts))
       }
     }
@@ -47,7 +49,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
       }
 
       val eventualNoticeboard = ugcService.noticeboard(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page, noticeboard = Some(id))
+      val eventualReports = ugcService.reports(pageSize = PageSize, page, assignment = Some(id))
 
       for {
         noticeboard <- eventualNoticeboard
@@ -71,7 +73,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
       }
 
       val eventualNoticeboard = ugcService.noticeboard(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, noticeboard = Some(id), hasMediaType = Some("image"))
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, assignment = Some(id), hasMediaType = Some("image"))
 
       for {
         noticeboard <- eventualNoticeboard
