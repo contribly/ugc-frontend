@@ -15,15 +15,15 @@ object NoticeboardController extends Controller with Pages with WithOwner {
   private val ugcService = UGCService
   private val signedInUserService = SignedInUserService
 
-  def noticeboards(page: Option[Int]) = Action.async { request =>
+  def assignments(page: Option[Int]) = Action.async { request =>
 
     val noticeboardsPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboards(Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
       }
 
-      val eventualNoticeboards = ugcService.noticeboards(PageSize, page.fold(1)(p => p))
+      val eventualNoticeboards = ugcService.assignments(PageSize, page.fold(1)(p => p))
       val eventualNoticeboardContributionCounts = ugcService.reports(pageSize = 0, refinements = Some(Seq(Assignment)))
 
       for {
@@ -40,15 +40,15 @@ object NoticeboardController extends Controller with Pages with WithOwner {
     withOwner(request, noticeboardsPage)
   }
 
-  def noticeboard(id: String, page: Option[Int]) = Action.async { request =>
+  def assignment(id: String, page: Option[Int]) = Action.async { request =>
 
     val noticeboardPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.noticeboard(noticeboard.id, Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
       }
 
-      val eventualNoticeboard = ugcService.noticeboard(id)
+      val eventualNoticeboard = ugcService.assignment(id)
       val eventualReports = ugcService.reports(pageSize = PageSize, page, assignment = Some(id))
 
       for {
@@ -72,7 +72,7 @@ object NoticeboardController extends Controller with Pages with WithOwner {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))
       }
 
-      val eventualNoticeboard = ugcService.noticeboard(id)
+      val eventualNoticeboard = ugcService.assignment(id)
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, assignment = Some(id), hasMediaType = Some("image"))
 
       for {

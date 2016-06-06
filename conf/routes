@@ -24,12 +24,12 @@ POST       /submit                  controllers.SubmitController.submit
 
 GET        /profile                 controllers.UserController.profile
 
-GET        /noticeboards            controllers.NoticeboardController.noticeboards(page: Option[Int])
-GET        /noticeboards/:id        controllers.NoticeboardController.noticeboard(id: String, page: Option[Int])
-GET        /noticeboards/:id/gallery        controllers.NoticeboardController.gallery(id: String, page: Option[Int])
+GET        /assignments                     controllers.NoticeboardController.assignments(page: Option[Int])
+GET        /assignments/:id                 controllers.NoticeboardController.assignment(id: String, page: Option[Int])
+GET        /assignments/:id/gallery         controllers.NoticeboardController.gallery(id: String, page: Option[Int])
 
-GET        /reports/:id             controllers.ReportController.report(id: String)
-POST        /reports/:id/flag       controllers.ReportController.flag(id: String)
+GET        /contributions/:id             controllers.ReportController.contribution(id: String)
+POST       /contributions/:id/flag        controllers.ReportController.flag(id: String)
 
 GET        /tags                    controllers.TagsController.tags
 GET        /tags/:id                controllers.TagsController.tag(id: String, page: Option[Int])

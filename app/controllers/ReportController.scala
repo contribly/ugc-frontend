@@ -18,27 +18,27 @@ object ReportController extends WithOwner {
   val ugcService = UGCService
   val signedInUserService = SignedInUserService
 
-  def report(id: String) = Action.async { request =>
+  def contribution(id: String) = Action.async { request =>
 
-    val reportPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val contributionPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       val eventualFlagTypes = ugcService.flagTypes
       val eventualSignedInUser = signedInUserService.signedIn(request)
 
       for {
         signedIn <- eventualSignedInUser
-        report <- ugcService.report(id, signedIn.map( s => s._2))
+        contribution <- ugcService.contribution(id, signedIn.map(s => s._2))
         flagTypes <- eventualFlagTypes
 
       } yield {
-        report.fold(NotFound(views.html.notFound())) { r =>
+        contribution.fold(NotFound(views.html.notFound())) { r =>
           val flagTypeTuples = flagTypes.map(ft => (ft.id, ft.name))
           Ok(views.html.report(r, owner, signedIn.map(s => s._1), flagTypeTuples, flagForm))
         }
       }
     }
 
-    withOwner(request, reportPage)
+    withOwner(request, contributionPage)
   }
 
   def flag(id: String) = Action.async { request =>
@@ -47,7 +47,7 @@ object ReportController extends WithOwner {
 
     for {
       signedIn <- signedInUserService.signedIn(request)
-      report <- ugcService.report(id, signedIn.map(s => s._2))
+      report <- ugcService.contribution(id, signedIn.map(s => s._2))
 
     } yield {
 
@@ -66,7 +66,7 @@ object ReportController extends WithOwner {
           }
         )
 
-        Redirect(routes.ReportController.report(id))
+        Redirect(routes.ReportController.contribution(id))
       }
     }
 

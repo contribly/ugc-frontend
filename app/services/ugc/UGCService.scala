@@ -40,13 +40,13 @@ trait UGCService {
     }
   }
 
-  def noticeboard(id: String): Future[Noticeboard] = {
+  def assignment(id: String): Future[Noticeboard] = {
     WS.url(assignmentsUrl / id).get.map { r =>
       Json.parse(r.body).as[Noticeboard]
     }
   }
 
-  def noticeboards(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
+  def assignments(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
     val params = Seq(
       "pageSize" -> pageSize,
       "page" -> page,
@@ -112,7 +112,7 @@ trait UGCService {
     }
   }
 
-  def report(id: String, token: Option[String]): Future[Option[Report]] = {
+  def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
     val reportRequest: WSRequest = WS.url(contributionsUrl / id)
     val withToken = token.fold(reportRequest){ t => reportRequest.withHeaders(bearerTokenHeader(t))}
 

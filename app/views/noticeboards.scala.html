@@ -15,7 +15,7 @@
     @includes.pages(pages)
 
     @noticeboards.map { n =>
-        <h4><a href="@routes.NoticeboardController.noticeboard(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
+        <h4><a href="@routes.NoticeboardController.assignment(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
 
         @n.description.map{ d =>
             <p>@Html(d)</p>
@@ -30,7 +30,7 @@
 
         @n.cover.map{ c =>
             @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
-                <a href="@routes.NoticeboardController.noticeboard(n.id, None)"><img src="@i.url" /></a>
+                <a href="@routes.NoticeboardController.assignment(n.id, None)"><img src="@i.url" /></a>
             }
         }
         <hr/>
