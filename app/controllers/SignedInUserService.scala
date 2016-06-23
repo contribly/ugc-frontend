@@ -31,5 +31,4 @@ class SignedInUserService {
 
 }
 
-object SignedInUserService extends SignedInUserService {
-}
+object SignedInUserService extends SignedInUserService
