@@ -1,8 +1,7 @@
 package controllers
 
 import model.User
-import play.api.Logger
-import play.api.mvc.{Session, Request}
+import play.api.mvc.{Request, Session}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
