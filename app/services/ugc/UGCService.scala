@@ -89,7 +89,7 @@ trait UGCService {
       Some("pageSize" -> pageSize),
       Some("page" -> page),
       tag.map(t => "tag" -> t),
-      assignment.map(n => "noticeboard" -> n),
+      assignment.map(n => "assignment" -> n),
       user.map(u => "user" -> u),
       hasMediaType.map(mt => "hasMediaType" -> mt),
       state.map(s => "state" -> s),
