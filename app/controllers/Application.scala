@@ -13,9 +13,11 @@ import scala.concurrent.Future
 
 class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { implicit request =>
+  def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { request =>
 
     val indexPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+
+      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
@@ -36,7 +38,9 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
     withOwner(request, indexPage)
   }
 
-  def gallery(page: Option[Int]) = Action.async { implicit request =>
+  def gallery(page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val galleryPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
@@ -59,7 +63,9 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
     withOwner(request, galleryPage)
   }
 
-  def videos(page: Option[Int]) = Action.async { implicit request =>
+  def videos(page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val videoPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
