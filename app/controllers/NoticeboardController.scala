@@ -15,11 +15,9 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   private val Assignment = "assignment"
 
-  def assignments(page: Option[Int]) = Action.async { request =>
+  def assignments(page: Option[Int]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val noticeboardsPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val noticeboardsPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
@@ -31,7 +29,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboards <- eventualNoticeboards
         noticeboardContributionCounts <- eventualNoticeboardContributionCounts
-        signedIn <- signedInUserService.signedIn(request)
+        signedIn <- signedInUserService.signedIn(r)
 
       } yield {
           val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get(Assignment)
@@ -39,14 +37,12 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(noticeboardsPage, request)
+    withOwner(noticeboardsPage)
   }
 
-  def assignment(id: String, page: Option[Int]) = Action.async { request =>
+  def assignment(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val noticeboardPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val noticeboardPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
@@ -58,21 +54,19 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboard <- eventualNoticeboard
         reports <- eventualReports
-        signedIn <- signedInUserService.signedIn(request)
+        signedIn <- signedInUserService.signedIn(r)
 
       } yield {
         Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
       }
     }
 
-    withOwner(noticeboardPage, request)
+    withOwner(noticeboardPage)
   }
 
-  def gallery(id: String, page: Option[Int]) = Action.async { request =>
+  def gallery(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val galleyPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val galleyPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))
@@ -84,7 +78,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboard <- eventualNoticeboard
         reports <- eventualReports
-        signedIn <- signedInUserService.signedIn(request)
+        signedIn <- signedInUserService.signedIn(r)
 
       } yield {
         Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
@@ -92,7 +86,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(galleyPage, request)
+    withOwner(galleyPage)
   }
 
 }

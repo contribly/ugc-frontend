@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import model.User
-import play.api.i18n.{MessagesApi, I18nSupport}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
@@ -13,11 +13,9 @@ import scala.concurrent.Future
 
 class UserController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def user(id: String, page: Option[Int]) = Action.async { request =>
+  def user(id: String, page: Option[Int]) = Action.async { implicit request =>
 
     val userPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-
-      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
       def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
@@ -35,12 +33,10 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
       }
     }
 
-    withOwner(userPage, request)
+    withOwner(userPage)
   }
 
-  def profile = Action.async { request =>
-
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+  def profile = Action.async { implicit request =>
 
     val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
@@ -65,7 +61,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
       }
     }
 
-    withOwner(profilePage, request)
+    withOwner(profilePage)
   }
 
 }

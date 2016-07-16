@@ -35,7 +35,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       }
     }
 
-    withOwner(submitPrompt, request)
+    withOwner(submitPrompt)(request)
   }
 
   def submit() = Action.async(parse.multipartFormData) { request =>
@@ -83,7 +83,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       }
     }
 
-    withOwner(submitAction, request)
+    withOwner(submitAction)(request)
   }
 
 }

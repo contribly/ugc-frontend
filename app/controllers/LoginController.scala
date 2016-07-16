@@ -22,40 +22,36 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
     )(LoginDetails.apply)(LoginDetails.unapply)
   )
 
-  def prompt() = Action.async { request =>
+  def prompt() = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val loginPromptPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val loginPromptPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
       
-      val withErrors = request.session.get("error").fold(loginForm) { e =>
+      val withErrors = r.session.get("error").fold(loginForm) { e =>
         loginForm.withGlobalError(e)
       }
 
-      Future.successful(Ok(views.html.login(withErrors, owner)).withSession(request.session - "error"))
+      Future.successful(Ok(views.html.login(withErrors, owner)).withSession(r.session - "error"))
     }
 
-    withOwner(loginPromptPage, request)
+    withOwner(loginPromptPage)
   }
 
-  def submit() = Action.async { request =>
+  def submit() = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+    val loginSubmit: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
-    val loginSubmit: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-
-      loginForm.bindFromRequest()(request).fold(
+      loginForm.bindFromRequest()(r).fold(
         formWithErrors => {
           Future.successful(Ok(views.html.login(formWithErrors, owner)))
         },
         loginDetails => {
           ugcService.token(loginDetails.username, loginDetails.password).map { to =>
             to.fold({ e =>
-              val withErrors = request.session +("error", e)
+              val withErrors = r.session +("error", e)
               Redirect(routes.LoginController.prompt()).withSession(withErrors)
             }, { t =>
               Logger.info("Setting session token: " + t)
-              Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
+              Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(r.session, t))
             }
             )
           }
@@ -63,7 +59,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
       )
     }
 
-    withOwner(loginSubmit, request)
+    withOwner(loginSubmit)
   }
 
   def logout = Action {

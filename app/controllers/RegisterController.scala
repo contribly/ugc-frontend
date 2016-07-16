@@ -23,23 +23,23 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
     )(RegistrationDetails.apply)(RegistrationDetails.unapply)
   )
 
-  def prompt() = Action.async { request =>
+  def prompt() = Action.async { implicit request =>
 
-    val registerPromptPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val registerPromptPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
       val withErrors = request.session.get("error").fold(registrationForm) { e =>
         registrationForm.withGlobalError(e)
       }
-      Future.successful(Ok(views.html.register(withErrors, owner)).withSession(request.session - "error"))
+      Future.successful(Ok(views.html.register(withErrors, owner)).withSession(r.session - "error"))
     }
 
-    withOwner(registerPromptPage, request)
+    withOwner(registerPromptPage)
   }
 
-  def submit() = Action.async { request =>
+  def submit() = Action.async { implicit request =>
 
-    val registerSubmit: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val registerSubmit: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
-      registrationForm.bindFromRequest()(request).fold(
+      registrationForm.bindFromRequest()(r).fold(
         formWithErrors => {
           Future.successful(Ok(views.html.register(formWithErrors, owner)))
         },
@@ -49,19 +49,19 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
             mu.fold({ e =>
               Logger.warn("Failed to register user: " + e)
-              val withErrors = request.session +("error", e)
+              val withErrors = r.session +("error", e)
               Future.successful(Redirect(routes.RegisterController.prompt()).withSession(withErrors))
 
             }, { u =>
               Logger.info("Registered new user: " + u)
               ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
                 to.fold ({ e =>
-                  val withErrors = request.session +("error", e)
+                  val withErrors = r.session +("error", e)
                   Redirect(routes.Application.index(None, None)).withSession(withErrors)
 
                 }, { t =>
                   Logger.info("Got token: " + t)
-                  Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
+                  Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(r.session, t))
                 }
                 )
               }
@@ -72,7 +72,7 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
       )
     }
 
-    withOwner(registerSubmit, request)
+    withOwner(registerSubmit)
   }
 
 }

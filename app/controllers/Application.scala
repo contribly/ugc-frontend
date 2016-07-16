@@ -13,17 +13,15 @@ import scala.concurrent.Future
 
 class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { request =>
+  def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val indexPage: (Request[Any], User) => Future[Result] = (reques2t: Request[Any], owner: User) => {
+    val indexPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = hasMediaType)
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
 
       for {
         reports <- eventualReports
@@ -34,21 +32,19 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(indexPage, request)
+    withOwner(indexPage)
   }
 
-  def gallery(page: Option[Int]) = Action.async { request =>
+  def gallery(page: Option[Int]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val galleryPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val galleryPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("image"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
 
       for {
         reports <- eventualReports
@@ -59,21 +55,19 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(galleryPage, request)
+    withOwner(galleryPage)
   }
 
-  def videos(page: Option[Int]) = Action.async { request =>
+  def videos(page: Option[Int]) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val videoPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val videoPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("video"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(request)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
 
       for {
         reports <- eventualReports
@@ -84,7 +78,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(videoPage, request)
+    withOwner(videoPage)
   }
 
 }

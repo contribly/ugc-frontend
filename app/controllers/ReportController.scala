@@ -17,14 +17,12 @@ import scala.concurrent.Future
 
 class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport{
 
-  def contribution(id: String) = Action.async { request =>
+  def contribution(id: String) = Action.async { implicit request =>
 
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
-    val contributionPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val contributionPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       val eventualFlagTypes = ugcService.flagTypes
-      val eventualSignedInUser = signedInUserService.signedIn(request)
+      val eventualSignedInUser = signedInUserService.signedIn(r)
 
       for {
         signedIn <- eventualSignedInUser
@@ -39,12 +37,10 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
       }
     }
 
-    withOwner(contributionPage, request)
+    withOwner(contributionPage)
   }
 
-  def flag(id: String) = Action.async { request =>
-
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+  def flag(id: String) = Action.async { implicit request =>
 
     val eventualSignedInUser = signedInUserService.signedIn(request)
 

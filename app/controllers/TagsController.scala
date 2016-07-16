@@ -12,9 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class TagsController @Inject() (ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with I18nSupport {
 
-  def tags = Action.async { request =>
-
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+  def tags = Action.async { implicit request =>
 
     val eventualTags = ugcService.tags()
     val eventualOwner = ugcService.owner
@@ -31,9 +29,7 @@ class TagsController @Inject() (ugcService: UGCService, signedInUserService: Sig
     }
   }
 
-  def tag(id: String, page: Option[Int]) = Action.async { request =>
-
-    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+  def tag(id: String, page: Option[Int]) = Action.async { implicit request =>
 
     def pageLinksFor(tag: Tag, totalNumber: Long): Seq[PageLink] = {
       pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.TagsController.tag(tag.id, Some(p)).url))
