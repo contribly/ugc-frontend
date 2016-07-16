@@ -15,7 +15,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
   def user(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val userPage = (owner: User, r: Request[Any]) => {
+    val userPage = (owner: User) => {
 
       def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
@@ -38,7 +38,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
   def profile = Action.async { implicit request =>
 
-    val profilePage = (owner: User, r: Request[Any]) => {
+    val profilePage = (owner: User) => {
 
       signedInUserService.signedIn.flatMap { so =>
         so.fold{

@@ -14,7 +14,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { implicit request =>
 
-    def indexPage = (owner: User, r: Request[Any]) => {
+    def indexPage = (owner: User) => {
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
@@ -36,7 +36,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def gallery(page: Option[Int]) = Action.async { implicit request =>
 
-    val galleryPage = (owner: User, r: Request[Any]) => {
+    val galleryPage = (owner: User) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
@@ -59,7 +59,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def videos(page: Option[Int]) = Action.async { implicit request =>
 
-    val videoPage = (owner: User, r: Request[Any]) => {
+    val videoPage = (owner: User) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))

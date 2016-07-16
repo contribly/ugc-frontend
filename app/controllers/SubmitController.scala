@@ -27,7 +27,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def prompt() = Action.async { implicit request =>
 
-    val submitPrompt = (owner: User, r: Request[Any]) => {
+    val submitPrompt = (owner: User) => {
       for {
         signedIn <- signedInUserService.signedIn
 
@@ -41,7 +41,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def submit() = Action.async(parse.multipartFormData) { implicit request =>
 
-    val submitAction = (owner: User, r: Request[MultipartFormData[TemporaryFile]]) => {
+    val submitAction = (owner: User) => {
 
       signedInUserService.signedIn(request).flatMap { signedIn =>
         // TODO catch not signed in
@@ -56,7 +56,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
             val bearerToken = request.session.get("token").get
 
-            val mediaFile: Option[FilePart[TemporaryFile]] = r.body.file("media")
+            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
 
             val noMedia: Future[Option[Media]] = Future.successful(None)
             val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
@@ -83,7 +83,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       }
     }
 
-    withOwner(submitAction)(request)
+    withOwner(submitAction)
   }
 
 }

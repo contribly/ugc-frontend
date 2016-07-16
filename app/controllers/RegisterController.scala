@@ -8,7 +8,7 @@ import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,11 +25,11 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
   def prompt() = Action.async { implicit request =>
 
-    val registerPromptPage = (owner: User, r: Request[Any]) => {
+    val registerPromptPage = (owner: User) => {
       val withErrors = request.session.get("error").fold(registrationForm) { e =>
         registrationForm.withGlobalError(e)
       }
-      Future.successful(Ok(views.html.register(withErrors, owner)).withSession(r.session - "error"))
+      Future.successful(Ok(views.html.register(withErrors, owner)).withSession(request.session - "error"))
     }
 
     withOwner(registerPromptPage)
@@ -37,9 +37,9 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
   def submit() = Action.async { implicit request =>
 
-    val registerSubmit = (owner: User, r: Request[Any]) => {
+    val registerSubmit = (owner: User) => {
 
-      registrationForm.bindFromRequest()(r).fold(
+      registrationForm.bindFromRequest()(request).fold(
         formWithErrors => {
           Future.successful(Ok(views.html.register(formWithErrors, owner)))
         },
@@ -49,19 +49,19 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
             mu.fold({ e =>
               Logger.warn("Failed to register user: " + e)
-              val withErrors = r.session +("error", e)
+              val withErrors = request.session + ("error", e)
               Future.successful(Redirect(routes.RegisterController.prompt()).withSession(withErrors))
 
             }, { u =>
               Logger.info("Registered new user: " + u)
               ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
                 to.fold ({ e =>
-                  val withErrors = r.session +("error", e)
+                  val withErrors = request.session + ("error", e)
                   Redirect(routes.Application.index(None, None)).withSession(withErrors)
 
                 }, { t =>
                   Logger.info("Got token: " + t)
-                  Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(r.session, t))
+                  Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
                 }
                 )
               }

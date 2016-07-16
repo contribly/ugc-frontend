@@ -16,7 +16,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignments(page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardsPage = (owner: User, r: Request[Any]) => {
+    val noticeboardsPage = (owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
@@ -41,7 +41,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignment(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardPage = (owner: User, r: Request[Any]) => {
+    val noticeboardPage = (owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
@@ -65,7 +65,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def gallery(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val galleyPage = (owner: User, r: Request[Any]) => {
+    val galleyPage = (owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))

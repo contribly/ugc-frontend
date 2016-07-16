@@ -18,7 +18,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def contribution(id: String) = Action.async { implicit request =>
 
-    val contributionPage = (owner: User, r: Request[Any]) => {
+    val contributionPage = (owner: User) => {
 
       val eventualFlagTypes = ugcService.flagTypes
       val eventualSignedInUser = signedInUserService.signedIn
