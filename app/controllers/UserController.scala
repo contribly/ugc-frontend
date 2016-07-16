@@ -40,9 +40,9 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
   def profile = Action.async { request =>
 
-    val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
-      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+    val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       signedInUserService.signedIn(request).flatMap { so =>
         so.fold{

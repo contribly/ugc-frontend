@@ -27,9 +27,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
     implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val loginPromptPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-
-      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
+      
       val withErrors = request.session.get("error").fold(loginForm) { e =>
         loginForm.withGlobalError(e)
       }

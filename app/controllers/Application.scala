@@ -15,10 +15,9 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { request =>
 
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+
     val indexPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
-
-      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
-
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
