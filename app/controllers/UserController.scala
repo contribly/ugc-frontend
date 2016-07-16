@@ -35,7 +35,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
       }
     }
 
-    withOwner(request, userPage)
+    withOwner(userPage, request)
   }
 
   def profile = Action.async { request =>
@@ -65,7 +65,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
       }
     }
 
-    withOwner(request, profilePage)
+    withOwner(profilePage, request)
   }
 
 }

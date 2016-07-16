@@ -17,7 +17,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
     implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
-    val indexPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val indexPage: (Request[Any], User) => Future[Result] = (reques2t: Request[Any], owner: User) => {
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
@@ -34,7 +34,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(request, indexPage)
+    withOwner(indexPage, request)
   }
 
   def gallery(page: Option[Int]) = Action.async { request =>
@@ -59,7 +59,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(request, galleryPage)
+    withOwner(galleryPage, request)
   }
 
   def videos(page: Option[Int]) = Action.async { request =>
@@ -84,7 +84,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(request, videoPage)
+    withOwner(videoPage, request)
   }
 
 }

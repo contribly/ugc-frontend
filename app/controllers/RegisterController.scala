@@ -32,7 +32,7 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
       Future.successful(Ok(views.html.register(withErrors, owner)).withSession(request.session - "error"))
     }
 
-    withOwner(request, registerPromptPage)
+    withOwner(registerPromptPage, request)
   }
 
   def submit() = Action.async { request =>
@@ -72,7 +72,7 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
       )
     }
 
-    withOwner(request, registerSubmit)
+    withOwner(registerSubmit, request)
   }
 
 }

@@ -39,7 +39,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(request, noticeboardsPage)
+    withOwner(noticeboardsPage, request)
   }
 
   def assignment(id: String, page: Option[Int]) = Action.async { request =>
@@ -65,7 +65,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(request, noticeboardPage)
+    withOwner(noticeboardPage, request)
   }
 
   def gallery(id: String, page: Option[Int]) = Action.async { request =>
@@ -92,7 +92,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(request, galleyPage)
+    withOwner(galleyPage, request)
   }
 
 }

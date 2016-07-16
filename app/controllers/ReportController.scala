@@ -39,7 +39,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
       }
     }
 
-    withOwner(request, contributionPage)
+    withOwner(contributionPage, request)
   }
 
   def flag(id: String) = Action.async { request =>

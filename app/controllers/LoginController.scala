@@ -35,7 +35,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
       Future.successful(Ok(views.html.login(withErrors, owner)).withSession(request.session - "error"))
     }
 
-    withOwner(request, loginPromptPage)
+    withOwner(loginPromptPage, request)
   }
 
   def submit() = Action.async { request =>
@@ -63,7 +63,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
       )
     }
 
-    withOwner(request, loginSubmit)
+    withOwner(loginSubmit, request)
   }
 
   def logout = Action {
