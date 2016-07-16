@@ -24,12 +24,12 @@ trait UGCService {
 
   val applicationJsonHeader = "Content-Type" -> "application/json"
 
-  val assignmentsUrl: String = apiUrl + "/assignments"
-  val contributionsUrl: String = apiUrl + "/contributions"
-  val mediaUrl: String = apiUrl + "/media"
-  val tokenUrl: String = apiUrl + "/token"
-  val usersUrl: String = apiUrl + "/users"
-  val verifyUrl: String = apiUrl + "/verify"
+  val assignmentsUrl = apiUrl + "/assignments"
+  val contributionsUrl = apiUrl + "/contributions"
+  val mediaUrl = apiUrl + "/media"
+  val tokenUrl = apiUrl + "/token"
+  val usersUrl = apiUrl + "/users"
+  val verifyUrl = apiUrl + "/verify"
 
   val Ok: Int = 200
   val Accepted: Int = 202
@@ -53,7 +53,7 @@ trait UGCService {
       "ownedBy" -> ownedBy
       )
 
-    WS.url((assignmentsUrl).addParams(params)).get.map { r =>
+    WS.url(assignmentsUrl.addParams(params)).get.map { r =>
       Json.parse(r.body).as[NoticeboardSearchResult]
     }
   }
@@ -96,35 +96,31 @@ trait UGCService {
       refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten
 
-    val u = (contributionsUrl).addParams(params)
+    val u = contributionsUrl.addParams(params)
     Logger.info("Fetching from url: " + u)
     val url = WS.url(u)
     val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
     withToken.get.map { r =>
       r.status match {
-        case 200 => {
+        case 200 =>
           Json.parse(r.body).as[SearchResult]
-        }
-        case _ => {
+        case _ =>
           SearchResult(0, 0, Seq(), None) // TODO not really a proper fail return value
-        }
       }
     }
   }
 
   def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
     val reportRequest: WSRequest = WS.url(contributionsUrl / id)
-    val withToken = token.fold(reportRequest){ t => reportRequest.withHeaders(bearerTokenHeader(t))}
+    val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
 
     withToken.get.map { r =>
       r.status match {
-        case 200 => {
+        case 200 =>
           Some(Json.parse(r.body).as[Report])
-        }
-        case _ => {
+        case _ =>
           Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
           None
-        }
       }
     }
   }
@@ -135,8 +131,6 @@ trait UGCService {
       "body" -> body,
       "media" -> media.map(m => Json.toJson(Seq(Map("id" -> m.id))))
     )
-
-    Logger.info("Report submission JSON: " + submissionJson.toString())
 
     val eventualResponse = WS.url(contributionsUrl).
       withHeaders(bearerTokenHeader(token), applicationJsonHeader).
