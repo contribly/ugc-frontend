@@ -19,12 +19,8 @@ class SignedInUserService {
 
   def signedIn(request: Request[Any]): Future[Option[(User, String)]] = {
     val noneUser: Future[Option[(User, String)]] = Future.successful(None)
-    request.session.get(sessionTokenKey).fold(noneUser){ t =>
-      ugcService.verify(t).map { uo =>
-        uo.map { u =>
-          (u, t)
-        }
-      }
+    request.session.get(sessionTokenKey).fold(noneUser) { t =>
+      ugcService.verify(t).map(ao => ao.flatMap(a => a.user.map(u => (u, t))))
     }
   }
 

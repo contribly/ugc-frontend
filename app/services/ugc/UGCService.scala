@@ -289,16 +289,12 @@ trait UGCService {
     }
   }
 
-  def verify(token: String): Future[Option[User]] = {
-    WS.url(verifyUrl).withHeaders(bearerTokenHeader(token)).
-      post(Results.EmptyContent()).map { r =>
-      if (r.status == Ok) {
-        Some(Json.parse(r.body).as[User])
-      } else {
-        Logger.info(r.status + ": " + r.body)
-        None
+  def verify(token: String): Future[Option[Authority]] = {
+    WS.url(verifyUrl).withHeaders(bearerTokenHeader(token)).post(Results.EmptyContent()).map { r =>
+      r.status match {
+        case Ok => Some(Json.parse(r.body).as[Authority])
+        case _ => None
       }
-
     }
   }
 
