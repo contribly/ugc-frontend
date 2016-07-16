@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import model.{Noticeboard, User}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
@@ -10,11 +11,13 @@ import views.PageLink
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with Pages with WithOwner {
+class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   private val Assignment = "assignment"
 
   def assignments(page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val noticeboardsPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
@@ -41,6 +44,8 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignment(id: String, page: Option[Int]) = Action.async { request =>
 
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
+
     val noticeboardPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
@@ -64,6 +69,8 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
   }
 
   def gallery(id: String, page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val galleyPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 

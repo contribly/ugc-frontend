@@ -1,7 +1,7 @@
 @import model.{Report, User}
 @import model.Noticeboard
 @import views.PageLink
-@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])
+@(noticeboard: Noticeboard, reports: Seq[Report], owner: User, signedIn: Option[User], pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>

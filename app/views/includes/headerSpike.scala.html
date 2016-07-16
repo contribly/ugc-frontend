@@ -10,14 +10,14 @@
 </ul>
 
 @signedIn.fold{
-<ul>
-    <li><a href="@routes.LoginController.prompt">Sign in</a></li>
-    <li><a href="@routes.RegisterController.prompt">Register</a></li>
-</ul>
+    <ul>
+        <li><a href="@routes.LoginController.prompt">Sign in</a></li>
+        <li><a href="@routes.RegisterController.prompt">Register</a></li>
+    </ul>
 }{ s =>
-<ul>
-    <li>Signed in as <a href="@routes.UserController.profile">@s.displayName</a></li>
-    <li><a href="@routes.LoginController.logout">Sign out</a></li>
-    <li><a href="@routes.SubmitController.prompt">Submit</a></li>
-</ul>
+    <ul>
+        <li>Signed in as <a href="@routes.UserController.profile">@s.displayName</a></li>
+        <li><a href="@routes.LoginController.logout">Sign out</a></li>
+        <li><a href="@routes.SubmitController.prompt">Submit</a></li>
+    </ul>
 }

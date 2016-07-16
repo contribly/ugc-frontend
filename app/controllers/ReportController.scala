@@ -7,6 +7,7 @@ import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.{MessagesApi, I18nSupport}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
@@ -14,9 +15,11 @@ import services.ugc.UGCService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with WithOwner {
+class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport{
 
   def contribution(id: String) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val contributionPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
@@ -40,6 +43,8 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
   }
 
   def flag(id: String) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val eventualSignedInUser = signedInUserService.signedIn(request)
 

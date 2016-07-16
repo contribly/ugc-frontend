@@ -1,6 +1,6 @@
 @import model.Tag
 @import model.User
-@(tags: Seq[Tag], owner: User, signedIn: Option[User])
+@(tags: Seq[Tag], owner: User, signedIn: Option[User])(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>

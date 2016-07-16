@@ -3,8 +3,8 @@ package controllers
 import javax.inject.Inject
 
 import model.User
-import play.api.i18n.{MessagesApi, I18nSupport}
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc._
 import services.ugc.UGCService
 import views.PageLink
 
@@ -16,6 +16,8 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { request =>
 
     val indexPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+
+      implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
@@ -37,6 +39,8 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
   }
 
   def gallery(page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val galleryPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 
@@ -60,6 +64,8 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
   }
 
   def videos(page: Option[Int]) = Action.async { request =>
+
+    implicit val implicitRequestNeededForI18N = request  // TODO Suggests that play expects out wrappers to leave the request as an implicit
 
     val videoPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
 

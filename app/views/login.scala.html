@@ -1,8 +1,7 @@
 @import model.LoginDetails
 @import model.User
 @import play.api.Play.current
-@import play.api.i18n.Messages.Implicits._
-@(loginForm: Form[LoginDetails], owner: User)
+@(loginForm: Form[LoginDetails], owner: User)(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>

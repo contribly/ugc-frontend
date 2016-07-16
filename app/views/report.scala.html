@@ -1,8 +1,7 @@
 @import model.forms.FlagSubmission
 @import model.{FlagType, Report, User}
 @import play.api.Play.current
-@import play.api.i18n.Messages.Implicits._
-@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])
+@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>

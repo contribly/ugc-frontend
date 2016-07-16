@@ -2,7 +2,7 @@
 @import model.Tag
 @import model.User
 @import views.PageLink
-@(reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long, pages: Seq[PageLink])
+@(reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
