@@ -25,28 +25,28 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
     )(SubmissionDetails.apply)(SubmissionDetails.unapply)
   )
 
-  def prompt() = Action.async { request =>
+  def prompt() = Action.async { implicit request =>
 
-    val submitPrompt: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val submitPrompt: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
       for {
-        signedIn <- signedInUserService.signedIn(request)
+        signedIn <- signedInUserService.signedIn
+
       } yield {
         Ok(views.html.submit(submitForm, owner, signedIn.map(s => s._1)))
       }
     }
 
-    withOwner(submitPrompt)(request)
+    withOwner(submitPrompt)
   }
 
-  def submit() = Action.async(parse.multipartFormData) { request =>
+  def submit() = Action.async(parse.multipartFormData) { implicit request =>
 
-    val submitAction: (Request[MultipartFormData[TemporaryFile]], User) => Future[Result] = (request: Request[MultipartFormData[TemporaryFile]], owner: User) => {
+    val submitAction: (Request[MultipartFormData[TemporaryFile]], User) => Future[Result] = (r: Request[MultipartFormData[TemporaryFile]], owner: User) => {
 
       signedInUserService.signedIn(request).flatMap { signedIn =>
         // TODO catch not signed in
 
-        val boundForm: Form[SubmissionDetails] = submitForm.bindFromRequest()(request)
-        boundForm.fold(
+        submitForm.bindFromRequest().fold(
           formWithErrors => {
             Logger.info("Form failed to validate: " + formWithErrors)
             Future.successful(Ok(views.html.submit(formWithErrors, owner, signedIn.map(s => s._1))))
@@ -56,7 +56,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
             val bearerToken = request.session.get("token").get
 
-            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+            val mediaFile: Option[FilePart[TemporaryFile]] = r.body.file("media")
 
             val noMedia: Future[Option[Media]] = Future.successful(None)
             val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>

@@ -22,7 +22,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
     val contributionPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       val eventualFlagTypes = ugcService.flagTypes
-      val eventualSignedInUser = signedInUserService.signedIn(r)
+      val eventualSignedInUser = signedInUserService.signedIn
 
       for {
         signedIn <- eventualSignedInUser
@@ -42,10 +42,8 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def flag(id: String) = Action.async { implicit request =>
 
-    val eventualSignedInUser = signedInUserService.signedIn(request)
-
     for {
-      signedIn <- signedInUserService.signedIn(request)
+      signedIn <- signedInUserService.signedIn
       report <- ugcService.contribution(id, signedIn.map(s => s._2))
 
     } yield {

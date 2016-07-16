@@ -20,7 +20,7 @@ class TagsController @Inject() (ugcService: UGCService, signedInUserService: Sig
     for {
       tags <- eventualTags
       owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      signedIn <- signedInUserService.signedIn
 
     } yield {
       owner.fold(NotFound(views.html.notFound())) { o =>
@@ -44,7 +44,7 @@ class TagsController @Inject() (ugcService: UGCService, signedInUserService: Sig
       tag <- eventualTag
       reports <- eventualReports
       owner <- eventualOwner
-      signedIn <- signedInUserService.signedIn(request)
+      signedIn <- signedInUserService.signedIn
       tags <- eventualTags
 
     } yield {

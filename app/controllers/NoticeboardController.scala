@@ -29,7 +29,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboards <- eventualNoticeboards
         noticeboardContributionCounts <- eventualNoticeboardContributionCounts
-        signedIn <- signedInUserService.signedIn(r)
+        signedIn <- signedInUserService.signedIn
 
       } yield {
           val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get(Assignment)
@@ -54,7 +54,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboard <- eventualNoticeboard
         reports <- eventualReports
-        signedIn <- signedInUserService.signedIn(r)
+        signedIn <- signedInUserService.signedIn
 
       } yield {
         Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
@@ -78,7 +78,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       for {
         noticeboard <- eventualNoticeboard
         reports <- eventualReports
-        signedIn <- signedInUserService.signedIn(r)
+        signedIn <- signedInUserService.signedIn
 
       } yield {
         Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))

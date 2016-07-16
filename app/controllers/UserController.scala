@@ -15,7 +15,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
   def user(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val userPage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val userPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
       def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
@@ -24,7 +24,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
       for {
         user <- ugcService.user(id)
         reports <- ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(id))
-        signedIn <- signedInUserService.signedIn(request)
+        signedIn <- signedInUserService.signedIn
 
       } yield {
         user.fold(NotFound(views.html.notFound())) { u =>
@@ -38,9 +38,9 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
   def profile = Action.async { implicit request =>
 
-    val profilePage: (Request[Any], User) => Future[Result] = (request: Request[Any], owner: User) => {
+    val profilePage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
 
-      signedInUserService.signedIn(request).flatMap { so =>
+      signedInUserService.signedIn.flatMap { so =>
         so.fold{
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>

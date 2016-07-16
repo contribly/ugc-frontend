@@ -17,7 +17,7 @@ class SignedInUserService @Inject() (ugcService: UGCService) {
     session + (SessionTokenKey, token)
   }
 
-  def signedIn(request: Request[Any]): Future[Option[(User, String)]] = {
+  def signedIn(implicit request: Request[Any]): Future[Option[(User, String)]] = {
     val noneUser: Future[Option[(User, String)]] = Future.successful(None)
     request.session.get(SessionTokenKey).fold(noneUser) { t =>
       ugcService.verify(t).map(ao => ao.flatMap(a => a.user.map(u => (u, t))))

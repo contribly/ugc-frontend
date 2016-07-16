@@ -21,7 +21,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = hasMediaType)
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
         reports <- eventualReports
@@ -44,7 +44,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("image"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
         reports <- eventualReports
@@ -67,7 +67,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
 
       val eventualReports = ugcService.reports(pageSize = PageSize, page = page, hasMediaType = Some("video"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn(r)
+      val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
         reports <- eventualReports
