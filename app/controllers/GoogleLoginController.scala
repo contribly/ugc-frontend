@@ -3,17 +3,16 @@ package controllers
 import javax.inject.Inject
 
 import com.netaporter.uri.dsl._
-import play.api.Play.current
 import play.api.libs.json.Json
-import play.api.libs.ws.WS
+import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import play.api.{Configuration, Logger, Play}
+import play.api.{Configuration, Logger}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GoogleLoginController @Inject() (configuration: Configuration, ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller {
+class GoogleLoginController @Inject() (configuration: Configuration, ugcService: UGCService, signedInUserService: SignedInUserService, ws: WSClient) extends Controller {
 
   val rootUrl = configuration.getString("root.url").get
   val clientId = configuration.getString("google.client.id").get
@@ -54,7 +53,7 @@ class GoogleLoginController @Inject() (configuration: Configuration, ugcService:
       val tokenUrl = "https://www.googleapis.com/oauth2/v4/token"
 
       Logger.info("Exchanging code for token: " + tokenUrl)
-      WS.url(tokenUrl).post(tokenParams).flatMap { r => {
+      ws.url(tokenUrl).post(tokenParams).flatMap { r => {
         Logger.info("Token response: " + r.body)
 
         implicit val tr = Json.reads[TokenResponse]
