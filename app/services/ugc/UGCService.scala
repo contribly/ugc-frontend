@@ -1,6 +1,7 @@
 package services.ugc
 
 import java.io.File
+import javax.inject.Inject
 
 import com.netaporter.uri.dsl._
 import model._
@@ -10,17 +11,17 @@ import play.api.Play.current
 import play.api.libs.json._
 import play.api.libs.ws.{WS, WSRequest}
 import play.api.mvc.Results
-import play.api.{Logger, Play}
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
 
-trait UGCService {
+class UGCService @Inject() (configuration: Configuration) {
 
-  val apiUrl: String
-  val ownedBy: String
-  val clientId: String
-  val clientSecret: String
+  val apiUrl = configuration.getString("ugc.api.url").get
+  val ownedBy = configuration.getString("ugc.user").get
+  val clientId = configuration.getString("ugc.client.id").get
+  val clientSecret = configuration.getString("ugc.client.secret").get
 
   val applicationJsonHeader = "Content-Type" -> "application/json"
 
@@ -306,11 +307,4 @@ trait UGCService {
     "Authorization" -> ("Basic " + Base64.encodeBase64String((clientId + ":" + clientSecret).getBytes()))
   }
 
-}
-
-object UGCService extends UGCService {
-  override lazy val apiUrl: String = Play.configuration.getString("ugc.api.url").get
-  override lazy val ownedBy: String = Play.configuration.getString("ugc.user").get
-  override lazy val clientId: String = Play.configuration.getString("ugc.client.id").get
-  override lazy val clientSecret: String = Play.configuration.getString("ugc.client.secret").get
 }

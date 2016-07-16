@@ -1,10 +1,10 @@
 package controllers
 
-import _root_.twitter4j.conf.{Configuration, ConfigurationBuilder}
-import play.api.Play.current
+import javax.inject.Inject
+
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller, Session}
-import play.api.{Logger, Play}
+import play.api.{Configuration, Logger}
 import services.ugc.UGCService
 import twitter4j.auth.{AccessToken, RequestToken}
 import twitter4j.{Twitter, TwitterException, TwitterFactory}
@@ -12,14 +12,11 @@ import twitter4j.{Twitter, TwitterException, TwitterFactory}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait TwitterLoginController extends Controller {
+class TwitterLoginController @Inject() (configuration: Configuration, ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller {
 
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
-
-  val rootUrl: String
-  val consumerKey: String
-  val consumerSecret: String
+  val rootUrl = configuration.getString("root.url").get
+  val consumerKey = configuration.getString("twitter.consumer.key").get
+  val consumerSecret = configuration.getString("twitter.consumer.secret").get
 
   val callbackUrl = rootUrl + routes.TwitterLoginController.callback(None, None)
   val TwitterRequestTokenSessionKey: String = "twitter-request-token"
@@ -93,16 +90,10 @@ trait TwitterLoginController extends Controller {
   }
 
   private def getTwitterApi: Twitter = {
-    def buildConfig: Configuration = {
-      new ConfigurationBuilder().setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerSecret).build
+    def buildConfig:  twitter4j.conf.Configuration = {
+      new  twitter4j.conf.ConfigurationBuilder().setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerSecret).build
     }
-    return new TwitterFactory(buildConfig).getInstance
+    new TwitterFactory(buildConfig).getInstance
   }
 
-}
-
-object TwitterLoginController extends TwitterLoginController {
-  override lazy val rootUrl = Play.configuration.getString("root.url").get
-  override lazy val consumerKey = Play.configuration.getString("twitter.consumer.key").get
-  override lazy val consumerSecret = Play.configuration.getString("twitter.consumer.secret").get
 }

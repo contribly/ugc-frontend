@@ -1,24 +1,23 @@
 package controllers
 
+import javax.inject.Inject
+
 import com.netaporter.uri.dsl._
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
-import play.api.mvc.{Result, Action, Controller}
-import play.api.{Logger, Play}
+import play.api.mvc.{Action, Controller}
+import play.api.{Configuration, Logger, Play}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait GoogleLoginController extends Controller {
+class GoogleLoginController @Inject() (configuration: Configuration, ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller {
 
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
-
-  val rootUrl: String
-  val clientId: String
-  val clientSecret: String
+  val rootUrl = configuration.getString("root.url").get
+  val clientId = configuration.getString("google.client.id").get
+  val clientSecret = configuration.getString("google.client.secret").get
 
   val callbackUrl = rootUrl + routes.GoogleLoginController.callback(None, None)
 
@@ -81,10 +80,4 @@ trait GoogleLoginController extends Controller {
 
   private case class TokenResponse(access_token: String)
 
-}
-
-object GoogleLoginController extends GoogleLoginController {
-  override lazy val rootUrl = Play.configuration.getString("root.url").get
-  override lazy val clientId = Play.configuration.getString("google.client.id").get
-  override lazy val clientSecret = Play.configuration.getString("google.client.secret").get
 }

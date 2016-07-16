@@ -1,8 +1,9 @@
-
 package controllers
 
+import javax.inject.Inject
+
 import model.User
-import play.api.Logger
+import play.api.i18n.{MessagesApi, I18nSupport}
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 import views.PageLink
@@ -10,10 +11,7 @@ import views.PageLink
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object Application extends Controller with Pages with WithOwner {
-
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { request =>
 

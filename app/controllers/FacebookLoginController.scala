@@ -1,24 +1,22 @@
 package controllers
 
+import javax.inject.Inject
+
 import com.restfb.FacebookClient.AccessToken
 import com.restfb.scope.{ExtendedPermissions, ScopeBuilder}
 import com.restfb.{DefaultFacebookClient, FacebookClient, Version}
-import play.api.Play.current
 import play.api.mvc.{Action, Controller}
-import play.api.{Logger, Play}
+import play.api.{Configuration, Logger}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait FacebookLoginController extends Controller {
+class FacebookLoginController @Inject() (configuration: Configuration, ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller {
 
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
-
-  val rootUrl: String
-  val appId: String
-  val appSecret: String
+  val rootUrl = configuration.getString("root.url").get
+  val appId = configuration.getString("facebook.app.id").get
+  val appSecret =configuration.getString("facebook.app.secret").get
 
   val callbackUrl = rootUrl + routes.FacebookLoginController.callback(None, None, None, None)
 
@@ -49,23 +47,18 @@ trait FacebookLoginController extends Controller {
       Logger.info("Obtained user access token: " + facebookAccessToken)
 
       ugcService.tokenFacebook(facebookAccessToken.getAccessToken).map { to =>
-        to.fold({ e =>
-          val withErrors = request.session +("error", e)
-          Redirect(routes.LoginController.prompt).withSession(withErrors)
-        }, { t =>
-          Logger.info("Setting session token: " + t)
-          Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
-        }
+        to.fold(
+          { e =>
+            val withErrors = request.session +("error", e)
+            Redirect(routes.LoginController.prompt).withSession(withErrors)
+          }, { t =>
+            Logger.info("Setting session token: " + t)
+            Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
+          }
         )
       }
     }
 
   }
 
-}
-
-object FacebookLoginController extends FacebookLoginController {
-  override lazy val rootUrl = Play.configuration.getString("root.url").get
-  override lazy val appId = Play.configuration.getString("facebook.app.id").get
-  override lazy val appSecret = Play.configuration.getString("facebook.app.secret").get
 }

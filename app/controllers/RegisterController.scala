@@ -1,20 +1,19 @@
 package controllers
 
+import javax.inject.Inject
+
 import model.User
 import model.forms.RegistrationDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.mvc.{Result, Request, Action, Controller}
+import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object RegisterController extends Controller with WithOwner {
-
-  val signedInUserService = SignedInUserService
-  val ugcService = UGCService
+class RegisterController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with WithOwner {
 
   val registrationForm: Form[RegistrationDetails] = Form(
     mapping(

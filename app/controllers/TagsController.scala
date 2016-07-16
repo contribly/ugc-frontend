@@ -1,6 +1,7 @@
 package controllers
 
-import controllers.Application._
+import javax.inject.Inject
+
 import model.Tag
 import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
@@ -8,10 +9,7 @@ import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object TagsController extends Controller with Pages {
-
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+class TagsController @Inject() (ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with Pages {
 
   def tags = Action.async { request =>
 

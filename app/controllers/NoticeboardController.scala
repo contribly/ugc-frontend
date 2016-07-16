@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject.Inject
+
 import model.{Noticeboard, User}
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
@@ -8,12 +10,9 @@ import views.PageLink
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object NoticeboardController extends Controller with Pages with WithOwner {
+class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with Pages with WithOwner {
 
   private val Assignment = "assignment"
-
-  private val ugcService = UGCService
-  private val signedInUserService = SignedInUserService
 
   def assignments(page: Option[Int]) = Action.async { request =>
 

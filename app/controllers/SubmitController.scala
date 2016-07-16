@@ -1,7 +1,9 @@
 package controllers
 
-import model.{User, Media}
+import javax.inject.Inject
+
 import model.forms.SubmissionDetails
+import model.{Media, User}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
@@ -13,10 +15,7 @@ import services.ugc.UGCService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object SubmitController extends Controller with WithOwner {
-
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+class SubmitController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with WithOwner {
 
   val submitForm: Form[SubmissionDetails] = Form(
     mapping(

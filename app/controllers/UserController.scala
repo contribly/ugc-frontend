@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject.Inject
+
 import model.User
 import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
@@ -8,10 +10,7 @@ import views.PageLink
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object UserController extends Controller with Pages with WithOwner {
-
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+class UserController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with Pages with WithOwner {
 
   def user(id: String, page: Option[Int]) = Action.async { request =>
 

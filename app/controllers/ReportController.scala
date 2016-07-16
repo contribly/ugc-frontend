@@ -1,22 +1,20 @@
 package controllers
 
-import controllers.SubmitController._
+import javax.inject.Inject
+
 import model.User
 import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
-import play.api.mvc.{Result, Request, Action}
+import play.api.mvc.{Action, Controller, Request, Result}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object ReportController extends WithOwner {
-
-  val ugcService = UGCService
-  val signedInUserService = SignedInUserService
+class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService) extends Controller with WithOwner {
 
   def contribution(id: String) = Action.async { request =>
 
