@@ -1,3 +1,3 @@
 assignments=Aasignaciones
-galley=Galería
+gallery=Galería
 videos=Vídeos
