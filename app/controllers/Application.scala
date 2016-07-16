@@ -9,13 +9,12 @@ import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { implicit request =>
 
-    val indexPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    def indexPage = (owner: User, r: Request[Any]) => {
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
@@ -37,7 +36,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def gallery(page: Option[Int]) = Action.async { implicit request =>
 
-    val galleryPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val galleryPage = (owner: User, r: Request[Any]) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
@@ -60,7 +59,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def videos(page: Option[Int]) = Action.async { implicit request =>
 
-    val videoPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val videoPage = (owner: User, r: Request[Any]) => {
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))

@@ -27,7 +27,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def prompt() = Action.async { implicit request =>
 
-    val submitPrompt: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val submitPrompt = (owner: User, r: Request[Any]) => {
       for {
         signedIn <- signedInUserService.signedIn
 
@@ -41,7 +41,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def submit() = Action.async(parse.multipartFormData) { implicit request =>
 
-    val submitAction: (Request[MultipartFormData[TemporaryFile]], User) => Future[Result] = (r: Request[MultipartFormData[TemporaryFile]], owner: User) => {
+    val submitAction = (owner: User, r: Request[MultipartFormData[TemporaryFile]]) => {
 
       signedInUserService.signedIn(request).flatMap { signedIn =>
         // TODO catch not signed in

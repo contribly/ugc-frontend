@@ -4,12 +4,11 @@ import javax.inject.Inject
 
 import model.{Noticeboard, User}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.mvc.{Action, Controller, Request}
 import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
@@ -17,7 +16,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignments(page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardsPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val noticeboardsPage = (owner: User, r: Request[Any]) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
@@ -42,7 +41,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignment(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val noticeboardPage = (owner: User, r: Request[Any]) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
@@ -66,7 +65,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def gallery(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val galleyPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val galleyPage = (owner: User, r: Request[Any]) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))

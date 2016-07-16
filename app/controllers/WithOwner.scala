@@ -13,13 +13,13 @@ trait WithOwner {
 
   def ugcService: UGCService
 
-  def withOwner[T](handlerFunction: (Request[T], User) => Future[Result])(implicit request: Request[T]): Future[Result] = {
+  def withOwner[T](handlerFunction: (User, Request[T]) => Future[Result])(implicit request: Request[T]): Future[Result] = {
     ugcService.owner.flatMap { oo =>
       oo.fold {
         Logger.warn("Owner not found; returning 404")
         Future.successful(NotFound(views.html.notFound()))
       } { o =>
-        handlerFunction(request, o)
+        handlerFunction(o, request)
       }
     }
   }

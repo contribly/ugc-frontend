@@ -7,19 +7,18 @@ import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.{MessagesApi, I18nSupport}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.mvc.{Action, Controller, Request}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport{
 
   def contribution(id: String) = Action.async { implicit request =>
 
-    val contributionPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val contributionPage = (owner: User, r: Request[Any]) => {
 
       val eventualFlagTypes = ugcService.flagTypes
       val eventualSignedInUser = signedInUserService.signedIn

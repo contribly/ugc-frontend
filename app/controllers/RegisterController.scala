@@ -25,7 +25,7 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
   def prompt() = Action.async { implicit request =>
 
-    val registerPromptPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val registerPromptPage = (owner: User, r: Request[Any]) => {
       val withErrors = request.session.get("error").fold(registrationForm) { e =>
         registrationForm.withGlobalError(e)
       }
@@ -37,7 +37,7 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
 
   def submit() = Action.async { implicit request =>
 
-    val registerSubmit: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val registerSubmit = (owner: User, r: Request[Any]) => {
 
       registrationForm.bindFromRequest()(r).fold(
         formWithErrors => {

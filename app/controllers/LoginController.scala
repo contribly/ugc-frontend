@@ -7,7 +7,7 @@ import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Controller, Request, Result, _}
+import play.api.mvc.{Controller, Request, _}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,7 +24,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
 
   def prompt() = Action.async { implicit request =>
 
-    val loginPromptPage: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val loginPromptPage = (owner: User, r: Request[Any]) => {
       
       val withErrors = r.session.get("error").fold(loginForm) { e =>
         loginForm.withGlobalError(e)
@@ -38,7 +38,7 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
 
   def submit() = Action.async { implicit request =>
 
-    val loginSubmit: (Request[Any], User) => Future[Result] = (r: Request[Any], owner: User) => {
+    val loginSubmit = (owner: User, r: Request[Any]) => {
 
       loginForm.bindFromRequest()(r).fold(
         formWithErrors => {
