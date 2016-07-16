@@ -18,7 +18,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
 
   def contribution(id: String) = Action.async { implicit request =>
 
-    val contributionPage = (owner: User) => {
+    withOwner { owner =>
 
       val eventualFlagTypes = ugcService.flagTypes
       val eventualSignedInUser = signedInUserService.signedIn
@@ -35,8 +35,6 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
         }
       }
     }
-
-    withOwner(contributionPage)
   }
 
   def flag(id: String) = Action.async { implicit request =>

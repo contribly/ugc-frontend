@@ -24,22 +24,17 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
 
   def prompt() = Action.async { implicit request =>
 
-    val loginPromptPage = (owner: User) => {
-      
+    withOwner { owner =>
       val withErrors = request.session.get("error").fold(loginForm) { e =>
         loginForm.withGlobalError(e)
       }
-
       Future.successful(Ok(views.html.login(withErrors, owner)).withSession(request.session - "error"))
     }
-
-    withOwner(loginPromptPage)
   }
 
   def submit() = Action.async { implicit request =>
 
-    val loginSubmit = (owner: User) => {
-
+    withOwner { owner =>
       loginForm.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(Ok(views.html.login(formWithErrors, owner)))
@@ -58,8 +53,6 @@ class LoginController @Inject() (val ugcService: UGCService, signedInUserService
         }
       )
     }
-
-    withOwner(loginSubmit)
   }
 
   def logout = Action {

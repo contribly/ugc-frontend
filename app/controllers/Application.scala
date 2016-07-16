@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject.Inject
 
-import model.User
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import services.ugc.UGCService
@@ -14,7 +13,8 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
 
   def index(page: Option[Int], hasMediaType: Option[String]) = Action.async { implicit request =>
 
-    def indexPage = (owner: User) => {
+    withOwner { owner =>
+
       def pagesLinkFor(totalNumber: Long, hasMediaType: Option[String]): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), hasMediaType).url))
       }
@@ -30,13 +30,11 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         Ok(views.html.index(reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pagesLinkFor(reports.numberFound, hasMediaType)))
       }
     }
-
-    withOwner(indexPage)
   }
 
   def gallery(page: Option[Int]) = Action.async { implicit request =>
 
-    val galleryPage = (owner: User) => {
+    withOwner { owner =>
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
@@ -53,13 +51,11 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         Ok(views.html.gallery(reports.results, owner, signedIn.map(s => s._1), pageLinksFor(reports.numberFound), reports.numberFound))
       }
     }
-
-    withOwner(galleryPage)
   }
 
   def videos(page: Option[Int]) = Action.async { implicit request =>
 
-    val videoPage = (owner: User) => {
+    withOwner { owner =>
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
@@ -77,7 +73,6 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
       }
     }
 
-    withOwner(videoPage)
   }
 
 }

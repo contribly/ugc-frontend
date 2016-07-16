@@ -26,8 +26,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
   )
 
   def prompt() = Action.async { implicit request =>
-
-    val submitPrompt = (owner: User) => {
+    withOwner { owner =>
       for {
         signedIn <- signedInUserService.signedIn
 
@@ -35,16 +34,11 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
         Ok(views.html.submit(submitForm, owner, signedIn.map(s => s._1)))
       }
     }
-
-    withOwner(submitPrompt)
   }
 
   def submit() = Action.async(parse.multipartFormData) { implicit request =>
-
-    val submitAction = (owner: User) => {
-
-      signedInUserService.signedIn(request).flatMap { signedIn =>
-        // TODO catch not signed in
+    withOwner { owner =>
+      signedInUserService.signedIn(request).flatMap { signedIn =>  // TODO catch not signed in
 
         submitForm.bindFromRequest().fold(
           formWithErrors => {
@@ -82,8 +76,6 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
         )
       }
     }
-
-    withOwner(submitAction)
   }
 
 }
