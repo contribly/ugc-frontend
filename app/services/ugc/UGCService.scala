@@ -7,16 +7,15 @@ import com.netaporter.uri.dsl._
 import model._
 import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
-import play.api.Play.current
 import play.api.libs.json._
-import play.api.libs.ws.{WS, WSRequest}
+import play.api.libs.ws.{WSClient, WSRequest}
 import play.api.mvc.Results
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Future
 
-class UGCService @Inject() (configuration: Configuration) {
+class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   val apiUrl = configuration.getString("ugc.api.url").get
   val ownedBy = configuration.getString("ugc.user").get
@@ -36,13 +35,13 @@ class UGCService @Inject() (configuration: Configuration) {
   val Accepted: Int = 202
 
   def flagTypes: Future[Seq[FlagType]] = {
-    WS.url(apiUrl + "/flag-types").get.map { r =>
+    ws.url(apiUrl + "/flag-types").get.map { r =>
       Json.parse(r.body).as[Seq[FlagType]]
     }
   }
 
   def assignment(id: String): Future[Noticeboard] = {
-    WS.url(assignmentsUrl / id).get.map { r =>
+    ws.url(assignmentsUrl / id).get.map { r =>
       Json.parse(r.body).as[Noticeboard]
     }
   }
@@ -54,7 +53,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "ownedBy" -> ownedBy
       )
 
-    WS.url(assignmentsUrl.addParams(params)).get.map { r =>
+    ws.url(assignmentsUrl.addParams(params)).get.map { r =>
       Json.parse(r.body).as[NoticeboardSearchResult]
     }
   }
@@ -64,7 +63,7 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def register(registrationDetails: RegistrationDetails): Future[Either[String, User]] = {
-    WS.url(usersUrl).withHeaders(clientAuthHeader).
+    ws.url(usersUrl).withHeaders(clientAuthHeader).
       post(Json.toJson(registrationDetails)).map { r =>
         if (r.status == Ok) {
           Right(Json.parse(r.body).as[User])
@@ -99,7 +98,7 @@ class UGCService @Inject() (configuration: Configuration) {
 
     val u = contributionsUrl.addParams(params)
     Logger.info("Fetching from url: " + u)
-    val url = WS.url(u)
+    val url = ws.url(u)
     val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
     withToken.get.map { r =>
       r.status match {
@@ -112,7 +111,7 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
-    val reportRequest: WSRequest = WS.url(contributionsUrl / id)
+    val reportRequest: WSRequest = ws.url(contributionsUrl / id)
     val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
 
     withToken.get.map { r =>
@@ -133,7 +132,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "media" -> media.map(m => Json.toJson(Seq(Map("id" -> m.id))))
     )
 
-    val eventualResponse = WS.url(contributionsUrl).
+    val eventualResponse = ws.url(contributionsUrl).
       withHeaders(bearerTokenHeader(token), applicationJsonHeader).
       post(submissionJson)
 
@@ -151,7 +150,7 @@ class UGCService @Inject() (configuration: Configuration) {
   def submitFlag(reportId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
     val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
 
-    WS.url(contributionsUrl / reportId / "flag").
+    ws.url(contributionsUrl / reportId / "flag").
       withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
       Logger.info("Response: " + response)
@@ -159,7 +158,7 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def submitMedia(mf: File, token: String): Future[Option[Media]] = {
-    val eventualResponse = WS.url(mediaUrl).
+    val eventualResponse = ws.url(mediaUrl).
       withHeaders(bearerTokenHeader(token)).
       post(mf)
 
@@ -175,13 +174,13 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def tag(id: String): Future[Tag] = {
-    WS.url(apiUrl + "/tags/" + id).get.map { r =>
+    ws.url(apiUrl + "/tags/" + id).get.map { r =>
       Json.parse(r.body).as[Tag]
     }
   }
 
   def tags(): Future[Seq[Tag]] = {
-    WS.url((apiUrl + "/tags").addParam("ownedBy", ownedBy)).get.map { r =>
+    ws.url((apiUrl + "/tags").addParam("ownedBy", ownedBy)).get.map { r =>
       Json.parse(r.body).as[Seq[Tag]]
     }
   }
@@ -196,7 +195,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "password" -> Seq(password)
     )
 
-    WS.url(tokenUrl).
+    ws.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post(params).map{ r =>
         if (r.status == Ok) {
@@ -219,7 +218,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "token" -> Seq(googleToken)
     )
 
-    WS.url(tokenUrl).
+    ws.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post(params).map{ r =>
         if (r.status == Ok) {
@@ -242,7 +241,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "token" -> Seq(facebookAccessToken)
     )
 
-    WS.url(tokenUrl).
+    ws.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post(params).map{ r =>
         if (r.status == Ok) {
@@ -266,7 +265,7 @@ class UGCService @Inject() (configuration: Configuration) {
       "secret" -> Seq(secret)
     )
 
-    WS.url(tokenUrl).
+    ws.url(tokenUrl).
       withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
       post(params).map{ r =>
         if (r.status == Ok) {
@@ -281,7 +280,7 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def user(id: String): Future[Option[User]] = {
-    WS.url(usersUrl / id).get.map { r =>
+    ws.url(usersUrl / id).get.map { r =>
       if (r.status == Ok) {
         Some(Json.parse(r.body).as[User])
       } else {
@@ -291,7 +290,7 @@ class UGCService @Inject() (configuration: Configuration) {
   }
 
   def verify(token: String): Future[Option[Authority]] = {
-    WS.url(verifyUrl).withHeaders(bearerTokenHeader(token)).post(Results.EmptyContent()).map { r =>
+    ws.url(verifyUrl).withHeaders(bearerTokenHeader(token)).post(Results.EmptyContent()).map { r =>
       r.status match {
         case Ok => Some(Json.parse(r.body).as[Authority])
         case _ => None
