@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
+import model.Media
 import model.forms.SubmissionDetails
-import model.{Media, User}
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
@@ -31,49 +31,61 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
         signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.submit(submitForm, owner, signedIn.map(s => s._1)))
+        signedIn.fold {
+          Redirect(routes.LoginController.prompt())
+
+        } { s =>
+          Ok(views.html.submit(submitForm, owner, Some(s._1)))
+        }
       }
     }
   }
 
   def submit() = Action.async(parse.multipartFormData) { implicit request =>
     withOwner { owner =>
-      signedInUserService.signedIn(request).flatMap { signedIn =>  // TODO catch not signed in
 
-        submitForm.bindFromRequest().fold(
-          formWithErrors => {
-            Logger.info("Form failed to validate: " + formWithErrors)
-            Future.successful(Ok(views.html.submit(formWithErrors, owner, signedIn.map(s => s._1))))
-          },
-          submissionDetails => {
-            Logger.info("Successfully validated submission details: " + submissionDetails)
+      signedInUserService.signedIn(request).flatMap { signedIn =>
 
-            val bearerToken = request.session.get("token").get
+        signedIn.fold {
+          Future.successful(Redirect(routes.LoginController.prompt()))
+        } { s =>
 
-            val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+          submitForm.bindFromRequest().fold(
+            formWithErrors => {
+              Logger.info("Form failed to validate: " + formWithErrors)
+              Future.successful(Ok(views.html.submit(formWithErrors, owner, Some(s._1))))
+            },
+            submissionDetails => {
+              Logger.info("Successfully validated submission details: " + submissionDetails)
 
-            val noMedia: Future[Option[Media]] = Future.successful(None)
-            val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
-              Logger.info("Found media file on request: " + mf)
-              ugcService.submitMedia(mf.ref.file, bearerToken)
-            }
+              val bearerToken = request.session.get("token").get
 
-            eventualMedia.flatMap { media =>
-              val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
-              submissionResult.map { or =>
-                Logger.info("Submission result: " + or)
-                or.fold({
-                  Logger.info("Redirecting to homepage")
-                  Redirect(routes.Application.index(None, None))
-                }
-                ) { r =>
-                  Logger.info("Redirecting to profile page: " + r.id)
-                  Redirect(routes.UserController.profile())
+              val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+
+              val noMedia: Future[Option[Media]] = Future.successful(None)
+              val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
+                Logger.info("Found media file on request: " + mf)
+                ugcService.submitMedia(mf.ref.file, bearerToken)
+              }
+
+              eventualMedia.flatMap { media =>
+                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
+                submissionResult.map { or =>
+                  Logger.info("Submission result: " + or)
+                  or.fold({
+                    Logger.info("Redirecting to homepage")
+                    Redirect(routes.Application.index(None, None))
+                  }
+                  ) { r =>
+                    Logger.info("Redirecting to profile page: " + r.id)
+                    Redirect(routes.UserController.profile())
+                  }
                 }
               }
             }
-          }
-        )
+          )
+
+        }
       }
     }
   }
