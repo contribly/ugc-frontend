@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import model.Media
+import model.{User, Media}
 import model.forms.SubmissionDetails
 import play.api.Logger
 import play.api.data.Forms._
@@ -58,18 +58,16 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
             submissionDetails => {
               Logger.info("Successfully validated submission details: " + submissionDetails)
 
-              val bearerToken = request.session.get("token").get
-
               val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
 
               val noMedia: Future[Option[Media]] = Future.successful(None)
               val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
                 Logger.info("Found media file on request: " + mf)
-                ugcService.submitMedia(mf.ref.file, bearerToken)
+                ugcService.submitMedia(mf.ref.file, s._2)
               }
 
               eventualMedia.flatMap { media =>
-                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, bearerToken) //TODO should be on the signed in user
+                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, s._2) //TODO should be on the signed in user
                 submissionResult.map { or =>
                   Logger.info("Submission result: " + or)
                   or.fold({

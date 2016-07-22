@@ -54,7 +54,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
           },
           submissionDetails => {
             Logger.info("Successfully validated flag submission: " + submissionDetails)
-            ugcService.submitFlag(r.id, submissionDetails, request.session.get("token")).map { r =>
+            ugcService.submitFlag(r.id, submissionDetails, signedIn.map(s => s._2)).map { r =>
               Logger.info("Submitted flag")
             }
           }
