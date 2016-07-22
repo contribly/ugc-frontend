@@ -1,4 +1,4 @@
-GET        /                        controllers.Application.index(page: Option[Int], hasMediaType: Option[String])
+GET        /                        controllers.Application.index(page: Option[Int], mediaTypes: Option[String])
 GET        /gallery                 controllers.Application.gallery(page: Option[Int])
 GET        /videos                  controllers.Application.videos(page: Option[Int])
 
