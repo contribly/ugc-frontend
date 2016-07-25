@@ -79,7 +79,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
               tag: Option[String] = None,
               assignment: Option[String] = None,
               user: Option[String] = None,
-              mediaTypes: Option[String] = None,
+              mediaType: Option[String] = None,
               state: Option[String] = None,
               refinements: Option[Seq[String]] = None,
               token: Option[String] = None): Future[SearchResult] = {
@@ -91,7 +91,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
       tag.map(t => "tag" -> t),
       assignment.map(n => "assignment" -> n),
       user.map(u => "user" -> u),
-      mediaTypes.map(mt => "mediaTypes" -> mt),
+      mediaType.map(mt => "mediaType" -> mt),
       state.map(s => "state" -> s),
       refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten

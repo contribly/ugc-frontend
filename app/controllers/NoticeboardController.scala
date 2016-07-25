@@ -72,7 +72,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
 
       val eventualNoticeboard = ugcService.assignment(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, assignment = Some(id), mediaTypes = Some("image"))
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, assignment = Some(id), mediaType = Some("image"))
 
       for {
         noticeboard <- eventualNoticeboard

@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def index(page: Option[Int], mediaTypes: Option[String]) = Action.async { implicit request =>
+  def index(page: Option[Int], mediaType: Option[String]) = Action.async { implicit request =>
 
     withOwner { owner =>
 
@@ -19,7 +19,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), mediaTypes).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaTypes = mediaTypes)
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = mediaType)
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
@@ -27,7 +27,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         signedIn <- eventualVerifiedSignedInUser
 
       } yield {
-        Ok(views.html.index(reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pagesLinkFor(reports.numberFound, mediaTypes)))
+        Ok(views.html.index(reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pagesLinkFor(reports.numberFound, mediaType)))
       }
     }
   }
@@ -40,7 +40,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaTypes = Some("image"))
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = Some("image"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
@@ -61,7 +61,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaTypes = Some("video"))
+      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = Some("video"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
