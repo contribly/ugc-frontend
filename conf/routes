@@ -28,8 +28,8 @@ GET        /assignments                     controllers.AssignmentController.ass
 GET        /assignments/:id                 controllers.AssignmentController.assignment(id: String, page: Option[Int])
 GET        /assignments/:id/gallery         controllers.AssignmentController.gallery(id: String, page: Option[Int])
 
-GET        /contributions/:id             controllers.ReportController.contribution(id: String)
-POST       /contributions/:id/flag        controllers.ReportController.flag(id: String)
+GET        /contributions/:id             controllers.ContributionController.contribution(id: String)
+POST       /contributions/:id/flag        controllers.ContributionController.flag(id: String)
 
 GET        /tags                    controllers.TagsController.tags
 GET        /tags/:id                controllers.TagsController.tag(id: String, page: Option[Int])

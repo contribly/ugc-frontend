@@ -14,7 +14,7 @@ import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReportController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport{
+class ContributionController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport{
 
   def contribution(id: String) = Action.async { implicit request =>
 
@@ -60,7 +60,7 @@ class ReportController @Inject() (val ugcService: UGCService, signedInUserServic
           }
         )
 
-        Redirect(routes.ReportController.contribution(id))
+        Redirect(routes.ContributionController.contribution(id))
       }
     }
 

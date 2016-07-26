@@ -23,7 +23,7 @@
     <hr/>
     <h6>Report a problem with this report</h6>
 
-    @helper.form(action = routes.ReportController.flag(r.id)) {
+    @helper.form(action = routes.ContributionController.flag(r.id)) {
         @helper.select(flagForm("type"), options = flagTypes)
         @helper.inputText(flagForm("notes"))
 
