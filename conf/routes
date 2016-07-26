@@ -24,9 +24,9 @@ POST       /submit                  controllers.SubmitController.submit
 
 GET        /profile                 controllers.UserController.profile
 
-GET        /assignments                     controllers.NoticeboardController.assignments(page: Option[Int])
-GET        /assignments/:id                 controllers.NoticeboardController.assignment(id: String, page: Option[Int])
-GET        /assignments/:id/gallery         controllers.NoticeboardController.gallery(id: String, page: Option[Int])
+GET        /assignments                     controllers.AssignmentController.assignments(page: Option[Int])
+GET        /assignments/:id                 controllers.AssignmentController.assignment(id: String, page: Option[Int])
+GET        /assignments/:id/gallery         controllers.AssignmentController.gallery(id: String, page: Option[Int])
 
 GET        /contributions/:id             controllers.ReportController.contribution(id: String)
 POST       /contributions/:id/flag        controllers.ReportController.flag(id: String)

@@ -10,7 +10,7 @@ import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
+class AssignmentController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   private val Assignment = "assignment"
 
@@ -19,7 +19,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
     val assignmentsPage = (owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignments(Some(p)).url))
       }
 
       for {
@@ -40,7 +40,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
     val assignmentsPage = (owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(noticeboard.id, Some(p)).url))
       }
 
       val eventualNoticeboard = ugcService.assignment(id)
@@ -64,7 +64,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
     val galleyPage = (owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.gallery(noticeboard.id, Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(noticeboard.id, Some(p)).url))
       }
 
       val eventualNoticeboard = ugcService.assignment(id)
