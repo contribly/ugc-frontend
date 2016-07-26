@@ -33,7 +33,7 @@ class TagsController @Inject() (val ugcService: UGCService, signedInUserService:
       }
 
       val eventualTag = ugcService.tag(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, tag = Some(id))
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, tag = Some(id))
       val eventualTags = ugcService.tags()
 
       for {

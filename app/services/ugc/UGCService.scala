@@ -74,15 +74,30 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def reports(pageSize: Int,
-              page: Option[Int] = None,
-              tag: Option[String] = None,
-              assignment: Option[String] = None,
-              user: Option[String] = None,
-              mediaType: Option[String] = None,
-              state: Option[String] = None,
-              refinements: Option[Seq[String]] = None,
-              token: Option[String] = None): Future[SearchResult] = {
+  def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
+    val reportRequest: WSRequest = ws.url(contributionsUrl / id)
+    val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
+
+    withToken.get.map { r =>
+      r.status match {
+        case 200 =>
+          Some(Json.parse(r.body).as[Report])
+        case _ =>
+          Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
+          None
+      }
+    }
+  }
+
+  def contributions(pageSize: Int,
+                    page: Option[Int] = None,
+                    tag: Option[String] = None,
+                    assignment: Option[String] = None,
+                    user: Option[String] = None,
+                    mediaType: Option[String] = None,
+                    state: Option[String] = None,
+                    refinements: Option[Seq[String]] = None,
+                    token: Option[String] = None): Future[SearchResult] = {
 
     val params = Seq(
       Some("ownedBy" -> ownedBy),
@@ -103,24 +118,11 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     withToken.get.map { r =>
       r.status match {
         case 200 =>
-          Json.parse(r.body).as[SearchResult]
-        case _ =>
-          SearchResult(0, 0, Seq(), None) // TODO not really a proper fail return value
-      }
-    }
-  }
+          val contributions = Json.parse(r.body).as[Seq[Report]]
+          SearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), contributions, None)
 
-  def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
-    val reportRequest: WSRequest = ws.url(contributionsUrl / id)
-    val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
-
-    withToken.get.map { r =>
-      r.status match {
-        case 200 =>
-          Some(Json.parse(r.body).as[Report])
         case _ =>
-          Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
-          None
+          SearchResult(0, Seq(), None) // TODO not really a proper fail return value
       }
     }
   }

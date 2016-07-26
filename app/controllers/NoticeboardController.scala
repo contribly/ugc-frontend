@@ -23,7 +23,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
 
       val eventualNoticeboards = ugcService.assignments(PageSize, page.fold(1)(p => p))
-      val eventualNoticeboardContributionCounts = ugcService.reports(pageSize = 0, refinements = Some(Seq(Assignment)))
+      val eventualNoticeboardContributionCounts = ugcService.contributions(pageSize = 0, refinements = Some(Seq(Assignment)))
 
       for {
         noticeboards <- eventualNoticeboards
@@ -48,7 +48,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
 
       val eventualNoticeboard = ugcService.assignment(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page, assignment = Some(id))
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page, assignment = Some(id))
 
       for {
         noticeboard <- eventualNoticeboard
@@ -72,7 +72,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
 
       val eventualNoticeboard = ugcService.assignment(id)
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, assignment = Some(id), mediaType = Some("image"))
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, assignment = Some(id), mediaType = Some("image"))
 
       for {
         noticeboard <- eventualNoticeboard

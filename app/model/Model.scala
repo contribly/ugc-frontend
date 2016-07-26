@@ -100,7 +100,7 @@ object Report {
   implicit val formats: Format[Report] = Json.format[Report]
 }
 
-case class SearchResult(numberFound: Long, startIndex: Long, results: Seq[Report], refinements: Option[Map[String, Map[String, Long]]])
+case class SearchResult(numberFound: Long, results: Seq[Report], refinements: Option[Map[String, Map[String, Long]]])
 
 object SearchResult {
   implicit val formats: Format[SearchResult] = Json.format[SearchResult]

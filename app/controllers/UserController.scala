@@ -23,7 +23,7 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
       for {
         user <- ugcService.user(id)
-        reports <- ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(id))
+        reports <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(id))
         signedIn <- signedInUserService.signedIn
 
       } yield {
@@ -45,9 +45,9 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
 
-          val eventualApprovedReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
-          val eventualAwaitingReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
-          val eventualRejectedReports = ugcService.reports(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
+          val eventualApprovedReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
+          val eventualAwaitingReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
+          val eventualRejectedReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
 
           for {
             approved <- eventualApprovedReports

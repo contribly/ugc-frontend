@@ -19,7 +19,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), mediaTypes).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = mediaType)
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = mediaType)
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
@@ -40,7 +40,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = Some("image"))
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("image"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
@@ -61,7 +61,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
 
-      val eventualReports = ugcService.reports(pageSize = PageSize, page = page, mediaType = Some("video"))
+      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("video"))
       val eventualVerifiedSignedInUser = signedInUserService.signedIn
 
       for {
