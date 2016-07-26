@@ -1,7 +1,7 @@
 @import model.forms.FlagSubmission
-@import model.{FlagType, Report, User}
+@import model.{FlagType, Contribution, User}
 @import play.api.Play.current
-@(r: Report, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])(implicit messages: Messages)
+@(r: Contribution, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,7 +21,7 @@
     }
 
     <hr/>
-    <h6>Report a problem with this report</h6>
+    <h6>Contribution a problem with this report</h6>
 
     @helper.form(action = routes.ContributionController.flag(r.id)) {
         @helper.select(flagForm("type"), options = flagTypes)

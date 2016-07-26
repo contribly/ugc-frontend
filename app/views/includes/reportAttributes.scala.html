@@ -1,5 +1,5 @@
-@import model.Report
-@(r: Report)
+@import model.Contribution
+@(r: Contribution)
 <p>
     @r.via.user.map { u =>
         <a href="@routes.UserController.user(u.id, None)">@u.displayName</a>

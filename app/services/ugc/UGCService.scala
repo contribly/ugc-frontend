@@ -75,14 +75,14 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def contribution(id: String, token: Option[String]): Future[Option[Report]] = {
+  def contribution(id: String, token: Option[String]): Future[Option[Contribution]] = {
     val reportRequest: WSRequest = ws.url(contributionsUrl / id)
     val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
 
     withToken.get.map { r =>
       r.status match {
         case 200 =>
-          Some(Json.parse(r.body).as[Report])
+          Some(Json.parse(r.body).as[Contribution])
         case _ =>
           Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
           None
@@ -98,7 +98,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
                     mediaType: Option[String] = None,
                     state: Option[String] = None,
                     refinements: Option[Seq[String]] = None,
-                    token: Option[String] = None): Future[SearchResult] = {
+                    token: Option[String] = None): Future[ContributionSearchResult] = {
 
     val params = Seq(
       Some("ownedBy" -> ownedBy),
@@ -119,16 +119,16 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     withToken.get.map { r =>
       r.status match {
         case 200 =>
-          val contributions = Json.parse(r.body).as[Seq[Report]]
-          SearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), contributions, None)
+          val contributions = Json.parse(r.body).as[Seq[Contribution]]
+          ContributionSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), contributions, None)
 
         case _ =>
-          SearchResult(0, Seq(), None) // TODO not really a proper fail return value
+          ContributionSearchResult(0, Seq(), None) // TODO not really a proper fail return value
       }
     }
   }
 
-  def submit(headline: String, body: String, media: Option[Media], token: String): Future[Option[Report]] = {
+  def submit(headline: String, body: String, media: Option[Media], token: String): Future[Option[Contribution]] = {
 
     val submissionJson = Json.obj("headline" -> headline,
       "body" -> body,
@@ -142,7 +142,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     eventualResponse.map(r => {
       if (r.status == Ok) {
         Logger.info("Submission accepted: " + r.body)
-        Some(Json.parse(r.body).as[Report])
+        Some(Json.parse(r.body).as[Contribution])
       } else {
         Logger.info("Submission rejected: " + r.status + " " + r.body)
         None

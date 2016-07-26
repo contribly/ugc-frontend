@@ -24,6 +24,17 @@ object Artifact {
   implicit val reads: Reads[Artifact] = Json.reads[Artifact]
 }
 
+case class Assignment(id: String, name: String, description: Option[String],
+                      geoCodingResolution:  Option[String],
+                      ends: Option[DateTime], embargo: Option[DateTime], starts: Option[DateTime], featured: Boolean, cover: Option[MediaUsage])
+
+object Assignment {
+  implicit val df: Reads[DateTime] = DateTimeFormat
+  implicit val reads: Reads[Assignment] = Json.reads[Assignment]
+}
+
+case class AssignmentSearchResult(numberFound: Long, results: Seq[Assignment])
+
 case class Authority(client: Option[Client], user: Option[User])
 
 object Authority {
@@ -35,6 +46,17 @@ case class Client(id: String, name: String)
 object Client {
   implicit val reads: Reads[Client] = Json.reads[Client]
 }
+
+case class Contribution(id: String, headline: String, created: DateTime, assignment: Option[Assignment],
+                        body: Option[String], tags: Seq[Tag], place: Option[Place],
+                        mediaUsages: Seq[MediaUsage], via: Authority)
+
+object Contribution {
+  implicit val df: Reads[DateTime] = DateTimeFormat
+  implicit val reads: Reads[Contribution] = Json.reads[Contribution]
+}
+
+case class ContributionSearchResult(numberFound: Long, results: Seq[Contribution], refinements: Option[Map[String, Map[String, Long]]])
 
 case class FlagType(id: String, name: String)
 
@@ -60,21 +82,6 @@ object MediaUsage {
   implicit val reads: Reads[MediaUsage] = Json.reads[MediaUsage]
 }
 
-case class Assignment(id: String, name: String, description: Option[String],
-                      geoCodingResolution:  Option[String],
-                      ends: Option[DateTime], embargo: Option[DateTime], starts: Option[DateTime], featured: Boolean, cover: Option[MediaUsage])
-
-object Assignment {
-  implicit val df: Reads[DateTime] = DateTimeFormat
-  implicit val reads: Reads[Assignment] = Json.reads[Assignment]
-}
-
-case class AssignmentSearchResult(numberFound: Long, results: Seq[Assignment])
-
-case class Report(id: String, headline: String, created: DateTime, assignment: Option[Assignment],
-                  body: Option[String], tags: Seq[Tag], place: Option[Place],
-                  mediaUsages: Seq[MediaUsage], via: Authority)
-
 case class Osm(osmId: Long, osmType: String)
 
 object Osm {
@@ -85,17 +92,6 @@ case class Place(name: Option[String], latLong: Option[LatLong], osm: Option[Osm
 
 object Place {
   implicit val reads: Reads[Place] = Json.reads[Place]
-}
-
-object Report {
-  implicit val df: Reads[DateTime] = DateTimeFormat
-  implicit val reads: Reads[Report] = Json.reads[Report]
-}
-
-case class SearchResult(numberFound: Long, results: Seq[Report], refinements: Option[Map[String, Map[String, Long]]])
-
-object SearchResult {
-  implicit val reads: Reads[SearchResult] = Json.reads[SearchResult]
 }
 
 case class Tag(id: String, name: String)

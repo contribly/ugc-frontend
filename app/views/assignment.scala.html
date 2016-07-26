@@ -1,7 +1,7 @@
-@import model.{Report, User}
+@import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(noticeboard: Assignment, reports: Seq[Report], owner: User, signedIn: Option[User], contributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
+@(noticeboard: Assignment, reports: Seq[Contribution], owner: User, signedIn: Option[User], contributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>

@@ -1,8 +1,8 @@
-@import model.Report
+@import model.Contribution
 @import model.Tag
 @import model.User
 @import views.PageLink
-@(tag: Tag, reports: Seq[Report], owner: User, signedIn: Option[User], tags: Seq[Tag], pages: Seq[PageLink])(implicit messages: Messages)
+@(tag: Tag, reports: Seq[Contribution], owner: User, signedIn: Option[User], tags: Seq[Tag], pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>

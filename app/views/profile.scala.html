@@ -1,5 +1,5 @@
-@import model.{User, Report, SearchResult}
-@(user: User, owner: User, signedIn: Option[User], approved: SearchResult, awaiting: SearchResult, rejected: SearchResult)(implicit messages: Messages)
+@import model.{User, Contribution, ContributionSearchResult}
+@(user: User, owner: User, signedIn: Option[User], approved: ContributionSearchResult, awaiting: ContributionSearchResult, rejected: ContributionSearchResult)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
