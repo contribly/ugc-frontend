@@ -31,7 +31,7 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
       } yield {
         contribution.fold(NotFound(views.html.notFound())) { r =>
           val flagTypeTuples = flagTypes.map(ft => (ft.id, ft.name))
-          Ok(views.html.report(r, owner, signedIn.map(s => s._1), flagTypeTuples, flagForm))
+          Ok(views.html.contribution(r, owner, signedIn.map(s => s._1), flagTypeTuples, flagForm))
         }
       }
     }
@@ -69,7 +69,8 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
   private val flagForm: Form[FlagSubmission] = Form(
     mapping(
       "type" -> optional(text),
-      "notes" -> optional(text)
+      "notes" -> optional(text),
+      "email" -> optional(email)
     )(FlagSubmission.apply)(FlagSubmission.unapply)
   )
 

@@ -26,7 +26,7 @@
     @helper.form(action = routes.ContributionController.flag(r.id)) {
         @helper.select(flagForm("type"), options = flagTypes)
         @helper.inputText(flagForm("notes"))
-
+        @helper.inputText(flagForm("email"))
         <input type="submit" id="submit">
     }
     <hr/>
