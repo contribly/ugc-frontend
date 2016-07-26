@@ -16,32 +16,28 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
 
   def assignments(page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardsPage = (owner: User) => {
+    val assignmentsPage = (owner: User) => {
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignments(Some(p)).url))
       }
 
-      val eventualNoticeboards = ugcService.assignments(PageSize, page.fold(1)(p => p))
-      val eventualNoticeboardContributionCounts = ugcService.contributions(pageSize = 0, refinements = Some(Seq(Assignment)))
-
       for {
-        noticeboards <- eventualNoticeboards
-        noticeboardContributionCounts <- eventualNoticeboardContributionCounts
+        assignments <- ugcService.assignments(PageSize, page.fold(1)(p => p))
         signedIn <- signedInUserService.signedIn
 
       } yield {
-          val contributionCounts: Map[String, Long] = noticeboardContributionCounts.refinements.get(Assignment)
-          Ok(views.html.noticeboards(noticeboards.results, owner, signedIn.map(s => s._1), pagesLinkFor(noticeboards.numberFound.toInt), contributionCounts))
+          val contributionCounts: Map[String, Long] = Map()
+          Ok(views.html.noticeboards(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), contributionCounts))
       }
     }
 
-    withOwner(noticeboardsPage)
+    withOwner(assignmentsPage)
   }
 
   def assignment(id: String, page: Option[Int]) = Action.async { implicit request =>
 
-    val noticeboardPage = (owner: User) => {
+    val assignmentsPage = (owner: User) => {
 
       def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.NoticeboardController.assignment(noticeboard.id, Some(p)).url))
@@ -60,7 +56,7 @@ class NoticeboardController @Inject() (val ugcService: UGCService, signedInUserS
       }
     }
 
-    withOwner(noticeboardPage)
+    withOwner(assignmentsPage)
   }
 
   def gallery(id: String, page: Option[Int]) = Action.async { implicit request =>
