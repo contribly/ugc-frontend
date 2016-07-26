@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{Noticeboard, User}
+import model.{Assignment, User}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller, Request}
 import services.ugc.UGCService
@@ -39,7 +39,7 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
     val assignmentsPage = (owner: User) => {
 
-      def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
+      def pageLinksFor(noticeboard: Assignment, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(noticeboard.id, Some(p)).url))
       }
 
@@ -60,7 +60,7 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
     val galleyPage = (owner: User) => {
 
-      def pageLinksFor(noticeboard: Noticeboard, totalNumber: Long): Seq[PageLink] = {
+      def pageLinksFor(noticeboard: Assignment, totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(noticeboard.id, Some(p)).url))
       }
 

@@ -1,11 +1,11 @@
 @import model.{Report, User}
-@import model.Noticeboard
+@import model.Assignment
 @import views.PageLink
-@(noticeboards: Seq[Noticeboard], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])(implicit messages: Messages)
+@(noticeboards: Seq[Assignment], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Noticeboards</title>
+    <title>Assignments</title>
 </head>
 <body>
 
@@ -20,7 +20,7 @@
         @n.description.map{ d =>
             <p>@Html(d)</p>
         }
-        @n.endDate.map{ed =>
+        @n.ends.map{ ed =>
             <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
         }
 

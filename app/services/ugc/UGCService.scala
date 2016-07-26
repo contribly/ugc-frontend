@@ -40,13 +40,13 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def assignment(id: String): Future[Noticeboard] = {
+  def assignment(id: String): Future[Assignment] = {
     ws.url(assignmentsUrl / id).get.map { r =>
-      Json.parse(r.body).as[Noticeboard]
+      Json.parse(r.body).as[Assignment]
     }
   }
 
-  def assignments(pageSize: Int, page: Int): Future[NoticeboardSearchResult] = {
+  def assignments(pageSize: Int, page: Int): Future[AssignmentSearchResult] = {
     val params = Seq(
       "pageSize" -> pageSize,
       "page" -> page,
@@ -54,8 +54,8 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
       )
 
     ws.url(assignmentsUrl.addParams(params)).get.map { r =>
-      val assignments = Json.parse(r.body).as[Seq[Noticeboard]]
-      NoticeboardSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), assignments)
+      val assignments = Json.parse(r.body).as[Seq[Assignment]]
+      AssignmentSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), assignments)
     }
   }
 
