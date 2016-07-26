@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.restfb.FacebookClient.AccessToken
-import com.restfb.scope.{ExtendedPermissions, ScopeBuilder}
+import com.restfb.scope.{UserDataPermissions, ExtendedPermissions, ScopeBuilder}
 import com.restfb.{DefaultFacebookClient, FacebookClient, Version}
 import play.api.mvc.{Action, Controller}
 import play.api.{Configuration, Logger}
@@ -21,9 +21,7 @@ class FacebookLoginController @Inject() (configuration: Configuration, ugcServic
   val callbackUrl = rootUrl + routes.FacebookLoginController.callback(None, None, None, None)
 
   def redirect() = Action.async { request =>
-    val scopeBuilder: ScopeBuilder  = new ScopeBuilder()
-    scopeBuilder.addPermission(ExtendedPermissions.EMAIL)
-
+    val scopeBuilder: ScopeBuilder = new ScopeBuilder().addPermission(ExtendedPermissions.EMAIL).addPermission(UserDataPermissions.USER_ABOUT_ME);
     val client: FacebookClient  = new DefaultFacebookClient(Version.VERSION_2_5)
     val loginDialogUrlString = client.getLoginDialogUrl(appId, callbackUrl, scopeBuilder)
 
