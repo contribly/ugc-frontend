@@ -1,11 +1,11 @@
 @import model.{Report, User}
 @import model.Assignment
 @import views.PageLink
-@(noticeboards: Seq[Assignment], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])(implicit messages: Messages)
+@(assignments: Seq[Assignment], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Assignments</title>
+    <title>@Messages("assignments")</title>
 </head>
 <body>
 
@@ -14,13 +14,13 @@
 
     @includes.pages(pages)
 
-    @noticeboards.map { n =>
+    @assignments.map { n =>
         <h4><a href="@routes.AssignmentController.assignment(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
 
         @n.description.map{ d =>
             <p>@Html(d)</p>
         }
-        @n.ends.map{ ed =>
+        @n.ends.map{ed =>
             <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
         }
 
