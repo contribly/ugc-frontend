@@ -28,7 +28,7 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
       } yield {
           val contributionCounts: Map[String, Long] = Map()
-          Ok(views.html.noticeboards(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), contributionCounts))
+          Ok(views.html.assignments(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), contributionCounts))
       }
     }
 
@@ -43,16 +43,13 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(noticeboard.id, Some(p)).url))
       }
 
-      val eventualNoticeboard = ugcService.assignment(id)
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page, assignment = Some(id))
-
       for {
-        noticeboard <- eventualNoticeboard
-        reports <- eventualReports
+        assignment <- ugcService.assignment(id)
+        contributions <- ugcService.contributions(pageSize = PageSize, page, assignment = Some(id))
         signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.noticeboard(noticeboard, reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pageLinksFor(noticeboard, reports.numberFound)))
+        Ok(views.html.assignment(assignment, contributions.results, owner, signedIn.map(s => s._1), contributions.numberFound, pageLinksFor(assignment, contributions.numberFound)))
       }
     }
 
@@ -67,16 +64,13 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(noticeboard.id, Some(p)).url))
       }
 
-      val eventualNoticeboard = ugcService.assignment(id)
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, assignment = Some(id), mediaType = Some("image"))
-
       for {
-        noticeboard <- eventualNoticeboard
-        reports <- eventualReports
+        assignment <- ugcService.assignment(id)
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, assignment = Some(id), mediaType = Some("image"))
         signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.noticeboardGallery(noticeboard, reports.results, owner, signedIn.map(s => s._1), pageLinksFor(noticeboard, reports.numberFound)))
+        Ok(views.html.assignmentGallery(assignment, contributions.results, owner, signedIn.map(s => s._1), pageLinksFor(assignment, contributions.numberFound)))
 
       }
     }
