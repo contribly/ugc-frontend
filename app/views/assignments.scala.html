@@ -24,9 +24,7 @@
             <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
         }
 
-        <p>Moderated: @n.moderated</p>
         <p>Featured: @n.featured</p>
-        <p>@n.supportedMediaTypes</p>
 
         @n.cover.map{ c =>
             @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>

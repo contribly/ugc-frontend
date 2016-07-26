@@ -24,10 +24,6 @@
         <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
 
-    @noticeboard.supportedMediaTypes.map{smt =>
-        <p>@smt</p>
-    }
-    
     <p><a href="@routes.AssignmentController.gallery(noticeboard.id, None)">Gallery</a>
         
     @includes.pages(pages)
