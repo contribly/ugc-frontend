@@ -54,7 +54,8 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
       )
 
     ws.url(assignmentsUrl.addParams(params)).get.map { r =>
-      Json.parse(r.body).as[NoticeboardSearchResult]
+      val assignments = Json.parse(r.body).as[Seq[Noticeboard]]
+      NoticeboardSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), assignments)
     }
   }
 
