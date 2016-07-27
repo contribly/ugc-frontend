@@ -1,24 +1,24 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(noticeboard: Assignment, reports: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink])(implicit messages: Messages)
+@(assignment: Assignment, contributions: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@noticeboard.name</title>
+    <title>@assignment.name</title>
 </head>
 <body>
 
     @includes.header(owner, signedIn)
     <hr/>
 
-    <h4>@noticeboard.name</h4>
+    <h4>@assignment.name</h4>
 
-    @noticeboard.description.map{d =>
+    @assignment.description.map{d =>
         <p>@Html(d)</p>
     }
 
-    @noticeboard.ends.map{ed =>
+    @assignment.ends.map{ed =>
         <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
 
@@ -26,7 +26,7 @@
 
     <hr/>
 
-    @reports.map{r =>
+    @contributions.map{r =>
         @includes.media(r, "medium", true)
     }
 

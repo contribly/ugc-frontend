@@ -1,7 +1,7 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(reports: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributions: Long)(implicit messages: Messages)
+@(contributions: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink], totalContributions: Long)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,13 +13,12 @@
     <hr/>
 
     <h4>Gallery</h4>
-
-    (@contributions)
+    (@totalContributions)
     @includes.pages(pages)
 
     <hr/>
 
-    @reports.map{r =>
+    @contributions.map{r =>
         @includes.media(r, "medium", true)
     }
 

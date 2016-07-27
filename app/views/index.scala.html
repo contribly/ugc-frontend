@@ -2,7 +2,7 @@
 @import model.Tag
 @import model.User
 @import views.PageLink
-@(reports: Seq[Contribution], owner: User, signedIn: Option[User], contributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
+@(contributions: Seq[Contribution], owner: User, signedIn: Option[User], totalContributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -11,13 +11,12 @@
 <body>
 
     @includes.header(owner, signedIn)
-
     <hr/>
 
-    (@contributions)
+    (@totalContributions)
     @includes.pages(pages)
 
-    @includes.contributions(reports)
+    @includes.contributions(contributions)
 
     <hr/>
 </body>

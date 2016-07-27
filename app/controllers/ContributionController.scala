@@ -41,11 +41,11 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
 
     for {
       signedIn <- signedInUserService.signedIn
-      report <- ugcService.contribution(id, signedIn.map(s => s._2))
+      contribution <- ugcService.contribution(id, signedIn.map(s => s._2))
 
     } yield {
 
-      report.fold(NotFound(Json.toJson("Not found"))) { r =>
+      contribution.fold(NotFound(Json.toJson("Not found"))) { r =>
 
         flagForm.bindFromRequest()(request).fold(
           formWithErrors => {

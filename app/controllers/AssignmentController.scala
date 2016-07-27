@@ -43,8 +43,8 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
     val assignmentsPage = (owner: User) => {
 
-      def pageLinksFor(noticeboard: Assignment, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(noticeboard.id, Some(p)).url))
+      def pageLinksFor(assignment: Assignment, totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(assignment.id, Some(p)).url))
       }
 
       for {
@@ -66,8 +66,8 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
     val galleyPage = (owner: User) => {
 
-      def pageLinksFor(noticeboard: Assignment, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(noticeboard.id, Some(p)).url))
+      def pageLinksFor(assignment: Assignment, totalNumber: Long): Seq[PageLink] = {
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(assignment.id, Some(p)).url))
       }
 
       for {

@@ -77,15 +77,15 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
   }
 
   def contribution(id: String, token: Option[String]): Future[Option[Contribution]] = {
-    val reportRequest: WSRequest = ws.url(contributionsUrl / id)
-    val withToken = token.fold(reportRequest) { t => reportRequest.withHeaders(bearerTokenHeader(t)) }
+    val contributionRequest: WSRequest = ws.url(contributionsUrl / id)
+    val withToken = token.fold(contributionRequest) { t => contributionRequest.withHeaders(bearerTokenHeader(t)) }
 
     withToken.get.map { r =>
       r.status match {
         case 200 =>
           Some(Json.parse(r.body).as[Contribution])
         case _ =>
-          Logger.info("Non 200 status for fetch report: " + r.status + " / " + r.body)
+          Logger.info("Non 200 status for fetch contribution: " + r.status + " / " + r.body)
           None
       }
     }
@@ -178,10 +178,10 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     })
   }
 
-  def submitFlag(reportId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
+  def submitFlag(contributionId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
     val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
 
-    ws.url(contributionsUrl / reportId / "flag").
+    ws.url(contributionsUrl / contributionId / "flag").
       withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
       Logger.info("Response: " + response)

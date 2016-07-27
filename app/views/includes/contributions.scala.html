@@ -1,7 +1,7 @@
 @import model.Contribution
-@(reports: Seq[Contribution])
+@(contributions: Seq[Contribution])
 
-@reports.map{ r =>
+@contributions.map{ r =>
     <hr/>
     <a href="@routes.ContributionController.contribution(r.id)"><h4>@r.headline</h4></a>
     @includes.contributionAttributes(r)

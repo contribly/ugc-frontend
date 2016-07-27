@@ -1,6 +1,6 @@
 @import model.{User, Contribution}
 @import views.PageLink
-@(user: User, owner: User, signedIn: Option[User], reports: Seq[Contribution], pages: Seq[PageLink])(implicit messages: Messages)
+@(user: User, owner: User, signedIn: Option[User], contributions: Seq[Contribution], pages: Seq[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +17,7 @@
 
     @includes.pages(pages)
 
-    @includes.contributions(reports)
+    @includes.contributions(contributions)
     <hr/>
 
 </body>
