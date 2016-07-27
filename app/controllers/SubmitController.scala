@@ -2,14 +2,11 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{User, Media}
 import model.forms.SubmissionDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.Files.TemporaryFile
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc._
 import services.ugc.UGCService
 
@@ -47,36 +44,47 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       signedInUserService.signedIn(request).flatMap { signedIn =>
 
         signedIn.fold {
+          Logger.info("A signed in user is required to submit in this example")
           Future.successful(Redirect(routes.LoginController.prompt()))
+
         } { s =>
+
+          val signedInUsersApiAccessToken = s._2
 
           submitForm.bindFromRequest().fold(
             formWithErrors => {
               Logger.info("Form failed to validate: " + formWithErrors)
               Future.successful(Ok(views.html.submit(formWithErrors, owner, Some(s._1))))
             },
+
             submissionDetails => {
+              // The submission past form validation; compose a contribution and submit it to the API
               Logger.info("Successfully validated submission details: " + submissionDetails)
 
-              val mediaFile: Option[FilePart[TemporaryFile]] = request.body.file("media")
+              // If there was a media file on the form submission then we will need to upload it to the media end point before referencing it in our submission
+              val mediaFileSeenOnFormSubmission = request.body.file("media")
 
-              val noMedia: Future[Option[Media]] = Future.successful(None)
-              val eventualMedia: Future[Option[Media]] = mediaFile.fold(noMedia) { mf =>
-                Logger.info("Found media file on request: " + mf)
-                ugcService.submitMedia(mf.ref.file, s._2)
-              }
+              val eventualMedia = mediaFileSeenOnFormSubmission.map{ mf =>
+                Logger.info("Uploadinf media file on request to the API media end point: " + mf)
+                ugcService.submitMedia(mf.ref.file, signedInUsersApiAccessToken)  // The media element is submitted using the signed in user's access token; this ensues the correct ownership
+              }.getOrElse(Future.successful(None))
 
               eventualMedia.flatMap { media =>
-                val submissionResult = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, s._2) //TODO should be on the signed in user
-                submissionResult.map { or =>
-                  Logger.info("Submission result: " + or)
+
+                // Submit the contribution to the contribution API end point including a reference to the uploaded media element.
+                val eventualSubmittedContribution = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, signedInUsersApiAccessToken)
+
+                eventualSubmittedContribution.map { or =>
+                  Logger.info("Contribution submission result: " + or)
+
                   or.fold({
-                    Logger.info("Redirecting to homepage")
+                    Logger.info("Contribution failed; redirecting to homepage")
                     Redirect(routes.IndexController.index(None, None))
                   }
                   ) { r =>
-                    Logger.info("Redirecting to profile page: " + r.id)
-                    Redirect(routes.UserController.profile())
+                    Logger.info("Contribution was successful; redirecting to contribution page")
+                    // This unmoderated contribution is only visible to the end user. The contribution page will make an authenticiated call to the API
+                    Redirect(routes.ContributionController.contribution(r.id))
                   }
                 }
               }
