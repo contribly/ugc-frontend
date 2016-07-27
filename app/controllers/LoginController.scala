@@ -2,7 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{LoginDetails, User}
+import model.User
+import model.forms.LoginDetails
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._

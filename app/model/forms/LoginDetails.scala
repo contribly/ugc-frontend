@@ -1,3 +1,3 @@
-package model
+package model.forms
 
 case class LoginDetails(username: String, password: String)
