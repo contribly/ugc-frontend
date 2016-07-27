@@ -1,12 +1,12 @@
 @import model.User
 @(owner: User, signedIn: Option[User])(implicit messages: Messages)
 
-<h3><a href="@routes.Application.index(None, None)">@owner.displayName</a></h3>
+<h3><a href="@routes.IndexController.index(None, None)">@owner.displayName</a></h3>
 
 <ul>
     <li><a href="@routes.AssignmentController.assignments(None)">@Messages("assignments")</a></li>
-    <li><a href="@routes.Application.gallery(None)">@Messages("gallery")</a></li>
-    <li><a href="@routes.Application.videos(None)">@Messages("videos")</a></li>
+    <li><a href="@routes.IndexController.gallery(None)">@Messages("gallery")</a></li>
+    <li><a href="@routes.IndexController.videos(None)">@Messages("videos")</a></li>
 </ul>
 
 @signedIn.fold{

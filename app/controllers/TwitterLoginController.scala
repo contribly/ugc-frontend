@@ -21,6 +21,7 @@ class TwitterLoginController @Inject() (configuration: Configuration, ugcService
   val callbackUrl = rootUrl + routes.TwitterLoginController.callback(None, None)
   val TwitterRequestTokenSessionKey: String = "twitter-request-token"
 
+  // Redirect the user to Twitter to begin a TWitter OAuth journey. Twitter will redirect the user back to our callback page below if all goes well.
   def redirect() = Action.async { request =>
 
     val twitterApi = getTwitterApi
@@ -39,6 +40,7 @@ class TwitterLoginController @Inject() (configuration: Configuration, ugcService
     Future.successful(Redirect(loginDialogUrlString).withSession(withRequestToken))
   }
 
+  // The user has returned from a Twitter OAuth journey. We should now have a Twitter request token which we can use to identifiy the Twitter user
   def callback(oauth_token: Option[String], oauth_verifier: Option[String]) = Action.async { request =>
     Logger.info("Received Twitter callback: " + oauth_token + ", " + oauth_verifier)
 
@@ -50,8 +52,7 @@ class TwitterLoginController @Inject() (configuration: Configuration, ugcService
           val requestToken = new RequestToken(rtMap.get("token").getOrElse(""), rtMap.get("secret").getOrElse(""))
           try {
             Logger.info("Exchanging Twitter request token for access token: " + requestToken + ", " + v)
-            val twitterApi: Twitter = getTwitterApi
-            val accessToken: AccessToken = twitterApi.getOAuthAccessToken(requestToken, v)
+            val accessToken: AccessToken = getTwitterApi.getOAuthAccessToken(requestToken, v)
             Logger.info("Got Twitter access token: " + accessToken.getToken)
             Some(accessToken)
 
@@ -70,18 +71,20 @@ class TwitterLoginController @Inject() (configuration: Configuration, ugcService
     }
 
     val withClearedRequestToken: Session = request.session - (TwitterRequestTokenSessionKey)
+
     twitterAccessToken.fold {
-      Future.successful(Redirect(routes.Application.index(None, None)).withSession(withClearedRequestToken))
+      Logger.info("Twitter callback did not result in a valid Twitter access token; abort the sign in flow")
+      Future.successful(Redirect(routes.IndexController.index(None, None)).withSession(withClearedRequestToken))
     } { tat =>
 
       ugcService.tokenTwitter(tat.getToken, tat.getTokenSecret).map { to =>
         to.fold({ e =>
           val withErrors = withClearedRequestToken +("error", e)
-          Redirect(routes.Application.index(None, None)).withSession(withClearedRequestToken)
+          Redirect(routes.IndexController.index(None, None)).withSession(withClearedRequestToken)
 
         }, { t =>
           Logger.info("Setting session token: " + t)
-          Redirect(routes.Application.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(withClearedRequestToken, t))
+          Redirect(routes.IndexController.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(withClearedRequestToken, t))
         }
         )
       }

@@ -9,14 +9,14 @@ import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Application @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
+class IndexController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   def index(page: Option[Int], mediaType: Option[String]) = Action.async { implicit request =>
 
     withOwner { owner =>
 
       def pagesLinkFor(totalNumber: Long, mediaTypes: Option[String]): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), mediaTypes).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.IndexController.index(Some(p), mediaTypes).url))
       }
 
       for {
@@ -36,7 +36,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
     withOwner { owner =>
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.IndexController.gallery(Some(p)).url))
       }
 
       for {
@@ -56,7 +56,7 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
     withOwner { owner =>
 
       def pageLinksFor(totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
+        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.IndexController.videos(Some(p)).url))
       }
 
       for {

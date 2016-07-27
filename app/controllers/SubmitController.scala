@@ -72,7 +72,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
                   Logger.info("Submission result: " + or)
                   or.fold({
                     Logger.info("Redirecting to homepage")
-                    Redirect(routes.Application.index(None, None))
+                    Redirect(routes.IndexController.index(None, None))
                   }
                   ) { r =>
                     Logger.info("Redirecting to profile page: " + r.id)
