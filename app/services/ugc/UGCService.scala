@@ -77,9 +77,8 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
   }
 
   def contribution(id: String, token: Option[String]): Future[Option[Contribution]] = {
-    val contributionRequest: WSRequest = ws.url(contributionsUrl / id)
+    val contributionRequest = ws.url(contributionsUrl / id)
     val withToken = token.fold(contributionRequest) { t => contributionRequest.withHeaders(bearerTokenHeader(t)) }
-
     withToken.get.map { r =>
       r.status match {
         case 200 =>
@@ -180,7 +179,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   def submitFlag(contributionId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
     val headers = Seq(Some(applicationJsonHeader), token.map(t => bearerTokenHeader(t))).flatten
-
     ws.url(contributionsUrl / contributionId / "flag").
       withHeaders(headers: _*).
       post(Json.toJson(flagSubmission)).map { response =>
