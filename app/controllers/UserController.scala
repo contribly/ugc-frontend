@@ -45,18 +45,21 @@ class UserController @Inject()(val ugcService: UGCService, signedInUserService: 
       signedInUserService.signedIn.flatMap { so =>
         so.fold {
           Future.successful(Redirect(routes.LoginController.prompt()))
-        } { signedIn =>
+        } { s =>
+
+          val signedInUser: User = s._1
+          val signedInUsersAccessToken = s._2
 
           for {
-            approved <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
-            awaiting <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
-            rejected <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
+            approved <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedInUser.id), state = Some("approved"), token = None) // No authetication is required to see approved public contributions
+            awaiting <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedInUser.id), state = Some("awaiting"), token = Some(signedInUsersAccessToken)) // The user can view their awaiting contributions by appending their access token to the request
+            rejected <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedInUser.id), state = Some("rejected"), token = Some(signedInUsersAccessToken)) // The user can view their rejected contributions by appending their access token to the request. This would be unwise to allow in production
 
           } yield {
             approved.fold(NotFound(views.html.notFound())) { ap =>
               awaiting.fold(NotFound(views.html.notFound())) { aw =>
                 rejected.fold(NotFound(views.html.notFound())) { rj =>
-                  Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), ap, aw, rj))
+                  Ok(views.html.profile(signedInUser, owner, Some(signedInUser), ap, aw, rj))
                 }
               }
             }
