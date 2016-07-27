@@ -2,14 +2,14 @@ package controllers
 
 import javax.inject.Inject
 
-import model.User
+import model.FlagType
 import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller, Request}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,13 +25,13 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
 
       for {
         signedIn <- eventualSignedInUser
-        contribution <- ugcService.contribution(id, signedIn.map(s => s._2))
+        signedInUsersAccessToken = signedIn.map(s => s._2)
+        contribution <- ugcService.contribution(id, signedInUsersAccessToken) // Appending the signed in user's access token to the API request allows them to see their currently unmoderated contributions
         flagTypes <- eventualFlagTypes
 
       } yield {
         contribution.fold(NotFound(views.html.notFound())) { r =>
-          val flagTypeTuples = flagTypes.map(ft => (ft.id, ft.name))
-          Ok(views.html.contribution(r, owner, signedIn.map(s => s._1), flagTypeTuples, flagForm))
+          Ok(views.html.contribution(r, owner, signedIn.map(s => s._1), flagTypeTuples(flagTypes), flagForm))
         }
       }
     }
@@ -73,5 +73,9 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
       "email" -> optional(email)
     )(FlagSubmission.apply)(FlagSubmission.unapply)
   )
+
+  private def flagTypeTuples(flagTypes: Seq[FlagType]): Seq[(String, String)] = {
+    flagTypes.map(ft => (ft.id, ft.name))
+  }
 
 }
