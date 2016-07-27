@@ -21,7 +21,7 @@
     }
 
     <hr/>
-    <h6>Contribution a problem with this contribution</h6>
+    <h5>@Messages("contribution.report.problem")</h5>
 
     @helper.form(action = routes.ContributionController.flag(r.id)) {
         @helper.select(flagForm("type"), options = flagTypes)
