@@ -11,7 +11,7 @@
 
 @signedIn.fold{
     <ul>
-        <li><a href="@routes.LoginController.prompt">Sign in</a></li>
+        <li><a href="@routes.LoginController.prompt">@Messages("sign.in")</a></li>
         <li><a href="@routes.RegisterController.prompt">Register</a></li>
     </ul>
 }{ s =>

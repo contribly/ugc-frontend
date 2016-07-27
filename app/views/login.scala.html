@@ -11,7 +11,7 @@
 @includes.header(owner, None)
 
 <hr/>
-<h4>Sign in</h4>
+<h4>@Messages("sign.in")</h4>
 
     <p>Not already registered? <a href="@routes.RegisterController.prompt">Register now</a></p>
 
@@ -24,18 +24,18 @@
     @helper.inputText(loginForm("username"))
     @helper.inputPassword(loginForm("password"))
     <p class="buttons">
-        <input type="submit" id="submit">
+        <input type="submit" id="submit" value="@Messages("sign.in")">
     <p>
 }
 
 <h4>Facebook</h4>
-<p><a href="@routes.FacebookLoginController.redirect">Login with Facebook</a></p>
+<p><a href="@routes.FacebookLoginController.redirect">@Messages("sign.in.facebook")</a></p>
 
 <h4>Twitter</h4>
-<p><a href="@routes.TwitterLoginController.redirect">Login with Twitter</a></p>
+<p><a href="@routes.TwitterLoginController.redirect">@Messages("sign.in.twitter")</a></p>
 
 <h4>Google</h4>
-<p><a href="@routes.GoogleLoginController.redirect">Login with Google</a></p>
+<p><a href="@routes.GoogleLoginController.redirect">@Messages("sign.in.google")</a></p>
 
 <hr/>
 </body>
