@@ -60,22 +60,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def owner(): Future[Option[User]] = {
-    user(ownedBy)
-  }
-
-  def register(registrationDetails: RegistrationDetails): Future[Either[String, User]] = {
-    ws.url(usersUrl).withHeaders(clientAuthHeader).
-      post(Json.toJson(registrationDetails)).map { r =>
-        if (r.status == Ok) {
-          Right(Json.parse(r.body).as[User])
-        } else {
-          Logger.warn("Register request failed: " + r.status + " / " + r.body)
-          Left(r.body)
-        }
-    }
-  }
-
   def contribution(id: String, token: Option[String]): Future[Option[Contribution]] = {
     val contributionRequest = ws.url(contributionsUrl / id)
     val withToken = token.fold(contributionRequest) { t => contributionRequest.withHeaders(bearerTokenHeader(t)) }
@@ -151,6 +135,22 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
           Some(Json.parse(r.body).as[Map[String, Map[String, Long]]])
         case _ =>
           None
+      }
+    }
+  }
+
+  def owner(): Future[Option[User]] = {
+    user(ownedBy)
+  }
+
+  def register(registrationDetails: RegistrationDetails): Future[Either[String, User]] = {
+    ws.url(usersUrl).withHeaders(clientAuthHeader).
+      post(Json.toJson(registrationDetails)).map { r =>
+      if (r.status == Ok) {
+        Right(Json.parse(r.body).as[User])
+      } else {
+        Logger.warn("Register request failed: " + r.status + " / " + r.body)
+        Left(r.body)
       }
     }
   }
