@@ -26,6 +26,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   val assignmentsUrl = apiUrl + "/assignments"
   val contributionsUrl = apiUrl + "/contributions"
+  val contributionRefinementsUrl = apiUrl + "/contribution-refinements"
   val mediaUrl = apiUrl + "/media"
   val tokenUrl = apiUrl + "/token"
   val usersUrl = apiUrl + "/users"
@@ -98,7 +99,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
                     mediaType: Option[String] = None,
                     state: Option[String] = None,
                     refinements: Option[Seq[String]] = None,
-                    token: Option[String] = None): Future[ContributionSearchResult] = {
+                    token: Option[String] = None): Future[Option[ContributionSearchResult]] = {
 
     val params = Seq(
       Some("ownedBy" -> ownedBy),
@@ -112,18 +113,46 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
       refinements.map(r => ("refinements", r.mkString(",")))
     ).flatten
 
-    val u = contributionsUrl.addParams(params)
-    Logger.info("Fetching from url: " + u)
-    val url = ws.url(u)
+    val url = ws.url(contributionsUrl.addParams(params))
     val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
     withToken.get.map { r =>
       r.status match {
         case 200 =>
           val contributions = Json.parse(r.body).as[Seq[Contribution]]
-          ContributionSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), contributions, None)
-
+          Some(ContributionSearchResult(r.header("X-total-count").map(c => c.toLong).getOrElse(0), contributions, None))
         case _ =>
-          ContributionSearchResult(0, Seq(), None) // TODO not really a proper fail return value
+          None
+      }
+    }
+  }
+
+  def contributionRefinements(tag: Option[String] = None,
+                    assignment: Option[String] = None,
+                    user: Option[String] = None,
+                    mediaType: Option[String] = None,
+                    state: Option[String] = None,
+                    refinements: Seq[String],
+                    token: Option[String] = None): Future[Option[Map[String, Map[String, Long]]]] = {
+
+    val params = Seq(
+      Some("ownedBy" -> ownedBy),
+      tag.map(t => "tag" -> t),
+      assignment.map(n => "assignment" -> n),
+      user.map(u => "user" -> u),
+      mediaType.map(mt => "mediaType" -> mt),
+      state.map(s => "state" -> s),
+      Some("refinements", refinements.mkString(","))
+    ).flatten
+
+    val url = ws.url(contributionRefinementsUrl.addParams(params))
+    val withToken = token.fold(url) { t => url.withHeaders(bearerTokenHeader(t)) }
+    withToken.get.map { r =>
+      r.status match {
+        case 200 =>
+          Logger.info("!!!!!!!!! " + r.body)
+          Some(Json.parse(r.body).as[Map[String, Map[String, Long]]])
+        case _ =>
+          None
       }
     }
   }

@@ -19,15 +19,14 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.index(Some(p), mediaTypes).url))
       }
 
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = mediaType)
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn
-
       for {
-        reports <- eventualReports
-        signedIn <- eventualVerifiedSignedInUser
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = mediaType)
+        signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.index(reports.results, owner, signedIn.map(s => s._1), reports.numberFound, pagesLinkFor(reports.numberFound, mediaType)))
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.index(cs.results, owner, signedIn.map(s => s._1), cs.numberFound, pagesLinkFor(cs.numberFound, mediaType)))
+        }
       }
     }
   }
@@ -40,15 +39,14 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.gallery(Some(p)).url))
       }
 
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("image"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn
-
       for {
-        reports <- eventualReports
-        signedIn <- eventualVerifiedSignedInUser
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("image"))
+        signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.gallery(reports.results, owner, signedIn.map(s => s._1), pageLinksFor(reports.numberFound), reports.numberFound))
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.gallery(cs.results, owner, signedIn.map(s => s._1), pageLinksFor(cs.numberFound), cs.numberFound))
+        }
       }
     }
   }
@@ -61,15 +59,14 @@ class Application @Inject() (val ugcService: UGCService, signedInUserService: Si
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.Application.videos(Some(p)).url))
       }
 
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("video"))
-      val eventualVerifiedSignedInUser = signedInUserService.signedIn
-
       for {
-        reports <- eventualReports
-        signedIn <- eventualVerifiedSignedInUser
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("video"))
+        signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.gallery(reports.results, owner, signedIn.map(s => s._1), pageLinksFor(reports.numberFound), reports.numberFound))
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.gallery(cs.results, owner, signedIn.map(s => s._1), pageLinksFor(cs.numberFound), cs.numberFound))
+        }
       }
     }
 

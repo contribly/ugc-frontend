@@ -9,7 +9,6 @@ import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class TagsController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
@@ -32,19 +31,16 @@ class TagsController @Inject() (val ugcService: UGCService, signedInUserService:
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.TagsController.tag(tag.id, Some(p)).url))
       }
 
-      val eventualTag = ugcService.tag(id)
-      val eventualReports = ugcService.contributions(pageSize = PageSize, page = page, tag = Some(id))
-      val eventualTags = ugcService.tags()
-
       for {
-        tag <- eventualTag
-        reports <- eventualReports
+        tag <- ugcService.tag(id)
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, tag = Some(id))
         signedIn <- signedInUserService.signedIn
-        tags <- eventualTags
+        tags <- ugcService.tags()
 
       } yield {
-        Ok(views.html.tag(tag, reports.results, owner, signedIn.map(s => s._1), tags, pageLinksFor(tag, reports.numberFound)))
-
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.tag(tag, cs.results, owner, signedIn.map(s => s._1), tags, pageLinksFor(tag, cs.numberFound)))
+        }
       }
     }
   }

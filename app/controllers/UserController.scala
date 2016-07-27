@@ -4,14 +4,14 @@ import javax.inject.Inject
 
 import model.User
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
+class UserController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
   def user(id: String, page: Option[Int]) = Action.async { implicit request =>
 
@@ -23,12 +23,14 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
 
       for {
         user <- ugcService.user(id)
-        reports <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(id))
+        contributions <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(id))
         signedIn <- signedInUserService.signedIn
 
       } yield {
         user.fold(NotFound(views.html.notFound())) { u =>
-          Ok(views.html.user(u, owner, signedIn.map(s => s._1), reports.results, pageLinksFor(u, reports.numberFound)))
+          contributions.fold(NotFound(views.html.notFound())) { cs =>
+            Ok(views.html.user(u, owner, signedIn.map(s => s._1), cs.results, pageLinksFor(u, cs.numberFound)))
+          }
         }
       }
     }
@@ -41,21 +43,23 @@ class UserController @Inject() (val ugcService: UGCService, signedInUserService:
     val profilePage = (owner: User) => {
 
       signedInUserService.signedIn.flatMap { so =>
-        so.fold{
+        so.fold {
           Future.successful(Redirect(routes.LoginController.prompt()))
         } { signedIn =>
 
-          val eventualApprovedReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
-          val eventualAwaitingReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
-          val eventualRejectedReports = ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
-
           for {
-            approved <- eventualApprovedReports
-            awaiting <- eventualAwaitingReports
-            rejected <- eventualRejectedReports
+            approved <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("approved"), token = Some(signedIn._2))
+            awaiting <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("awaiting"), token = Some(signedIn._2))
+            rejected <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(signedIn._1.id), state = Some("rejected"), token = Some(signedIn._2))
 
           } yield {
-            Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), approved, awaiting, rejected))
+            approved.fold(NotFound(views.html.notFound())) { ap =>
+              awaiting.fold(NotFound(views.html.notFound())) { aw =>
+                rejected.fold(NotFound(views.html.notFound())) { rj =>
+                  Ok(views.html.profile(signedIn._1, owner, Some(signedIn._1), ap, aw, rj))
+                }
+              }
+            }
           }
         }
       }

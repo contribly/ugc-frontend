@@ -12,11 +12,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class AssignmentController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  private val Assignment = "assignment"
-
   def assignments(page: Option[Int]) = Action.async { implicit request =>
 
     val assignmentsPage = (owner: User) => {
+
+      val AssignmentRefinement = "assignment"
 
       def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
         pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignments(Some(p)).url))
@@ -24,11 +24,15 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
       for {
         assignments <- ugcService.assignments(PageSize, page.fold(1)(p => p))
+        contributionRefinements <- ugcService.contributionRefinements(refinements = Seq(AssignmentRefinement))
         signedIn <- signedInUserService.signedIn
 
       } yield {
-          val contributionCounts: Map[String, Long] = Map()
-          Ok(views.html.assignments(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), contributionCounts))
+
+          // Decorate the assignments with contribution counts obtained from calling the contribution refinements end point
+          val assignmentContributionCounts = contributionRefinements.flatMap(rs => rs.get(AssignmentRefinement)).getOrElse(Map())
+
+          Ok(views.html.assignments(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), assignmentContributionCounts))
       }
     }
 
@@ -49,7 +53,9 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
         signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.assignment(assignment, contributions.results, owner, signedIn.map(s => s._1), contributions.numberFound, pageLinksFor(assignment, contributions.numberFound)))
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.assignment(assignment, cs.results, owner, signedIn.map(s => s._1), cs.numberFound, pageLinksFor(assignment, cs.numberFound)))
+        }
       }
     }
 
@@ -70,8 +76,9 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
         signedIn <- signedInUserService.signedIn
 
       } yield {
-        Ok(views.html.assignmentGallery(assignment, contributions.results, owner, signedIn.map(s => s._1), pageLinksFor(assignment, contributions.numberFound)))
-
+        contributions.fold(NotFound(views.html.notFound())) { cs =>
+          Ok(views.html.assignmentGallery(assignment, cs.results, owner, signedIn.map(s => s._1), pageLinksFor(assignment, cs.numberFound)))
+        }
       }
     }
 
