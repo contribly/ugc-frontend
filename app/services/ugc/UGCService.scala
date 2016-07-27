@@ -149,7 +149,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     withToken.get.map { r =>
       r.status match {
         case 200 =>
-          Logger.info("!!!!!!!!! " + r.body)
           Some(Json.parse(r.body).as[Map[String, Map[String, Long]]])
         case _ =>
           None
