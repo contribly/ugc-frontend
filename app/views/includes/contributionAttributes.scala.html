@@ -1,14 +1,14 @@
 @import model.Contribution
-@(r: Contribution)
+@(c: Contribution)
 <p>
-    @r.via.user.map { u =>
+    @c.via.user.map { u =>
         <a href="@routes.UserController.user(u.id, None)">@u.displayName</a>
     }
-    | @r.created.toDate.format("d MMM YYYY HH:mm")
-    @r.via.client.map { c =>
+    | @c.created.toDate.format("d MMM YYYY HH:mm")
+    @c.via.client.map { c =>
         via @c.name
     }
-    @r.assignment.map{ a =>
+    @c.assignment.map{ a =>
        | <a href="@routes.AssignmentController.assignment(a.id, None)">@a.name</a>
     }
 </p>

@@ -4,7 +4,7 @@
 @reports.map{ r =>
     <hr/>
     <a href="@routes.ContributionController.contribution(r.id)"><h4>@r.headline</h4></a>
-    @includes.reportAttributes(r)
+    @includes.contributionAttributes(r)
     @includes.media(r, "medium", true)
 
     @r.body.map{b =>
