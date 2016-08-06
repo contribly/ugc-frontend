@@ -1,7 +1,7 @@
-@import model.forms.SubmissionDetails
+@import model.forms.ContributionForm
 @import model.User
 @import play.api.Play.current
-@(submitForm: Form[SubmissionDetails], owner: User, signedIn: Option[User])(implicit messages: Messages)
+@(contributionForm: Form[ContributionForm], owner: User, signedIn: Option[User])(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -12,16 +12,16 @@
 
 <h4>Submit</h4>
 
-@if(submitForm.hasGlobalErrors) {
+@if(contributionForm.hasGlobalErrors) {
     <p class="error">
-        @submitForm.globalError
+        @contributionForm.globalError
     </p>
 }
 
 @helper.form(action = routes.SubmitController.submit, 'enctype -> "multipart/form-data") {
-    @helper.inputText(submitForm("headline"))
-    @helper.inputText(submitForm("body"))
-
+    @helper.inputText(contributionForm("headline"))
+    @helper.inputText(contributionForm("body"))
+    @helper.inputText(contributionForm("location"))
     <input type="file" name="media">
 
     <p class="buttons">

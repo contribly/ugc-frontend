@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import model.forms.SubmissionDetails
+import model.forms.ContributionForm
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
@@ -15,11 +15,11 @@ import scala.concurrent.Future
 
 class SubmitController @Inject() (val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with WithOwner with I18nSupport {
 
-  val submitForm: Form[SubmissionDetails] = Form(
+  val submitForm: Form[ContributionForm] = Form(
     mapping(
       "headline" -> nonEmptyText,
       "body" -> nonEmptyText
-    )(SubmissionDetails.apply)(SubmissionDetails.unapply)
+    )(ContributionForm.apply)(ContributionForm.unapply)
   )
 
   def prompt() = Action.async { implicit request =>
