@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
+import model.{Place, LatLong, MediaUsage, ContributionSubmission}
 import model.forms.ContributionForm
 import play.api.Logger
 import play.api.data.Forms._
@@ -18,7 +19,10 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
   val submitForm: Form[ContributionForm] = Form(
     mapping(
       "headline" -> nonEmptyText,
-      "body" -> nonEmptyText
+      "body" -> nonEmptyText,
+      "location" -> optional(nonEmptyText),
+      "latitude" -> optional(bigDecimal),
+      "longitude" -> optional(bigDecimal)
     )(ContributionForm.apply)(ContributionForm.unapply)
   )
 
@@ -70,11 +74,21 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
               }.getOrElse(Future.successful(None))
 
               eventualMedia.flatMap { media =>
+                // Compose the contribution and submit it to the contribution API end point including references to any uploaded media elements and location information.
+                val contributionSubmission = ContributionSubmission(
+                  submissionDetails.headline,
+                  Some(submissionDetails.body),
+                  media.map(m => Seq(MediaUsage(m, None, Seq()))).getOrElse(Seq()),
+                  submissionDetails.location.flatMap { location =>
+                    submissionDetails.latitude.flatMap { latitude =>
+                      submissionDetails.longitude.map { longitude =>
+                        Place(Some(location), Some(LatLong(latitude.toDouble, longitude.toDouble)), None)
+                      }
+                    }
+                  }
+                )
 
-                // Submit the contribution to the contribution API end point including a reference to the uploaded media element.
-                val eventualSubmittedContribution = ugcService.submit(submissionDetails.headline, submissionDetails.body, media, signedInUsersApiAccessToken)
-
-                eventualSubmittedContribution.map { or =>
+                ugcService.submit(contributionSubmission, signedInUsersApiAccessToken).map { or =>
                   Logger.info("Contribution submission result: " + or)
 
                   or.fold({

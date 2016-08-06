@@ -2,17 +2,15 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{User, Contribution, FlagType}
+import model.FlagType
 import model.forms.FlagSubmission
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.{Messages, I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.HtmlFormat
 import services.ugc.UGCService
-import views.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,10 +31,7 @@ class ContributionController @Inject()(val ugcService: UGCService, signedInUserS
 
       } yield {
         contribution.fold(NotFound(views.html.notFound())) { r =>
-          def contribution2 = views.html.contribution
-          val contribution1: HtmlFormat.Appendable = contribution2(r, owner, signedIn.map(s => s._1), flagTypeTuples(flagTypes), flagForm)
-          contribution1.body
-          Ok(contribution1)
+          Ok(views.html.contribution(r, owner, signedIn.map(s => s._1), flagTypeTuples(flagTypes), flagForm))
         }
       }
     }

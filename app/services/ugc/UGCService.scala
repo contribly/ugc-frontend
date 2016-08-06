@@ -155,26 +155,22 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def submit(headline: String, body: String, media: Option[Media], token: String): Future[Option[Contribution]] = {
+  def submit(contributionSubmission: ContributionSubmission, token: String): Future[Option[Contribution]] = {
+    // Serialize our contribution to JSON for POSTing to the new contributions end point
+    val contributionAsJson = Json.toJson(contributionSubmission)
 
-    val submissionJson = Json.obj("headline" -> headline,
-      "body" -> body,
-      "media" -> media.map(m => Json.toJson(Seq(Map("id" -> m.id))))
-    )
+    // POST to the contribution end point using the user's bearer token to identify the user
+    ws.url(contributionsUrl).withHeaders(bearerTokenHeader(token), applicationJsonHeader).post(contributionAsJson).map { r =>
+      r.status match {
+        case Ok =>
+          Logger.info("Submission accepted: " + r.body)
+          Some(Json.parse(r.body).as[Contribution])
 
-    val eventualResponse = ws.url(contributionsUrl).
-      withHeaders(bearerTokenHeader(token), applicationJsonHeader).
-      post(submissionJson)
-
-    eventualResponse.map(r => {
-      if (r.status == Ok) {
-        Logger.info("Submission accepted: " + r.body)
-        Some(Json.parse(r.body).as[Contribution])
-      } else {
-        Logger.info("Submission rejected: " + r.status + " " + r.body)
-        None
+        case _ =>
+          Logger.info("Submission rejected: " + r.status + " " + r.body)
+          None
       }
-    })
+    }
   }
 
   def submitFlag(contributionId: String, flagSubmission: FlagSubmission, token: Option[String]): Future[Unit] = {
