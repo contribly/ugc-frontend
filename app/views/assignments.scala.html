@@ -14,23 +14,30 @@
 
     @includes.pages(pages)
 
-    @assignments.map { n =>
-        <h4><a href="@routes.AssignmentController.assignment(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
+    @if(assignments.nonEmpty) {
 
-        @n.description.map{ d =>
-            <p>@Html(d)</p>
-        }
-        @n.ends.map{ed =>
-            <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
-        }
+        @assignments.map { n =>
+            <h4><a href="@routes.AssignmentController.assignment(n.id, None)">@n.name</a> @contributionCounts.get(n.id).map{ c => (@c) }</h4>
 
-        <p>Featured: @n.featured</p>
-
-        @n.cover.map{ c =>
-            @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
-                <a href="@routes.AssignmentController.assignment(n.id, None)"><img src="@i.url" /></a>
+            @n.description.map{ d =>
+                <p>@Html(d)</p>
             }
+            @n.ends.map{ed =>
+                <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
+            }
+
+            <p>Featured: @n.featured</p>
+
+            @n.cover.map{ c =>
+                @c.artifacts.find(a => a.contentType.startsWith("image") && a.width == Some(320)).map{ i =>
+                    <a href="@routes.AssignmentController.assignment(n.id, None)"><img src="@i.url" /></a>
+                }
+            }
+            <hr/>
         }
+
+    } else {
+        <p>@Messages("no.assignments")</p>
         <hr/>
     }
 
