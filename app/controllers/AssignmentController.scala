@@ -23,7 +23,7 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
       }
 
       for {
-        assignments <- ugcService.assignments(PageSize, page.fold(1)(p => p))
+        assignments <- ugcService.assignments(Some(PageSize), page)
         contributionRefinements <- ugcService.contributionRefinements(refinements = Seq(AssignmentRefinement))
         signedIn <- signedInUserService.signedIn
 

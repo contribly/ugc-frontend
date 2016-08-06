@@ -58,12 +58,13 @@ object Contribution {
 
 case class ContributionSearchResult(numberFound: Long, results: Seq[Contribution], refinements: Option[Map[String, Map[String, Long]]])
 
-case class ContributionSubmission(headline: String, body: Option[String], mediaUsages: Seq[MediaUsage], place: Option[Place])
+case class ContributionSubmission(headline: String, body: Option[String], mediaUsages: Seq[MediaUsage], place: Option[Place], assignment: Option[Assignment])
 
 object ContributionSubmission {
   implicit val aw = Json.writes[Artifact]
   implicit val mw = Json.writes[Media]
   implicit val muw = Json.writes[MediaUsage]
+  implicit val asw = Json.writes[Assignment]
   implicit val osmw = Json.writes[Osm]
   implicit val llW = Json.writes[LatLong]
   implicit val pw = Json.writes[Place]

@@ -24,7 +24,8 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       "latitude" -> optional(bigDecimal),
       "longitude" -> optional(bigDecimal),
       "osmId" -> optional(longNumber()),
-      "osmType" -> optional(nonEmptyText)
+      "osmType" -> optional(nonEmptyText),
+      "assignment" -> optional(nonEmptyText)
     )(ContributionForm.apply)(ContributionForm.unapply)
   )
 
@@ -32,13 +33,14 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
     withOwner { owner =>
       for {
         signedIn <- signedInUserService.signedIn
+        openAssignments <- ugcService.assignments(open = Some(true))
 
       } yield {
         signedIn.fold {
           Redirect(routes.LoginController.prompt())
 
         } { s =>
-          Ok(views.html.submit(submitForm, owner, Some(s._1)))
+          Ok(views.html.submit(submitForm, owner, Some(s._1), openAssignments.results))
         }
       }
     }
@@ -55,66 +57,70 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
         } { s =>
 
-          val signedInUsersApiAccessToken = s._2
+          ugcService.assignments(open = Some(true)).flatMap { oas =>
 
-          submitForm.bindFromRequest().fold(
-            formWithErrors => {
-              Logger.info("Form failed to validate: " + formWithErrors)
-              Future.successful(Ok(views.html.submit(formWithErrors, owner, Some(s._1))))
-            },
+            val signedInUsersApiAccessToken = s._2
 
-            submissionDetails => {
-              // The submission past form validation; compose a contribution and submit it to the API
-              Logger.info("Successfully validated submission details: " + submissionDetails)
+            submitForm.bindFromRequest().fold(
+              formWithErrors => {
+                Logger.info("Form failed to validate: " + formWithErrors)
+                Future.successful(Ok(views.html.submit(formWithErrors, owner, Some(s._1), oas.results)))
+              },
 
-              // If there was a media file on the form submission then we will need to upload it to the media end point before referencing it in our submission
-              val mediaFileSeenOnFormSubmission = request.body.file("media")
+              submissionDetails => {
+                // The submission past form validation; compose a contribution and submit it to the API
+                Logger.info("Successfully validated submission details: " + submissionDetails)
 
-              val eventualMedia = mediaFileSeenOnFormSubmission.map{ mf =>
-                Logger.info("Uploadinf media file on request to the API media end point: " + mf)
-                ugcService.submitMedia(mf.ref.file, signedInUsersApiAccessToken)  // The media element is submitted using the signed in user's access token; this ensues the correct ownership
-              }.getOrElse(Future.successful(None))
+                // If there was a media file on the form submission then we will need to upload it to the media end point before referencing it in our submission
+                val mediaFileSeenOnFormSubmission = request.body.file("media")
 
-              eventualMedia.flatMap { media =>
-                // Compose the contribution and submit it to the contribution API end point including references to any uploaded media elements and location information.
-                val contributionSubmission = ContributionSubmission(
-                  submissionDetails.headline,
-                  Some(submissionDetails.body),
-                  media.map(m => Seq(MediaUsage(m, None, Seq()))).getOrElse(Seq()),
-                  submissionDetails.location.flatMap { location =>
-                    submissionDetails.latitude.flatMap { latitude =>
-                      submissionDetails.longitude.map { longitude =>
-                        Place(
-                          Some(location),
-                          Some(LatLong(latitude.toDouble, longitude.toDouble)),
-                          submissionDetails.osmId.flatMap( osmId =>
-                            submissionDetails.osmType.map { osmType =>
-                              Osm(osmId, osmType)
-                            }
+                val eventualMedia = mediaFileSeenOnFormSubmission.map { mf =>
+                  Logger.info("Uploadinf media file on request to the API media end point: " + mf)
+                  ugcService.submitMedia(mf.ref.file, signedInUsersApiAccessToken) // The media element is submitted using the signed in user's access token; this ensues the correct ownership
+                }.getOrElse(Future.successful(None))
+
+                eventualMedia.flatMap { media =>
+                  // Compose the contribution and submit it to the contribution API end point including references to any uploaded media elements and location information.
+                  val contributionSubmission = ContributionSubmission(
+                    submissionDetails.headline,
+                    Some(submissionDetails.body),
+                    media.map(m => Seq(MediaUsage(m, None, Seq()))).getOrElse(Seq()),
+                    submissionDetails.location.flatMap { location =>
+                      submissionDetails.latitude.flatMap { latitude =>
+                        submissionDetails.longitude.map { longitude =>
+                          Place(
+                            Some(location),
+                            Some(LatLong(latitude.toDouble, longitude.toDouble)),
+                            submissionDetails.osmId.flatMap(osmId =>
+                              submissionDetails.osmType.map { osmType =>
+                                Osm(osmId, osmType)
+                              }
+                            )
                           )
-                        )
+                        }
                       }
+                    },
+                    submissionDetails.assignment.flatMap(sa => oas.results.find(a => a.id == sa))
+                  )
+
+                  ugcService.submit(contributionSubmission, signedInUsersApiAccessToken).map { or =>
+                    Logger.info("Contribution submission result: " + or)
+
+                    or.fold({
+                      Logger.info("Contribution failed; redirecting to homepage")
+                      Redirect(routes.IndexController.index(None, None))
                     }
-                  }
-                )
-
-                ugcService.submit(contributionSubmission, signedInUsersApiAccessToken).map { or =>
-                  Logger.info("Contribution submission result: " + or)
-
-                  or.fold({
-                    Logger.info("Contribution failed; redirecting to homepage")
-                    Redirect(routes.IndexController.index(None, None))
-                  }
-                  ) { r =>
-                    Logger.info("Contribution was successful; redirecting to contribution page")
-                    // This unmoderated contribution is only visible to the end user. The contribution page will make an authenticiated call to the API
-                    Redirect(routes.ContributionController.contribution(r.id))
+                    ) { r =>
+                      Logger.info("Contribution was successful; redirecting to contribution page")
+                      // This unmoderated contribution is only visible to the end user. The contribution page will make an authenticiated call to the API
+                      Redirect(routes.ContributionController.contribution(r.id))
+                    }
                   }
                 }
               }
-            }
-          )
+            )
 
+          }
         }
       }
     }

@@ -1,7 +1,7 @@
 @import model.forms.ContributionForm
-@import model.User
+@import model.{Assignment, User}
 @import play.api.Play.current
-@(contributionForm: Form[ContributionForm], owner: User, signedIn: Option[User])(implicit messages: Messages)
+@(contributionForm: Form[ContributionForm], owner: User, signedIn: Option[User], openAssignments: Seq[Assignment])(implicit messages: Messages)
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -24,6 +24,9 @@
 @helper.form(action = routes.SubmitController.submit, 'enctype -> "multipart/form-data") {
     @helper.inputText(contributionForm("headline"))
     @helper.inputText(contributionForm("body"))
+
+    @helper.select(contributionForm("assignment"), options = openAssignments.map(a => (a.id, a.name)))
+
     @helper.inputText(contributionForm("location"), 'class -> "location")
     @helper.inputText(contributionForm("latitude"))
     @helper.inputText(contributionForm("longitude"))

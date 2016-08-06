@@ -8,7 +8,7 @@ import model._
 import model.forms.{FlagSubmission, RegistrationDetails}
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.json._
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.WSClient
 import play.api.mvc.Results
 import play.api.{Configuration, Logger}
 
@@ -35,24 +35,19 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
   val Ok: Int = 200
   val Accepted: Int = 202
 
-  def flagTypes: Future[Seq[FlagType]] = {
-    ws.url(apiUrl + "/flag-types").get.map { r =>
-      Json.parse(r.body).as[Seq[FlagType]]
-    }
-  }
-
   def assignment(id: String): Future[Assignment] = {
     ws.url(assignmentsUrl / id).get.map { r =>
       Json.parse(r.body).as[Assignment]
     }
   }
 
-  def assignments(pageSize: Int, page: Int): Future[AssignmentSearchResult] = {
+  def assignments(pageSize: Option[Int] = None, page: Option[Int] = None, open: Option[Boolean] = None): Future[AssignmentSearchResult] = {
     val params = Seq(
-      "pageSize" -> pageSize,
-      "page" -> page,
-      "ownedBy" -> ownedBy
-      )
+      pageSize.map(ps => "pageSize" -> ps),
+      page.map(p => "page" -> p),
+      open.map(o => "open" -> o),
+      Some("ownedBy" -> ownedBy)
+    ).flatten
 
     ws.url(assignmentsUrl.addParams(params)).get.map { r =>
       val assignments = Json.parse(r.body).as[Seq[Assignment]]
@@ -136,6 +131,12 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
         case _ =>
           None
       }
+    }
+  }
+
+  def flagTypes: Future[Seq[FlagType]] = {
+    ws.url(apiUrl + "/flag-types").get.map { r =>
+      Json.parse(r.body).as[Seq[FlagType]]
     }
   }
 
