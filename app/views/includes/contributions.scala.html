@@ -10,11 +10,7 @@
     @r.body.map{b =>
         <p>@b</p>
     }
-    @r.place.map{p =>
-        @p.name.map{pn => <br/><i>@pn</i>}
-        @p.latLong.map{ll => <br/><i>@ll.latitude @ll.longitude</i>}
-        @p.osm.map{osm => <br/><i>@osm.osmId/@osm.osmType</i>}
-    }
+
     <p>
         @r.tags.map{t =>
         <a href="@routes.TagsController.tag(t.id, None)">@t.name</a>
