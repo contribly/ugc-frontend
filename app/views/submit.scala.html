@@ -42,6 +42,8 @@
             source: function(request, response) {
                 $('#latitude').val(null);
                 $('#longitude').val(null);
+                $('#osmId').val(null);
+                $('#osmType').val(null);
 
                 $.ajax({
                   url: "https://nominatim-ac.eelpieconsulting.co.uk/suggest",
