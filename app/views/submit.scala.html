@@ -27,6 +27,8 @@
     @helper.inputText(contributionForm("location"), 'class -> "location")
     @helper.inputText(contributionForm("latitude"))
     @helper.inputText(contributionForm("longitude"))
+    @helper.inputText(contributionForm("osmId"))
+    @helper.inputText(contributionForm("osmType"))
     <input type="file" name="media">
 
     <p class="buttons">
@@ -54,7 +56,9 @@
                             value: data[i].address,
                             label: data[i].address,
                             latitude: data[i].latlong.lat,
-                            longitude: data[i].latlong.lon
+                            longitude: data[i].latlong.lon,
+                            osmId: data[i].osmId,
+                            osmType: data[i].osmType
                             };
                         remapped.push(item);
                     }
@@ -67,6 +71,8 @@
                 $('#location').val(name);
                 $('#latitude').val(ui.item.latitude);
                 $('#longitude').val(ui.item.longitude);
+                $('#osmId').val(ui.item.osmId);
+                $('#osmType').val(ui.item.osmType);
 
                 var radius = $('#radius').val();
                 if (!radius) {

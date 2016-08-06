@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{Place, LatLong, MediaUsage, ContributionSubmission}
+import model._
 import model.forms.ContributionForm
 import play.api.Logger
 import play.api.data.Forms._
@@ -22,7 +22,9 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
       "body" -> nonEmptyText,
       "location" -> optional(nonEmptyText),
       "latitude" -> optional(bigDecimal),
-      "longitude" -> optional(bigDecimal)
+      "longitude" -> optional(bigDecimal),
+      "osmId" -> optional(longNumber()),
+      "osmType" -> optional(nonEmptyText)
     )(ContributionForm.apply)(ContributionForm.unapply)
   )
 
@@ -82,7 +84,15 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
                   submissionDetails.location.flatMap { location =>
                     submissionDetails.latitude.flatMap { latitude =>
                       submissionDetails.longitude.map { longitude =>
-                        Place(Some(location), Some(LatLong(latitude.toDouble, longitude.toDouble)), None)
+                        Place(
+                          Some(location),
+                          Some(LatLong(latitude.toDouble, longitude.toDouble)),
+                          submissionDetails.osmId.flatMap( osmId =>
+                            submissionDetails.osmType.map { osmType =>
+                              Osm(osmId, osmType)
+                            }
+                          )
+                        )
                       }
                     }
                   }
