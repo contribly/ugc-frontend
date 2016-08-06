@@ -29,7 +29,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
     )(ContributionForm.apply)(ContributionForm.unapply)
   )
 
-  def prompt() = Action.async { implicit request =>
+  def prompt(assignment: Option[String] = None) = Action.async { implicit request =>
     withOwner { owner =>
       for {
         signedIn <- signedInUserService.signedIn
@@ -40,7 +40,12 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
           Redirect(routes.LoginController.prompt())
 
         } { s =>
-          Ok(views.html.submit(submitForm, owner, Some(s._1), openAssignments.results))
+
+          val assignmentOptionsToShow = assignment.flatMap { sa =>
+            openAssignments.results.find(a => a.id == sa)
+          }.fold(openAssignments.results)(a => Seq(a))
+
+          Ok(views.html.submit(submitForm, owner, Some(s._1), assignmentOptionsToShow))
         }
       }
     }

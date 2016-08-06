@@ -18,8 +18,14 @@
         <p>@Html(d)</p>
     }
 
-    @assignment.ends.map { ed =>
-        <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
+    @assignment.ends.fold {
+        <p><a href="@routes.SubmitController.prompt(Some(assignment.id))">@Messages("contribute.to.this.assignment")</a></p>
+    }{ ed =>
+        @if(ed.isBeforeNow) {
+            <p><a href="@routes.SubmitController.prompt(Some(assignment.id))">@Messages("contribute.to.this.assignment")</a></p>
+        } else {
+            <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
+        }
     }
 
     @if(totalContributions > 0) {

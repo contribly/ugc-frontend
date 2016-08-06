@@ -12,5 +12,6 @@ sign.in.twitter=Iniciar sesión con Twitter
 
 no.assignments=No hay asignaciones
 
+contribute.to.this.assignment=Contribuir a esta asignación
 
 

@@ -19,7 +19,7 @@ GET        /logout                  controllers.LoginController.logout
 GET        /register                controllers.RegisterController.prompt
 POST       /register/submit         controllers.RegisterController.submit
 
-GET        /submit                  controllers.SubmitController.prompt
+GET        /submit                  controllers.SubmitController.prompt(assignment: Option[String])
 POST       /submit                  controllers.SubmitController.submit
 
 GET        /profile                 controllers.UserController.profile
