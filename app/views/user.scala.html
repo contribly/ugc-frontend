@@ -7,12 +7,14 @@
     <title>@user.displayName</title>
 </head>
 <body>
-
     @includes.header(owner, signedIn)
     <hr/>
 
     <h4>@user.displayName</h4>
 
+    @user.bio.map { b =>
+        <p>@b</p>
+    }
     <p>Registered @user.registered</p>
 
     @includes.pages(pages)
