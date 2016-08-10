@@ -1,4 +1,4 @@
-#Contriby reference front end
+#Contribly reference front end
 
 The application is an example web front end to the Contribly User Generated Content API.
 
