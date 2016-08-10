@@ -1,10 +1,10 @@
 #Contribly reference front end
 
-The application is an example web front end to the Contribly User Generated Content API.
+This application is an example web front end to the Contribly User Generated Content API.
 
-It is intended to demonstrate basic authentication, contribution and retrieval of content.
+It is intended to demonstrate basic authentication, contribution and retrieval of content and the associated Contribly API calls.
 
-The example is implemented in Scala and Play Framework 2.5.
+This example is implemented in Scala and Play Framework 2.5.
 
 
 ## Usage
@@ -20,4 +20,3 @@ sbt -Dhttp.port=9010
 run
 
 The moderated content of your Contribly instance should be visible on localhost:9010
-
