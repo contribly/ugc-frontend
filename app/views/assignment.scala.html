@@ -6,6 +6,9 @@
 <html>
 <head>
     <title>@assignment.name</title>
+    @assignment.description.map { d =>
+        <meta name="description" content="@d"/>
+    }
 </head>
 <body>
 
