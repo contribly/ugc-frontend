@@ -1,5 +1,6 @@
 assignments=Assignments
 gallery=Gallery
+images=images
 videos=Videos
 
 assignment.no.contributions=There are currently no approved contributions for this assignment.
@@ -13,3 +14,4 @@ sign.in.twitter=Sign in with Twitter
 no.assignments=No assignments
 
 contribute.to.this.assignment=Contribute to this assignment
+
