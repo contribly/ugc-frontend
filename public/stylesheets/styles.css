@@ -1,3 +1,13 @@
-h1 {
-    background-color: red;
+.gallery-image {
+    float: left;
+    position:relative;
+    text-align:center;
+}
+
+.caption {
+    position: absolute;
+    bottom: 20px;
+    margin: 0px;
+    width: 100%;
+    color: white;
 }

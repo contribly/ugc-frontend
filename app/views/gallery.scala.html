@@ -18,8 +18,12 @@
 
     <hr/>
 
-    @contributions.map{r =>
-        @includes.media(r, "medium", true)
+    @contributions.map{ c =>
+
+        <div class="gallery-image">
+            @includes.media(c, "medium", true)
+            <div class="caption">@c.headline</div>
+        </div>
     }
 
 <hr/>
