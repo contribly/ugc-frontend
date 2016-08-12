@@ -21,10 +21,10 @@
     <ul>
        <li>@totalContributions @Messages("contributions")</li>
         @refinements.get("image").map { ic =>
-            <li><a href="@routes.IndexController.gallery(None)">@ic @Messages("images")</a></li>
+            <li><a href="@routes.IndexController.gallery(None, Some("image"))">@ic @Messages("images")</a></li>
         }
         @refinements.get("video").map { ic =>
-            <li><a href="@routes.IndexController.videos(None)">@ic @Messages("videos")</a></li>
+            <li><a href="@routes.IndexController.gallery(None, Some("video"))">@ic @Messages("videos")</a></li>
         }
     </ul>
 

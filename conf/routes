@@ -1,6 +1,5 @@
-GET        /                        controllers.IndexController.index(page: Option[Int], mediaType: Option[String])
-GET        /gallery                 controllers.IndexController.gallery(page: Option[Int])
-GET        /videos                  controllers.IndexController.videos(page: Option[Int])
+GET        /                        controllers.IndexController.index(page: Option[Int])
+GET        /gallery                 controllers.IndexController.gallery(page: Option[Int], mediaType: Option[String])
 
 GET        /login/prompt            controllers.LoginController.prompt
 POST       /login/submit            controllers.LoginController.submit

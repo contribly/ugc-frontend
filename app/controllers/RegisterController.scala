@@ -57,11 +57,11 @@ class RegisterController @Inject() (val ugcService: UGCService, signedInUserServ
               ugcService.token(u.username, registrationDetails.password).map { to => // TODO Register end point should provide a token as well
                 to.fold ({ e =>
                   val withErrors = request.session + ("error", e)
-                  Redirect(routes.IndexController.index(None, None)).withSession(withErrors)
+                  Redirect(routes.IndexController.index(None)).withSession(withErrors)
 
                 }, { t =>
                   Logger.info("Got token: " + t)
-                  Redirect(routes.IndexController.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
+                  Redirect(routes.IndexController.index(None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
                 }
                 )
               }

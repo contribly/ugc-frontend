@@ -113,7 +113,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
                     or.fold({
                       Logger.info("Contribution failed; redirecting to homepage")
-                      Redirect(routes.IndexController.index(None, None))
+                      Redirect(routes.IndexController.index(None))
                     }
                     ) { r =>
                       Logger.info("Contribution was successful; redirecting to contribution page")

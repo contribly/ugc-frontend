@@ -82,7 +82,7 @@ class TwitterLoginController @Inject() (configuration: Configuration, ugcService
         }, { t =>
           Logger.info("Twitter access token succcessfully exchanged for API token: " + t)
           // Call the API verify method to obtain the API user associated with this token and attach them to the local session; this user can now be considered to be signed in.
-          Redirect(routes.IndexController.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(sessionWithClearedRequestToken, t))
+          Redirect(routes.IndexController.index(None)).withSession(signedInUserService.setSignedInUserOnSession(sessionWithClearedRequestToken, t))
         }
         )
       }

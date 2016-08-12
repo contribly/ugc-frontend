@@ -51,7 +51,7 @@ class FacebookLoginController @Inject() (configuration: Configuration, ugcServic
             Redirect(routes.LoginController.prompt).withSession(withErrors)
           }, { t =>
             Logger.info("Setting session token: " + t)
-            Redirect(routes.IndexController.index(None, None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
+            Redirect(routes.IndexController.index(None)).withSession(signedInUserService.setSignedInUserOnSession(request.session, t))
           }
         )
       }
