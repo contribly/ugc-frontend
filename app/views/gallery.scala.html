@@ -22,7 +22,7 @@
 
         <div class="gallery-image">
             @includes.media(c, "medium", true)
-            <div class="caption">@c.headline</div>
+            <div class="caption">@c.headline@if(c.likes.size > 0){ - @c.likes.size}</div>
         </div>
     }
 

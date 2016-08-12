@@ -1,29 +1,31 @@
 @import model.forms.FlagSubmission
 @import model.{FlagType, Contribution, User}
 @import play.api.Play.current
-@(r: Contribution, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])(implicit messages: Messages)
+@(c: Contribution, owner: User, signedIn: Option[User], flagTypes: Seq[(String, String)], flagForm: Form[FlagSubmission])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@r.headline</title>
+    <title>@c.headline</title>
 </head>
 <body>
 
     @includes.header(owner, signedIn)
     <hr/>
 
-    <h4>@r.headline</h4>
-    @includes.contributionAttributes(r)
-    @includes.media(r, "mediumoriginalaspectdouble", false)
+    <h4>@c.headline</h4>
+    @includes.contributionAttributes(c)
+    @includes.media(c, "mediumoriginalaspectdouble", false)
 
-    @r.body.map{b =>
+    @c.body.map{b =>
         <p>@b</p>
     }
+
+    <p>@c.likes.size @Messages("likes")</p>
 
     <hr/>
     <h5>@Messages("contribution.report.problem")</h5>
 
-    @helper.form(action = routes.ContributionController.flag(r.id)) {
+    @helper.form(action = routes.ContributionController.flag(c.id)) {
         @helper.select(flagForm("type"), options = flagTypes)
         @helper.inputText(flagForm("notes"))
         @helper.inputText(flagForm("email"))

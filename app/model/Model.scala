@@ -49,7 +49,8 @@ object Client {
 
 case class Contribution(id: String, headline: String, created: DateTime, assignment: Option[Assignment],
                         body: Option[String], tags: Seq[Tag], place: Option[Place],
-                        mediaUsages: Seq[MediaUsage], via: Authority)
+                        mediaUsages: Seq[MediaUsage], via: Authority,
+                        likes: Map[String, Long])
 
 object Contribution {
   implicit val df: Reads[DateTime] = DateTimeFormat
