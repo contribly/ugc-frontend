@@ -45,7 +45,7 @@ class IndexController @Inject()(val ugcService: UGCService, signedInUserService:
       }
 
       for {
-        contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("image"))
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some("image,video"))
         signedIn <- signedInUserService.signedIn
 
       } yield {
