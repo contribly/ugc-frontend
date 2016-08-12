@@ -1,0 +1,17 @@
+@import views.PageLink
+@(nextPage: Option[PageLink])
+@nextPage.map{ p =>
+    <div id="pagination">
+        <a href="@p.link" class="next">next</a>
+    </div>
+}
+
+<script>
+    var ias = jQuery.ias({
+        container:  '#posts',
+        item:       '.post',
+        pagination: '#pagination',
+        next:       '.next'
+    });
+</script>
+

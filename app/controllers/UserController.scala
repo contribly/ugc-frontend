@@ -13,14 +13,9 @@ import scala.concurrent.Future
 
 class UserController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def user(id: String, page: Option[Int]) = Action.async { implicit request =>
+  def user(id: String, page: Option[Long]) = Action.async { implicit request =>
 
     val userPage = (owner: User) => {
-
-      def pageLinksFor(user: User, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.UserController.user(user.id, Some(p)).url))
-      }
-
       for {
         user <- ugcService.user(id)
         contributions <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(id))
@@ -29,7 +24,8 @@ class UserController @Inject()(val ugcService: UGCService, signedInUserService: 
       } yield {
         user.fold(NotFound(views.html.notFound())) { u =>
           contributions.fold(NotFound(views.html.notFound())) { cs =>
-            Ok(views.html.user(u, owner, signedIn.map(s => s._1), cs.results, pageLinksFor(u, cs.numberFound)))
+            val nextPage = nextPageFor(cs.numberFound, page).map(p => PageLink(routes.UserController.user(id, Some(p)).url))
+            Ok(views.html.user(u, owner, signedIn.map(s => s._1), cs.results, nextPage))
           }
         }
       }

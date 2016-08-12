@@ -1,7 +1,7 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(contributions: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink], totalContributions: Long)(implicit messages: Messages)
+@(contributions: Seq[Contribution], owner: User, signedIn: Option[User], nextPage: Option[PageLink], totalContributions: Long)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,17 +14,19 @@
 
     <h4>Gallery</h4>
     (@totalContributions)
-    @includes.pages(pages)
 
     <hr/>
 
-    @contributions.map{ c =>
+    <div id="posts">
+        @contributions.map{ c =>
+            <div class="post gallery-image">
+                @includes.media(c, "medium", true)
+                <div class="caption">@c.headline@if(c.likes.size > 0){ - @c.likes.size}</div>
+            </div>
+        }
+    </div>
 
-        <div class="gallery-image">
-            @includes.media(c, "medium", true)
-            <div class="caption">@c.headline@if(c.likes.size > 0){ - @c.likes.size}</div>
-        </div>
-    }
+    @includes.pagination(nextPage)
 
 <hr/>
 </body>

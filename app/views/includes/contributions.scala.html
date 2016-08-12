@@ -1,20 +1,16 @@
 @import model.Contribution
 @(contributions: Seq[Contribution])
 
-@contributions.map{ r =>
-    <hr/>
-    <a href="@routes.ContributionController.contribution(r.id)"><h4>@r.headline</h4></a>
-    @includes.contributionAttributes(r)
-    @includes.media(r, "medium", true)
-
-    @r.body.map{b =>
-        <p>@b</p>
+<div id="posts">
+    @contributions.map{ r =>
+        <div class="post">
+            <hr/>
+            <a href="@routes.ContributionController.contribution(r.id)"><h4>@r.headline</h4></a>
+            @includes.contributionAttributes(r)
+            @includes.media(r, "medium", true)
+            @r.body.map{b =>
+                <p>@b</p>
+            }
+        </div>
     }
-
-    <p>
-        @r.tags.map{t =>
-        <a href="@routes.TagsController.tag(t.id, None)">@t.name</a>
-        }
-    </p>
-
-}
+</div>

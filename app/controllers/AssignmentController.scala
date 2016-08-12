@@ -12,18 +12,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class AssignmentController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def assignments(page: Option[Int]) = Action.async { implicit request =>
+  def assignments() = Action.async { implicit request =>
 
     val assignmentsPage = (owner: User) => {
 
       val AssignmentRefinement = "assignment"
 
-      def pagesLinkFor(totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignments(Some(p)).url))
-      }
-
       for {
-        assignments <- ugcService.assignments(Some(PageSize), page)
+        assignments <- ugcService.assignments(Some(PageSize))
         contributionRefinements <- ugcService.contributionRefinements(refinements = Seq(AssignmentRefinement))
         signedIn <- signedInUserService.signedIn
 
@@ -32,20 +28,16 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
           // Decorate the assignments with contribution counts obtained from calling the contribution refinements end point
           val assignmentContributionCounts = contributionRefinements.flatMap(rs => rs.get(AssignmentRefinement)).getOrElse(Map())
 
-          Ok(views.html.assignments(assignments.results, owner, signedIn.map(s => s._1), pagesLinkFor(assignments.numberFound.toInt), assignmentContributionCounts))
+        Ok(views.html.assignments(assignments.results, owner, signedIn.map(s => s._1), assignmentContributionCounts))
       }
     }
 
     withOwner(assignmentsPage)
   }
 
-  def assignment(id: String, page: Option[Int]) = Action.async { implicit request =>
+  def assignment(id: String, page: Option[Long]) = Action.async { implicit request =>
 
     val assignmentsPage = (owner: User) => {
-
-      def pageLinksFor(assignment: Assignment, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.assignment(assignment.id, Some(p)).url))
-      }
 
       for {
         assignment <- ugcService.assignment(id)
@@ -54,7 +46,8 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
       } yield {
         contributions.fold(NotFound(views.html.notFound())) { cs =>
-          Ok(views.html.assignment(assignment, cs.results, owner, signedIn.map(s => s._1), cs.numberFound, pageLinksFor(assignment, cs.numberFound)))
+          val nextPage = nextPageFor(cs.numberFound, page).map(p => PageLink(routes.AssignmentController.assignment(id, Some(p)).url))
+          Ok(views.html.assignment(assignment, cs.results, owner, signedIn.map(s => s._1), cs.numberFound, nextPage))
         }
       }
     }
@@ -62,13 +55,9 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
     withOwner(assignmentsPage)
   }
 
-  def gallery(id: String, page: Option[Int]) = Action.async { implicit request =>
+  def gallery(id: String, page: Option[Long]) = Action.async { implicit request =>
 
     val galleyPage = (owner: User) => {
-
-      def pageLinksFor(assignment: Assignment, totalNumber: Long): Seq[PageLink] = {
-        pagesNumbersFor(totalNumber).map(p => PageLink(p, routes.AssignmentController.gallery(assignment.id, Some(p)).url))
-      }
 
       for {
         assignment <- ugcService.assignment(id)
@@ -77,7 +66,8 @@ class AssignmentController @Inject()(val ugcService: UGCService, signedInUserSer
 
       } yield {
         contributions.fold(NotFound(views.html.notFound())) { cs =>
-          Ok(views.html.assignmentGallery(assignment, cs.results, owner, signedIn.map(s => s._1), pageLinksFor(assignment, cs.numberFound)))
+          val nextPage = nextPageFor(cs.numberFound, page).map(p => PageLink(routes.AssignmentController.gallery(id, Some(p)).url))
+          Ok(views.html.assignmentGallery(assignment, cs.results, owner, signedIn.map(s => s._1), nextPage))
         }
       }
     }

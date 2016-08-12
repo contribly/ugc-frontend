@@ -1,7 +1,7 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(assignment: Assignment, contributions: Seq[Contribution], owner: User, signedIn: Option[User], pages: Seq[PageLink])(implicit messages: Messages)
+@(assignment: Assignment, contributions: Seq[Contribution], owner: User, signedIn: Option[User], nextPage: Option[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,14 +22,16 @@
         <p>Ends: @ed.toDate.format("d MMM YYYY HH:mm")</p>
     }
 
-    @includes.pages(pages)
-
     <hr/>
 
-    @contributions.map{r =>
-        @includes.media(r, "medium", true)
-    }
+    <div id="posts">
+        @contributions.map{r =>
+            @includes.media(r, "medium", true)
+        }
+    </div>
 
-<hr/>
+    @includes.pagination(nextPage)
+
+    <hr/>
 </body>
 </html>

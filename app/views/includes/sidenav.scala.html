@@ -1,6 +1,0 @@
-@import model.Tag
-@(tags: Seq[Tag])
-
-@tags.map{t =>
-    <h4><a href="@routes.TagsController.tag(t.id, None)">@t.name</a></h4>
-}

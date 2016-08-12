@@ -1,5 +1,5 @@
-GET        /                        controllers.IndexController.index(page: Option[Int])
-GET        /gallery                 controllers.IndexController.gallery(page: Option[Int], mediaType: Option[String])
+GET        /                        controllers.IndexController.index(page: Option[Long])
+GET        /gallery                 controllers.IndexController.gallery(page: Option[Long], mediaType: Option[String])
 
 GET        /login/prompt            controllers.LoginController.prompt
 POST       /login/submit            controllers.LoginController.submit
@@ -23,16 +23,13 @@ POST       /submit                  controllers.SubmitController.submit
 
 GET        /profile                 controllers.UserController.profile
 
-GET        /assignments                     controllers.AssignmentController.assignments(page: Option[Int])
-GET        /assignments/:id                 controllers.AssignmentController.assignment(id: String, page: Option[Int])
-GET        /assignments/:id/gallery         controllers.AssignmentController.gallery(id: String, page: Option[Int])
+GET        /assignments                     controllers.AssignmentController.assignments
+GET        /assignments/:id                 controllers.AssignmentController.assignment(id: String, page: Option[Long])
+GET        /assignments/:id/gallery         controllers.AssignmentController.gallery(id: String, page: Option[Long])
 
 GET        /contributions/:id             controllers.ContributionController.contribution(id: String)
 POST       /contributions/:id/flag        controllers.ContributionController.flag(id: String)
 
-GET        /tags                    controllers.TagsController.tags
-GET        /tags/:id                controllers.TagsController.tag(id: String, page: Option[Int])
-
-GET        /users/:id               controllers.UserController.user(id: String, page: Option[Int])
+GET        /users/:id               controllers.UserController.user(id: String, page: Option[Long])
 
 GET        /assets/*file            controllers.Assets.at(path="/public", file)

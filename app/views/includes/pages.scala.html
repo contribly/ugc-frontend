@@ -1,9 +1,7 @@
 @import views.PageLink
 @(pages: Seq[PageLink])
-@if(pages.size > 1) {
-    <ul>
-       @pages.map{ p =>
-            <li><a href="@p.link">@p.page</a></li>
-        }
-    </ul>
+@pages.headOption.map{ p =>
+    <div id="pagination">
+        <a href="@p.link" class="next">next</a>
+    </div>
 }

@@ -1,3 +1,3 @@
 package views
 
-case class PageLink(page: Int, link: String)
+case class PageLink(link: String)

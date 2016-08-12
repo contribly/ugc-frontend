@@ -2,11 +2,16 @@ package controllers
 
 trait Pages {
 
-  val PageSize: Int = 40
+  val PageSize: Int = 20
 
-  def pagesNumbersFor(totalNumber: Long): Range = {
-    val i: Int = (totalNumber.toInt - 1) / PageSize
-    1 to (i + 1)
+  def nextPageFor(totalNumber: Long, currentPage: Option[Long]): Option[Long] = {
+    val nextPage = currentPage.getOrElse(1L) + 1
+    val nextIndex = nextPage * PageSize
+    if (nextIndex < totalNumber) {
+      Some(nextPage)
+    } else {
+      None
+    }
   }
-  
+
 }

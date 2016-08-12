@@ -1,7 +1,7 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(assignment: Assignment, contributions: Seq[Contribution], owner: User, signedIn: Option[User], totalContributions: Long, pages: Seq[PageLink])(implicit messages: Messages)
+@(assignment: Assignment, contributions: Seq[Contribution], owner: User, signedIn: Option[User], totalContributions: Long, nextPage: Option[PageLink])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,7 +32,6 @@
     }
 
     @if(totalContributions > 0) {
-        @includes.pages(pages)
         <p><a href="@routes.AssignmentController.gallery(assignment.id, None)">Gallery</a>
         @includes.contributions(contributions)
 
@@ -40,6 +39,8 @@
         <p>@Messages("assignment.no.contributions")</p>
     }
 
-<hr/>
+    @includes.pagination(nextPage)
+    <hr/>
+
 </body>
 </html>

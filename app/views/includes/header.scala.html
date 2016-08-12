@@ -1,11 +1,12 @@
 @import model.User
 @(owner: User, signedIn: Option[User])(implicit messages: Messages)
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
-
+<script src="@routes.Assets.at("js/jquery-3.1.0.min.js")"></script>
+<script src="@routes.Assets.at("js/jquery-ias.min.js")"></script>
 <h1><a href="@routes.IndexController.index(None)">@owner.displayName</a></h1>
 
 <ul>
-    <li><a href="@routes.AssignmentController.assignments(None)">@Messages("assignments")</a></li>
+    <li><a href="@routes.AssignmentController.assignments">@Messages("assignments")</a></li>
     <li><a href="@routes.IndexController.gallery(None, None)">@Messages("gallery")</a></li>
     <li><a href="@routes.SubmitController.prompt(None)">Submit</a></li>
 </ul>

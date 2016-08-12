@@ -1,7 +1,7 @@
 @import model.{Contribution, User}
 @import model.Assignment
 @import views.PageLink
-@(assignments: Seq[Assignment], owner: User, signedIn: Option[User], pages: Seq[PageLink], contributionCounts: Map[String, Long])(implicit messages: Messages)
+@(assignments: Seq[Assignment], owner: User, signedIn: Option[User], contributionCounts: Map[String, Long])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,8 +11,6 @@
 
     @includes.header(owner, signedIn)
     <hr/>
-
-    @includes.pages(pages)
 
     @if(assignments.nonEmpty) {
 

@@ -41,7 +41,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
     }
   }
 
-  def assignments(pageSize: Option[Int] = None, page: Option[Int] = None, open: Option[Boolean] = None): Future[AssignmentSearchResult] = {
+  def assignments(pageSize: Option[Int] = None, page: Option[Long] = None, open: Option[Boolean] = None): Future[AssignmentSearchResult] = {
     val params = Seq(
       pageSize.map(ps => "pageSize" -> ps),
       page.map(p => "page" -> p),
@@ -70,7 +70,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
   }
 
   def contributions(pageSize: Int,
-                    page: Option[Int] = None,
+                    page: Option[Long] = None,
                     tag: Option[String] = None,
                     assignment: Option[String] = None,
                     user: Option[String] = None,
