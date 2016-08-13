@@ -18,7 +18,7 @@ class UserController @Inject()(val ugcService: UGCService, signedInUserService: 
     val userPage = (owner: User) => {
       for {
         user <- ugcService.user(id)
-        contributions <- ugcService.contributions(pageSize = PageSize, page = Some(1), user = Some(id))
+        contributions <- ugcService.contributions(pageSize = PageSize, page = page, user = Some(id))
         signedIn <- signedInUserService.signedIn
 
       } yield {
