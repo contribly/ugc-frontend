@@ -1,6 +1,7 @@
 @import model.User
 @(owner: User, signedIn: Option[User])(implicit messages: Messages)
-<link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
+<link rel="stylesheet" href="@routes.Assets.at("css/styles.css")">
+<link rel="stylesheet" href="@routes.Assets.at("css/font-awesome-4.6.3/css/font-awesome.min.css")">
 <script src="@routes.Assets.at("js/jquery-3.1.0.min.js")"></script>
 <script src="@routes.Assets.at("js/jquery-ias.min.js")"></script>
 <h1><a href="@routes.IndexController.index(None)">@owner.displayName</a></h1>

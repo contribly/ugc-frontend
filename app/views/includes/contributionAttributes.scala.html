@@ -15,7 +15,7 @@
         |
         @p.name.map{ pn =>
             <span class="place" @p.latLong.map{ ll => data-latitude="@ll.latitude" data-longitude="@ll.longitude"} @p.osm.map{ osm => data-osm="@osm.osmId@osm.osmType"}>
-                @pn
+                <i class="fa fa-map-marker" aria-hidden="true"></i> @pn
             </span>
         }
     }

@@ -1,0 +1,17 @@
+.gallery-image {
+    float: left;
+    position:relative;
+    text-align:center;
+}
+
+.caption {
+    position: absolute;
+    margin: 0px;
+    bottom: 10px;
+    width: 100%;
+    color: white;
+}
+
+.caption .place{
+    font-size: 10pt;
+}
