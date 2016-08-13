@@ -23,12 +23,8 @@
     }
 
     <hr/>
-
-    <div id="posts">
-        @contributions.map{r =>
-            @includes.media(r, "medium", true)
-        }
-    </div>
+        @includes.galleryContributions(contributions)
+    <hr/>
 
     @includes.pagination(nextPage)
 

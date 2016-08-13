@@ -1,0 +1,26 @@
+@import model.Contribution
+@(contributions: Seq[Contribution])
+
+<div id="posts">
+    @contributions.map{ c =>
+    <div class="post gallery-image">
+        @includes.media(c, "medium", true)
+        <div class="caption">
+            <p>
+                @c.headline
+                @c.place.map { p =>
+                @p.name.map { pn =>
+                <br/><span class="place"><i class="fa fa-map-marker" aria-hidden="true"></i> @p.name</span>
+                }
+                }
+            </p>
+
+            @if(c.likes > 0) {
+            <p>
+                <i class="fa fa-heart" aria-hidden="true"></i> @c.likes
+            </p>
+            }
+        </div>
+    </div>
+    }
+</div>
