@@ -21,7 +21,14 @@
         @contributions.map{ c =>
             <div class="post gallery-image">
                 @includes.media(c, "medium", true)
-                <div class="caption">@c.headline@if(c.likes.size > 0){ - @c.likes.size}</div>
+                <div class="caption">
+                    @c.headline@if(c.likes.size > 0){ - @c.likes.size}
+                    @c.place.map { p =>
+                        @p.name.map { pn =>
+                            <br/><span class="place">@p.name</div>
+                        }
+                    }
+                </div>
             </div>
         }
     </div>
