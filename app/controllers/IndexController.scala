@@ -11,9 +11,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class IndexController @Inject()(val ugcService: UGCService, signedInUserService: SignedInUserService, val messagesApi: MessagesApi) extends Controller with Pages with WithOwner with I18nSupport {
 
-  def index(page: Option[Long]) = Action.async { implicit request =>
+  val MediaType = "mediaType"
 
-    val MediaType = "mediaType"
+  def index(page: Option[Long]) = Action.async { implicit request =>
 
     withOwner { owner =>
 
@@ -40,12 +40,14 @@ class IndexController @Inject()(val ugcService: UGCService, signedInUserService:
 
       for {
         contributions <- ugcService.contributions(pageSize = PageSize, page = page, mediaType = Some(mediaType.getOrElse(ImagesAndVideos)))
+        refinements <- ugcService.contributionRefinements(refinements = Seq(MediaType))
         signedIn <- signedInUserService.signedIn
 
       } yield {
         contributions.fold(NotFound(views.html.notFound())) { cs =>
           val nextPage = nextPageFor(cs.numberFound, page).map(p => PageLink(routes.IndexController.gallery(Some(p), mediaType).url))
-          Ok(views.html.gallery(cs.results, owner, signedIn.map(s => s._1), nextPage, cs.numberFound))
+          val mediaTypeCounts = refinements.flatMap( rs => rs.get(MediaType)).getOrElse(Map())
+          Ok(views.html.gallery(cs.results, owner, signedIn.map(s => s._1), nextPage, cs.numberFound, mediaTypeCounts))
         }
       }
     }
