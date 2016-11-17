@@ -21,6 +21,16 @@
     </p>
 }
 
+@signedIn.fold {
+    <p>You are not signed in.<br/>
+        You can submit your contribution anonymously. If you would like to be credited, please <a href="@routes.LoginController.prompt"> sign in</a> before contributing.
+    </p>
+}{ s =>
+    <p>You are signed in as @s.username.<br/>
+        Your contribution will be credited to you. If you would like to contribute anonymously, please <a href="@routes.LoginController.logout">sign out</a> before contributing.
+    </p>
+}
+
 @helper.form(action = routes.SubmitController.submit, 'enctype -> "multipart/form-data") {
     @helper.inputText(contributionForm("headline"))
     @helper.inputText(contributionForm("body"))

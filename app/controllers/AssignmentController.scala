@@ -2,9 +2,9 @@ package controllers
 
 import javax.inject.Inject
 
-import model.{Assignment, User}
+import model.User
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Controller, Request}
+import play.api.mvc.{Action, Controller}
 import services.ugc.UGCService
 import views.PageLink
 

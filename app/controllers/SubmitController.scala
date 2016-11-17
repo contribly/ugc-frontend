@@ -8,6 +8,8 @@ import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc._
 import services.ugc.UGCService
 
@@ -36,18 +38,13 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
         openAssignments <- ugcService.assignments(open = Some(true))
 
       } yield {
-        signedIn.fold {
-          Redirect(routes.LoginController.prompt())
+        val assignmentOptionsToShow = assignment.flatMap { sa =>
+          openAssignments.results.find(a => a.id == sa)
+        }.fold(openAssignments.results)(a => Seq(a))
 
-        } { s =>
-
-          val assignmentOptionsToShow = assignment.flatMap { sa =>
-            openAssignments.results.find(a => a.id == sa)
-          }.fold(openAssignments.results)(a => Seq(a))
-
-          Ok(views.html.submit(submitForm, owner, Some(s._1), assignmentOptionsToShow))
-        }
+        Ok(views.html.submit(submitForm, owner, signedIn.map(s => s._1), assignmentOptionsToShow))
       }
+
     }
   }
 
@@ -56,20 +53,31 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
 
       signedInUserService.signedIn(request).flatMap { signedIn =>
 
-        signedIn.fold {
-          Logger.info("A signed in user is required to submit in this example")
-          Future.successful(Redirect(routes.LoginController.prompt()))
+        val submissionAccessToken: Future[String] = signedIn.fold {
+          Logger.info("No user is signed in. Requesting an anonymous token to submit with")
+
+          ugcService.tokenAnonymous.map { te =>
+              te.fold({ l =>
+                Logger.error("Failed to obtain anonymous token: " + l)
+                throw new RuntimeException(l) // TODO push up to UI
+              },{ r =>
+                r
+            })
+          }
 
         } { s =>
+          Logger.info("Using signed in user's access token for submission")
+          Future.successful(s._2)
+        }
+
+        submissionAccessToken.flatMap { t =>
 
           ugcService.assignments(open = Some(true)).flatMap { oas =>
-
-            val signedInUsersApiAccessToken = s._2
 
             submitForm.bindFromRequest().fold(
               formWithErrors => {
                 Logger.info("Form failed to validate: " + formWithErrors)
-                Future.successful(Ok(views.html.submit(formWithErrors, owner, Some(s._1), oas.results)))
+                Future.successful(Ok(views.html.submit(formWithErrors, owner, signedIn.map(s => s._1), oas.results)))
               },
 
               submissionDetails => {
@@ -77,11 +85,11 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
                 Logger.info("Successfully validated submission details: " + submissionDetails)
 
                 // If there was a media file on the form submission then we will need to upload it to the media end point before referencing it in our submission
-                val mediaFileSeenOnFormSubmission = request.body.file("media")
+                val mediaFileSeenOnFormSubmission: Option[FilePart[TemporaryFile]] = request.body.file("media")
 
                 val eventualMedia = mediaFileSeenOnFormSubmission.map { mf =>
-                  Logger.info("Uploadinf media file on request to the API media end point: " + mf)
-                  ugcService.submitMedia(mf.ref.file, signedInUsersApiAccessToken) // The media element is submitted using the signed in user's access token; this ensues the correct ownership
+                  Logger.info("Uploading media file on request to the API media end point: " + mf)
+                  ugcService.submitMedia(mf.ref.file, t) // The media element is submitted using the same access token as the contribtution; this ensures the correct ownership
                 }.getOrElse(Future.successful(None))
 
                 eventualMedia.flatMap { media =>
@@ -108,7 +116,7 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
                     submissionDetails.assignment.flatMap(sa => oas.results.find(a => a.id == sa))
                   )
 
-                  ugcService.submit(contributionSubmission, signedInUsersApiAccessToken).map { or =>
+                  ugcService.submit(contributionSubmission, t).map { or =>
                     Logger.info("Contribution submission result: " + or)
 
                     or.fold({
@@ -116,15 +124,19 @@ class SubmitController @Inject() (val ugcService: UGCService, signedInUserServic
                       Redirect(routes.IndexController.index(None))
                     }
                     ) { r =>
-                      Logger.info("Contribution was successful; redirecting to contribution page")
-                      // This unmoderated contribution is only visible to the end user. The contribution page will make an authenticiated call to the API
-                      Redirect(routes.ContributionController.contribution(r.id))
+                      Logger.info("Contribution was successful")
+                      signedIn.fold {
+                        // Anonymous users should not be allowed to preview their unmoderated content.
+                        Redirect(routes.IndexController.index(None))
+                      } { _ =>
+                        // This unmoderated contribution is only visible to the end user. The contribution page will make an authenticiated call to the API
+                        Redirect(routes.ContributionController.contribution(r.id))
+                      }
                     }
                   }
                 }
               }
             )
-
           }
         }
       }

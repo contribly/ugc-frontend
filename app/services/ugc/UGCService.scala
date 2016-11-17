@@ -23,6 +23,7 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
   val clientSecret = configuration.getString("ugc.client.secret").get
 
   val applicationJsonHeader = "Content-Type" -> "application/json"
+  val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
   val assignmentsUrl = apiUrl + "/assignments"
   val contributionsUrl = apiUrl + "/contributions"
@@ -213,7 +214,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   def token(username: String, password: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for: " + Seq(username, password, clientId).mkString(", "))
-    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val params = Map(
       "grant_type" -> Seq("password"),
@@ -237,7 +237,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   def tokenGoogle(googleToken: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for Google access token: " + googleToken)
-    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val params = Map(
       "grant_type" -> Seq("google"),
@@ -260,7 +259,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   def tokenFacebook(facebookAccessToken: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for facebook access token: " + facebookAccessToken)
-    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val params = Map(
       "grant_type" -> Seq("facebook"),
@@ -283,7 +281,6 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
 
   def tokenTwitter(token: String, secret: String): Future[Either[String, String]] = {
     Logger.info("Requesting token for Twitter access token: " + token)
-    val formUrlEncodedContentTypeHeader = "Content-Type" -> "application/x-www-form-urlencoded"
 
     val params = Map(
       "grant_type" -> Seq("twitter"),
@@ -303,6 +300,27 @@ class UGCService @Inject() (configuration: Configuration, ws: WSClient) {
           Left(r.body)
         }
       }
+  }
+
+
+  def tokenAnonymous(): Future[Either[String, String]] = {
+    Logger.info("Requesting anonymous token")
+    val params = Map(
+      "grant_type" -> Seq("anonymous")
+    )
+
+    ws.url(tokenUrl).
+      withHeaders(clientAuthHeader, formUrlEncodedContentTypeHeader).
+      post(params).map{ r =>
+      if (r.status == Ok) {
+        val expectedTokenOnResponse = (Json.parse(r.body) \ "access_token").asOpt[String]
+        Either.cond(expectedTokenOnResponse.nonEmpty, expectedTokenOnResponse.get, "No token seen on sign in response")
+
+      } else {
+        Logger.info("Anonymouse token request failed: " + r.status + " / " + r.body)
+        Left(r.body)
+      }
+    }
   }
 
   def user(id: String): Future[Option[User]] = {
